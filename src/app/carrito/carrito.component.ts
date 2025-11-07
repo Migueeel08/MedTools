@@ -51,7 +51,7 @@ export class CarritoComponent implements OnInit {
   userImage: string = 'assets/img/user-icon.png';
   userMenuOpen: boolean = false;
 
-  // ===== MODAL DE CHECKOUT ===== ✅ NUEVO
+  // ===== MODAL DE CHECKOUT =====
   modalCheckoutVisible: boolean = false;
   direcciones: any[] = [];
   metodosPago: any[] = [];
@@ -201,7 +201,7 @@ export class CarritoComponent implements OnInit {
     });
   }
 
-  // ===== PROCEDER AL PAGO ===== ✅ ABRE MODAL
+  // ===== PROCEDER AL PAGO =====
   procederAlPago(): void {
     // Verificar que hay items disponibles
     const itemsDisponibles = this.carrito?.items.filter(item => item.producto_disponible);
@@ -216,7 +216,7 @@ export class CarritoComponent implements OnInit {
     this.cargarMetodosPagoUsuario();
   }
 
-  // ===== CARGAR DIRECCIONES DEL USUARIO ===== ✅ NUEVO
+  // ===== CARGAR DIRECCIONES DEL USUARIO =====
   cargarDireccionesUsuario(): void {
     console.log('🔍 Cargando direcciones para usuario:', this.userId);
     
@@ -236,7 +236,7 @@ export class CarritoComponent implements OnInit {
     });
   }
 
-  // ===== CARGAR MÉTODOS DE PAGO DEL USUARIO ===== ✅ NUEVO
+  // ===== CARGAR MÉTODOS DE PAGO DEL USUARIO =====
   cargarMetodosPagoUsuario(): void {
     console.log('🔍 Cargando métodos de pago para usuario:', this.userId);
     
@@ -256,24 +256,24 @@ export class CarritoComponent implements OnInit {
     });
   }
 
-  // ===== CERRAR MODAL ===== ✅ NUEVO
+  // ===== CERRAR MODAL =====
   cerrarModalCheckout(): void {
     this.modalCheckoutVisible = false;
     this.direccionSeleccionada = null;
     this.metodoPagoSeleccionado = null;
   }
 
-  // ===== SELECCIONAR DIRECCIÓN ===== ✅ NUEVO
+  // ===== SELECCIONAR DIRECCIÓN =====
   seleccionarDireccion(direccion: any): void {
     this.direccionSeleccionada = direccion;
   }
 
-  // ===== SELECCIONAR MÉTODO DE PAGO ===== ✅ NUEVO
+  // ===== SELECCIONAR MÉTODO DE PAGO =====
   seleccionarMetodoPago(metodo: any): void {
     this.metodoPagoSeleccionado = metodo;
   }
 
-  // ===== DETECTAR MARCA DE TARJETA ===== ✅ NUEVO
+  // ===== DETECTAR MARCA DE TARJETA =====
   detectarMarcaTarjeta(banco: string): string {
     if (!banco) return 'generic';
     
@@ -301,7 +301,7 @@ export class CarritoComponent implements OnInit {
     return 'generic';
   }
 
-  // ===== OBTENER LOGO DE TARJETA ===== ✅ NUEVO
+  // ===== OBTENER LOGO DE TARJETA =====
   obtenerLogoTarjeta(metodo: any): string {
     let marca = 'generic';
 
@@ -324,7 +324,7 @@ export class CarritoComponent implements OnInit {
     return logos[marca] || logos['generic'];
   }
 
-  // ===== OBTENER NOMBRE DE MARCA ===== ✅ NUEVO
+  // ===== OBTENER NOMBRE DE MARCA =====
   obtenerNombreMarca(metodo: any): string {
     if (!metodo.banco) return 'Tarjeta';
     
@@ -345,12 +345,12 @@ export class CarritoComponent implements OnInit {
     return nombres[marca] || metodo.banco;
   }
 
-  // ===== CALCULAR TOTAL ===== ✅ NUEVO
+  // ===== CALCULAR TOTAL =====
   calcularTotal(): number {
     return this.carrito?.subtotal || 0;
   }
 
-  // ===== CONFIRMAR COMPRA ===== ✅ NUEVO
+  // ===== CONFIRMAR COMPRA =====
   confirmarCompra(): void {
     if (!this.direccionSeleccionada) {
       alert('Debes seleccionar una dirección de envío');
@@ -435,11 +435,6 @@ export class CarritoComponent implements OnInit {
   irPerfil(): void {
     this.userMenuOpen = false;
     this.router.navigate(['/perfil']);
-  }
-
-  irVender(): void {
-    this.userMenuOpen = false;
-    this.router.navigate(['/vender']);
   }
 
   irConfiguracion(): void {

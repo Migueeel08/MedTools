@@ -22,22 +22,16 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #000;
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
   padding: 0 2rem;
   z-index: 1000;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+  box-shadow: 0 4px 15px rgba(30, 60, 114, 0.4);
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.logo:hover {
-  transform: scale(1.05);
+  gap: 12px;
 }
 
 .logo-text {
@@ -48,24 +42,39 @@ body {
   letter-spacing: 2px;
 }
 
-.header i,
-.header .fas {
+.header i {
   color: rgb(255, 255, 255);
   font-size: 1.5rem;
 }
 
-.header-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: white;
-  font-size: 1.3rem;
-  font-weight: 600;
+.search-box {
+  position: relative;
+  width: 350px;
 }
 
-.header-title i {
-  color: #a68efc;
+.search-box input {
+  width: 100%;
+  padding: 10px 40px 10px 15px;
+  border-radius: 25px;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
 }
+
+.search-box input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.search-box i {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ffffff;
+}
+
 
 /* Usuario */
 .auth-links {

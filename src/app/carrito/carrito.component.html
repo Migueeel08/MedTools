@@ -1,9 +1,9 @@
 <div class="carrito-container">
-  <!-- HEADER (mismo de FocoShop) -->
+  <!-- HEADER (mismo de MedTools) -->
   <header class="header">
     <div class="logo" (click)="volverInicio()">
-      <span class="logo-text">FOCOSHOP</span>
-      <i class="fas fa-shopping-cart"></i>
+      <span class="logo-text">MEDTOOLS</span>
+      <i class="fas fa-heartbeat"></i>
     </div>
 
     <div class="header-title">
@@ -22,10 +22,6 @@
 
             <button (click)="irPerfil()">
               <i class="fas fa-user"></i> Mi perfil
-            </button>
-
-            <button (click)="irVender()">
-              <i class="fas fa-tag"></i> Vender
             </button>
 
             <button (click)="irConfiguracion()">
@@ -241,7 +237,7 @@
           <i class="fas fa-shopping-cart"></i>
         </div>
         <h2>Tu carrito está vacío</h2>
-        <p>¡Descubre miles de productos y comienza a agregar!</p>
+        <p>¡Descubre miles de productos médicos y comienza a agregar!</p>
         <button class="btn-explorar" (click)="continuarComprando()">
           <i class="fas fa-search"></i>
           Explorar productos
@@ -250,7 +246,7 @@
     }
   </div>
 
-  <!-- ===== MODAL DE CHECKOUT ===== ✅ NUEVO -->
+  <!-- ===== MODAL DE CHECKOUT ===== -->
   @if (modalCheckoutVisible) {
     <div class="modal-overlay" (click)="cerrarModalCheckout()">
       <div class="modal-checkout" (click)="$event.stopPropagation()">
