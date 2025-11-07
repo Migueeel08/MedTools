@@ -3,13 +3,13 @@
   <header class="header">
     <div class="logo">
       <span class="logo-text">MEDTOOLS</span>
-      <i class="fa fa-shopping-cart"></i>
+      <i class="fa fa-heartbeat"></i>
     </div>
 
     <div class="search-box">
       <input
         type="text"
-        placeholder="Buscar productos..."
+        placeholder="Buscar productos médicos..."
         [(ngModel)]="busqueda"
         (ngModelChange)="onBusquedaChange()"
       />
@@ -18,6 +18,16 @@
 
     <!-- LINKS DE AUTENTICACIÓN Y CARRITO -->
     <div class="auth-links">
+      <!-- ÍCONO DE FAVORITOS (solo si está logueado) -->
+      @if (isLoggedIn) {
+        <div class="favoritos-header" (click)="irFavoritos()">
+          <i class="fa fa-heart"></i>
+          @if (contadorFavoritos > 0) {
+            <span class="favoritos-badge">{{ contadorFavoritos }}</span>
+          }
+        </div>
+      }
+
       <!-- ÍCONO DEL CARRITO (solo si está logueado) -->
       @if (isLoggedIn) {
         <div class="carrito-header" (click)="irAlCarrito()">
@@ -40,10 +50,6 @@
               <i class="fa fa-user"></i> Mi perfil
             </button>
 
-            <button (click)="irVender()">
-              <i class="fa fa-tag"></i> Vender
-            </button>
-
             <button (click)="irConfiguracion()">
               <i class="fa fa-cog"></i> Configuración
             </button>
@@ -61,62 +67,6 @@
     </div>
   </header>
 
-  <!-- OVERLAY OSCURO -->
-  <div class="menu-overlay" [class.active]="menuAbierto" (click)="toggleMenu()"></div>
-
-  <!-- MENÚ LATERAL -->
-  <aside class="menu-categorias" [class.open]="menuAbierto">
-    <div class="menu-header">
-      <div class="menu-titulo">
-        <i class="fa fa-th-large"></i>
-        <h3>Categorías</h3>
-      </div>
-      <button class="btn-cerrar-menu" (click)="toggleMenu()">
-        <i class="fa fa-times"></i>
-      </button>
-    </div>
-
-    <ul class="categorias-list">
-      @for (cat of categorias; track cat.nombre; let i = $index) {
-        <li class="categoria-item" [class.active]="i === categoriaSeleccionada">
-          <div class="categoria-principal" (click)="seleccionarCategoria(i)">
-            <div class="categoria-info">
-              <i class="fa fa-folder"></i>
-              <span>{{ cat.nombre }}</span>
-            </div>
-            @if (cat.subcategorias?.length) {
-              <i class="fa fa-chevron-right arrow-icon" [class.rotate]="i === categoriaSeleccionada"></i>
-            }
-          </div>
-
-          @if (cat.subcategorias?.length && i === categoriaSeleccionada) {
-            <ul class="subcategorias">
-              @for (sub of cat.subcategorias; track sub) {
-                <li class="subcategoria-item" (click)="seleccionarSubcategoria(sub)">
-                  <i class="fa fa-angle-right"></i>
-                  {{ sub }}
-                </li>
-              }
-            </ul>
-          }
-        </li>
-      }
-    </ul>
-
-    <div class="menu-footer">
-      <button class="btn-ver-todas" (click)="toggleMenu()">
-        <i class="fa fa-grip-horizontal"></i>
-        Ver todas las categorías
-      </button>
-    </div>
-  </aside>
-
-  <!-- BOTÓN DE MENÚ DE CATEGORÍAS -->
-  <button class="btn-menu-categorias" (click)="toggleMenu()">
-    <i class="fa fa-bars"></i> 
-    <span>CATEGORÍAS</span>
-  </button>
-
   <!-- CARRUSEL DE CATEGORÍAS -->
   <div class="carrusel-container">
     <button (click)="anterior()" class="arrow-btn left">
@@ -126,8 +76,13 @@
     <div class="categoria-grid" #categoriaGrid>
       @for (cat of categorias; track cat.nombre; let i = $index) {
         <div class="categoria-card" [class.active]="i === categoriaSeleccionada" (click)="seleccionarCategoria(i)">
-          <img [src]="cat.imagen" [alt]="cat.nombre" />
-          <p>{{ cat.nombre }}</p>
+          <div class="categoria-icon-wrapper">
+            <i [class]="getIconoCategoria(cat.nombre)"></i>
+          </div>
+          <p class="categoria-nombre">{{ cat.nombre }}</p>
+          @if (cat.subcategorias?.length > 0) {
+            <span class="categoria-count">{{ cat.subcategorias.length }} items</span>
+          }
         </div>
       }
     </div>
@@ -137,7 +92,7 @@
     </button>
   </div>
 
-  <!-- SUBCATEGORÍAS -->
+  <!-- SUBCATEGORÍAS (SE DESPLIEGA CUANDO SE SELECCIONA UNA CATEGORÍA) -->
   @if (categorias[categoriaSeleccionada]?.subcategorias?.length) {
     <div class="subcategorias-container">
       <h3 class="subcategorias-titulo">
@@ -145,6 +100,14 @@
         Subcategorías de {{ categorias[categoriaSeleccionada].nombre }}
       </h3>
       <div class="subcategorias-grid">
+        <button 
+          class="subcategoria-btn todas"
+          [class.active]="!subcategoriaSeleccionada"
+          (click)="seleccionarSubcategoria(null)"
+        >
+          <i class="fa fa-th"></i>
+          Ver todas
+        </button>
         @for (sub of categorias[categoriaSeleccionada].subcategorias; track sub) {
           <button 
             class="subcategoria-btn"
@@ -155,14 +118,6 @@
             {{ sub }}
           </button>
         }
-        <button 
-          class="subcategoria-btn todas"
-          [class.active]="!subcategoriaSeleccionada"
-          (click)="seleccionarSubcategoria(null)"
-        >
-          <i class="fa fa-th"></i>
-          Ver todas
-        </button>
       </div>
     </div>
   }
@@ -215,10 +170,27 @@
       <div class="filtro-seccion">
         <h4 class="filtro-subtitulo">Precio</h4>
         <div class="precio-inputs">
-          <input type="number" placeholder="Mínimo" [(ngModel)]="filtros.precioMin" (change)="aplicarFiltros()" />
+          <input 
+            type="number" 
+            placeholder="Mínimo" 
+            [(ngModel)]="filtros.precioMin" 
+            (ngModelChange)="validarPrecioMinimo()" 
+            min="0" 
+            step="100"
+          />
           <span>-</span>
-          <input type="number" placeholder="Máximo" [(ngModel)]="filtros.precioMax" (change)="aplicarFiltros()" />
+          <input 
+            type="number" 
+            placeholder="Máximo" 
+            [(ngModel)]="filtros.precioMax" 
+            (ngModelChange)="validarPrecioMaximo()" 
+            min="0" 
+            step="100"
+          />
         </div>
+        @if (errorPrecio) {
+          <p class="error-precio">{{ errorPrecio }}</p>
+        }
       </div>
 
       @if (marcasDisponibles.length > 0) {
