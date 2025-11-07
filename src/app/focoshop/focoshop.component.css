@@ -1085,3 +1085,22 @@ body {
     font-size: 28px;
   }
 }
+/* Centrar el icono de usuario */
+.user-icon {
+  font-size: 22px;
+  color: #ffcc00;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: #222;
+  transition: 0.3s ease;
+  cursor: pointer;
+}
+
+.user-icon:hover {
+  background-color: #ffcc00;
+  color: #111;
+}

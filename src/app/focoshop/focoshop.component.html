@@ -41,7 +41,8 @@
       <!-- USUARIO -->
       @if (isLoggedIn) {
         <div class="user-info" (click)="toggleUserMenu()">
-          <img [src]="userImage" alt="Perfil" class="user-icon" />
+          <!-- 🔹 Aquí se reemplazó la imagen por el ícono de usuario -->
+          <i class="fa fa-user user-icon"></i>
 
           <div class="user-menu" [class.open]="userMenuOpen">
             <div class="user-name-header">{{ userName }}</div>
