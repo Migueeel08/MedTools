@@ -1,0 +1,297 @@
+<div class="admin-productos-container">
+  
+  <!-- ===== HEADER ===== -->
+  <div class="admin-header">
+    <div class="header-left">
+      <button class="btn-volver" (click)="volverPanel()">
+        <i class="fas fa-arrow-left"></i> Volver al Panel
+      </button>
+      <div class="header-title">
+        <h1><i class="fas fa-boxes"></i> Gestión de Productos</h1>
+        <p>Administra el catálogo de productos de FocoShop</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BREADCRUMB ===== -->
+  <div class="breadcrumb">
+    <span (click)="volverPanel()">Admin</span>
+    <i class="fas fa-chevron-right"></i>
+    <span class="active">Productos</span>
+  </div>
+
+  <!-- ===== ESTADÍSTICAS ===== -->
+  <div class="stats-row">
+    <div class="stat-mini total">
+      <i class="fas fa-box"></i>
+      <div>
+        <h3>{{ stats.total }}</h3>
+        <p>Total Productos</p>
+      </div>
+    </div>
+    
+    <div class="stat-mini activos">
+      <i class="fas fa-check-circle"></i>
+      <div>
+        <h3>{{ stats.activos }}</h3>
+        <p>Activos</p>
+      </div>
+    </div>
+    
+    <div class="stat-mini inactivos">
+      <i class="fas fa-times-circle"></i>
+      <div>
+        <h3>{{ stats.inactivos }}</h3>
+        <p>Inactivos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FILTROS Y BÚSQUEDA ===== -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="busqueda"
+        (input)="filtrarProductos()"
+        placeholder="Buscar por nombre o descripción..."
+      />
+      @if (busqueda) {
+        <button class="btn-clear" (click)="busqueda = ''; filtrarProductos()">
+          <i class="fas fa-times"></i>
+        </button>
+      }
+    </div>
+
+    <select [(ngModel)]="categoriaFiltro" (change)="filtrarProductos()" class="filter-select">
+      <option value="">Todas las categorías</option>
+      @for (categoria of categorias; track categoria.id_categoria) {
+        <option [value]="categoria.id_categoria">{{ categoria.nombre }}</option>
+      }
+    </select>
+
+    <select [(ngModel)]="estadoFiltro" (change)="filtrarProductos()" class="filter-select">
+      <option value="">Todos los estados</option>
+      <option value="activo">Activos</option>
+      <option value="inactivo">Inactivos</option>
+    </select>
+
+    <button class="btn-clear-filters" (click)="limpiarFiltros()" title="Limpiar filtros">
+      <i class="fas fa-filter-circle-xmark"></i>
+    </button>
+
+    <button class="btn-refresh" (click)="cargarProductos()" title="Recargar">
+      <i class="fas fa-sync-alt"></i>
+    </button>
+  </div>
+
+  <!-- ===== TABLA DE PRODUCTOS ===== -->
+  <div class="table-container">
+    @if (cargando) {
+      <div class="loading">
+        <i class="fas fa-spinner fa-spin fa-3x"></i>
+        <p>Cargando productos...</p>
+      </div>
+    } @else if (productosFiltrados.length === 0) {
+      <div class="empty-state">
+        <i class="fas fa-box-open fa-3x"></i>
+        <h3>No se encontraron productos</h3>
+        <p>Intenta con otros filtros o términos de búsqueda</p>
+      </div>
+    } @else {
+      <table class="productos-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (producto of productosFiltrados; track producto.id_producto) {
+            <tr>
+              <td>{{ producto.id_producto }}</td>
+              <td class="producto-col">
+                <div class="producto-info">
+                  <img 
+                    [src]="producto.imagen" 
+                    alt="{{ producto.nombre }}"
+                    class="producto-img"
+                  />
+                  <div>
+                    <strong>{{ producto.nombre }}</strong>
+                    <p class="producto-desc">{{ producto.descripcion || 'Sin descripción' }}</p>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge-categoria">
+                  {{ getNombreCategoria(producto.id_categoria) }}
+                </span>
+              </td>
+              <td class="precio-col">${{ producto.precio | number:'1.2-2' }}</td>
+              <td>
+                <span 
+                  class="badge-stock"
+                  [class.stock-bajo]="producto.stock < 10"
+                  [class.stock-medio]="producto.stock >= 10 && producto.stock < 50"
+                  [class.stock-alto]="producto.stock >= 50"
+                >
+                  {{ producto.stock }} unidades
+                </span>
+              </td>
+              <td>
+                <span 
+                  class="badge-estado" 
+                  [class.estado-activo]="producto.estado === 'activo'"
+                  [class.estado-inactivo]="producto.estado === 'inactivo'"
+                >
+                  <i [class]="producto.estado === 'activo' ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
+                  {{ producto.estado === 'activo' ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td class="acciones-col">
+                <button 
+                  class="btn-accion ver" 
+                  (click)="verDetalles(producto)"
+                  title="Ver detalles"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+                
+                <button 
+                  class="btn-accion estado" 
+                  (click)="cambiarEstado(producto)"
+                  [title]="producto.estado === 'activo' ? 'Desactivar' : 'Activar'"
+                >
+                  <i [class]="producto.estado === 'activo' ? 'fas fa-toggle-on' : 'fas fa-toggle-off'"></i>
+                </button>
+                
+                <button 
+                  class="btn-accion eliminar" 
+                  (click)="eliminarProducto(producto)"
+                  title="Eliminar producto"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      
+      <div class="table-footer">
+        <p>Mostrando {{ productosFiltrados.length }} de {{ productos.length }} productos</p>
+      </div>
+    }
+  </div>
+
+  <!-- ===== MODAL DE DETALLES ===== -->
+  @if (modalVisible && productoSeleccionado) {
+    <div class="modal-overlay" (click)="cerrarModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2><i class="fas fa-box-open"></i> Detalles del Producto</h2>
+          <button class="btn-close-modal" (click)="cerrarModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="detail-section">
+            <div class="producto-imagen-grande">
+              <img 
+                [src]="productoSeleccionado.imagen" 
+                [alt]="productoSeleccionado.nombre"
+              />
+            </div>
+
+            <div class="detail-grid">
+              <div class="detail-item full-width">
+                <label><i class="fas fa-tag"></i> Nombre</label>
+                <p class="producto-nombre">{{ productoSeleccionado.nombre }}</p>
+              </div>
+
+              <div class="detail-item full-width">
+                <label><i class="fas fa-align-left"></i> Descripción</label>
+                <p>{{ productoSeleccionado.descripcion || 'Sin descripción' }}</p>
+              </div>
+
+              <div class="detail-item">
+                <label><i class="fas fa-id-badge"></i> ID</label>
+                <p>{{ productoSeleccionado.id_producto }}</p>
+              </div>
+
+              <div class="detail-item">
+                <label><i class="fas fa-list"></i> Categoría</label>
+                <p>{{ getNombreCategoria(productoSeleccionado.id_categoria) }}</p>
+              </div>
+
+              <div class="detail-item">
+                <label><i class="fas fa-dollar-sign"></i> Precio</label>
+                <p class="precio-grande">${{ productoSeleccionado.precio | number:'1.2-2' }}</p>
+              </div>
+
+              <div class="detail-item">
+                <label><i class="fas fa-boxes"></i> Stock</label>
+                <p>
+                  <span 
+                    class="badge-stock"
+                    [class.stock-bajo]="productoSeleccionado.stock < 10"
+                    [class.stock-medio]="productoSeleccionado.stock >= 10 && productoSeleccionado.stock < 50"
+                    [class.stock-alto]="productoSeleccionado.stock >= 50"
+                  >
+                    {{ productoSeleccionado.stock }} unidades
+                  </span>
+                </p>
+              </div>
+
+              <div class="detail-item">
+                <label><i class="fas fa-toggle-on"></i> Estado</label>
+                <p>
+                  <span 
+                    class="badge-estado" 
+                    [class.estado-activo]="productoSeleccionado.estado === 'activo'"
+                    [class.estado-inactivo]="productoSeleccionado.estado === 'inactivo'"
+                  >
+                    {{ productoSeleccionado.estado === 'activo' ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </p>
+              </div>
+
+              <div class="detail-item">
+                <label><i class="fas fa-user"></i> Vendedor ID</label>
+                <p>{{ productoSeleccionado.id_usuario }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-modal btn-secondary" (click)="cerrarModal()">
+            <i class="fas fa-times"></i> Cerrar
+          </button>
+          <button 
+            class="btn-modal btn-warning" 
+            (click)="cambiarEstado(productoSeleccionado); cerrarModal()"
+          >
+            <i class="fas fa-toggle-on"></i> 
+            {{ productoSeleccionado.estado === 'activo' ? 'Desactivar' : 'Activar' }}
+          </button>
+          <button 
+            class="btn-modal btn-danger" 
+            (click)="eliminarProducto(productoSeleccionado); cerrarModal()"
+          >
+            <i class="fas fa-trash"></i> Eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

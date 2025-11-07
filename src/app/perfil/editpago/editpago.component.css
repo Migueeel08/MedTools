@@ -1,0 +1,623 @@
+/* ==================== CONTAINER PRINCIPAL ==================== */
+.edit-pago-container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 0;
+}
+
+/* ==================== HEADER NEGRO FOCOSHOP ==================== */
+.edit-header {
+  background: #000;
+  padding: 20px 40px;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  text-transform: uppercase;
+}
+
+.logo-text {
+  letter-spacing: 2px;
+}
+
+.logo i {
+  font-size: 28px;
+}
+
+.btn-volver-header {
+  background: #8b5cf6;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-volver-header:hover {
+  background: #7c3aed;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+/* ==================== CONTENIDO PRINCIPAL ==================== */
+.edit-content {
+  max-width: 1200px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+.form-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  animation: slideUp 0.5s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-header {
+  background: white;
+  color: #333;
+  padding: 40px 40px 20px;
+  text-align: center;
+  border-bottom: none;
+}
+
+.form-header i {
+  font-size: 48px;
+  margin-bottom: 10px;
+  display: block;
+  color: #8b5cf6;
+}
+
+.form-header h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.pago-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  padding: 40px;
+}
+
+/* ==================== TARJETA 3D ==================== */
+.tarjeta-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.tarjeta-container {
+  perspective: 1000px;
+  width: 100%;
+  height: 240px;
+  position: relative;
+}
+
+.tarjeta-front,
+.tarjeta-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  transition: transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1);
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  color: white;
+}
+
+.tarjeta-front {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transform: rotateY(0deg);
+}
+
+.tarjeta-back {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transform: rotateY(180deg);
+}
+
+.tarjeta-container.flipped .tarjeta-front {
+  transform: rotateY(-180deg);
+}
+
+.tarjeta-container.flipped .tarjeta-back {
+  transform: rotateY(0deg);
+}
+
+/* Chip de la tarjeta */
+.tarjeta-chip {
+  width: 50px;
+  height: 40px;
+}
+
+.tarjeta-chip svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Número de tarjeta */
+.tarjeta-numero {
+  font-size: 24px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  font-family: 'Courier New', monospace;
+}
+
+/* Info de la tarjeta */
+.tarjeta-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.tarjeta-titular,
+.tarjeta-expiracion {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tarjeta-info label {
+  font-size: 10px;
+  text-transform: uppercase;
+  opacity: 0.8;
+  letter-spacing: 1px;
+}
+
+.tarjeta-info .valor {
+  font-size: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Logo de la tarjeta */
+.tarjeta-logo {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  width: 60px;
+  height: 40px;
+}
+
+.tarjeta-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Nombre del banco */
+.tarjeta-banco {
+  position: absolute;
+  bottom: 80px;
+  right: 25px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: 0.9;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Reverso de la tarjeta */
+.tarjeta-banda {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background: #000;
+}
+
+.tarjeta-cvv-container {
+  position: absolute;
+  top: 110px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tarjeta-cvv-container label {
+  font-size: 10px;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.tarjeta-cvv {
+  background: white;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-family: 'Courier New', monospace;
+  font-size: 18px;
+  font-weight: bold;
+  letter-spacing: 3px;
+  text-align: center;
+  min-width: 60px;
+}
+
+/* Información de seguridad */
+.seguridad-info {
+  background: #f0fdf4;
+  border: 2px solid #86efac;
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #166534;
+}
+
+.seguridad-info i {
+  font-size: 24px;
+  color: #22c55e;
+}
+
+.seguridad-info p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ==================== FORMULARIO ==================== */
+.pago-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.form-group label i {
+  color: #8b5cf6;
+  font-size: 14px;
+}
+
+.required {
+  color: #ef4444;
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+.input-field {
+  padding: 14px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  color: #1a1a1a;
+  background: white;
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+}
+
+.input-field::placeholder {
+  color: #9ca3af;
+}
+
+.helper-text {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.helper-text.success {
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Fecha de expiración */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.fecha-expiracion {
+  display: flex;
+  gap: 10px;
+}
+
+.fecha-expiracion select {
+  flex: 1;
+}
+
+/* Info de seguridad adicional */
+.info-seguridad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  padding: 20px;
+  background: #f9fafb;
+  border-radius: 12px;
+  margin-top: 10px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.info-item i {
+  font-size: 24px;
+  color: #8b5cf6;
+}
+
+.info-item div {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-item strong {
+  display: block;
+  font-size: 12px;
+  color: #1a1a1a;
+  margin-bottom: 2px;
+}
+
+.info-item p {
+  margin: 0;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+/* ==================== BOTONES ==================== */
+.form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.btn-cancelar,
+.btn-guardar {
+  flex: 1;
+  padding: 16px 30px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.btn-cancelar {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.btn-cancelar:hover {
+  background: #e5e7eb;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-guardar {
+  background: #8b5cf6;
+  color: white;
+}
+
+.btn-guardar:hover {
+  background: #7c3aed;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.4);
+}
+
+.btn-guardar:active,
+.btn-cancelar:active {
+  transform: translateY(0);
+}
+
+/* ==================== ALERTA DE ÉXITO ==================== */
+.alerta-exitosa {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  z-index: 1000;
+  animation: slideInRight 0.5s ease;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.alerta-contenido {
+  background: #8b5cf6;
+  color: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  min-width: 300px;
+}
+
+.alerta-contenido i {
+  font-size: 28px;
+}
+
+.alerta-contenido p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .pago-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .tarjeta-container {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .edit-header {
+    padding: 15px 20px;
+  }
+
+  .logo {
+    font-size: 20px;
+  }
+
+  .logo i {
+    font-size: 24px;
+  }
+
+  .btn-volver-header {
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+
+  .edit-content {
+    margin: 30px auto;
+    padding: 0 15px;
+  }
+
+  .form-header {
+    padding: 30px 25px 15px;
+  }
+
+  .form-header h2 {
+    font-size: 24px;
+  }
+
+  .pago-content {
+    padding: 30px 20px;
+    gap: 30px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .info-seguridad {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .tarjeta-numero {
+    font-size: 20px;
+    letter-spacing: 2px;
+  }
+
+  .alerta-exitosa {
+    right: 15px;
+    left: 15px;
+  }
+
+  .alerta-contenido {
+    min-width: auto;
+    padding: 16px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text {
+    font-size: 18px;
+  }
+
+  .form-header i {
+    font-size: 40px;
+  }
+
+  .form-header h2 {
+    font-size: 20px;
+  }
+
+  .tarjeta-container {
+    height: 220px;
+  }
+
+  .tarjeta-numero {
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+
+  .fecha-expiracion {
+    flex-direction: column;
+  }
+
+  .pago-content {
+    padding: 25px 15px;
+  }
+}

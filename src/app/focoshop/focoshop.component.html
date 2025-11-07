@@ -1,0 +1,349 @@
+<div class="container">
+  <!-- HEADER PRINCIPAL -->
+  <header class="header">
+    <div class="logo">
+      <span class="logo-text">MEDTOOLS</span>
+      <i class="fa fa-shopping-cart"></i>
+    </div>
+
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Buscar productos..."
+        [(ngModel)]="busqueda"
+        (ngModelChange)="onBusquedaChange()"
+      />
+      <i class="fa fa-search"></i>
+    </div>
+
+    <!-- LINKS DE AUTENTICACIÓN Y CARRITO -->
+    <div class="auth-links">
+      <!-- ÍCONO DEL CARRITO (solo si está logueado) -->
+      @if (isLoggedIn) {
+        <div class="carrito-header" (click)="irAlCarrito()">
+          <i class="fa fa-shopping-cart"></i>
+          @if (contadorCarrito > 0) {
+            <span class="carrito-badge">{{ contadorCarrito }}</span>
+          }
+        </div>
+      }
+
+      <!-- USUARIO -->
+      @if (isLoggedIn) {
+        <div class="user-info" (click)="toggleUserMenu()">
+          <img [src]="userImage" alt="Perfil" class="user-icon" />
+
+          <div class="user-menu" [class.open]="userMenuOpen">
+            <div class="user-name-header">{{ userName }}</div>
+
+            <button (click)="irPerfil()">
+              <i class="fa fa-user"></i> Mi perfil
+            </button>
+
+            <button (click)="irVender()">
+              <i class="fa fa-tag"></i> Vender
+            </button>
+
+            <button (click)="irConfiguracion()">
+              <i class="fa fa-cog"></i> Configuración
+            </button>
+
+            <div class="divider"></div>
+
+            <button class="logout-btn" (click)="logout()">
+              <i class="fa fa-sign-out-alt"></i> Cerrar sesión
+            </button>
+          </div>
+        </div>
+      } @else {
+        <a [routerLink]="['/login']" class="auth-link">Iniciar Sesión</a>
+      }
+    </div>
+  </header>
+
+  <!-- OVERLAY OSCURO -->
+  <div class="menu-overlay" [class.active]="menuAbierto" (click)="toggleMenu()"></div>
+
+  <!-- MENÚ LATERAL -->
+  <aside class="menu-categorias" [class.open]="menuAbierto">
+    <div class="menu-header">
+      <div class="menu-titulo">
+        <i class="fa fa-th-large"></i>
+        <h3>Categorías</h3>
+      </div>
+      <button class="btn-cerrar-menu" (click)="toggleMenu()">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+
+    <ul class="categorias-list">
+      @for (cat of categorias; track cat.nombre; let i = $index) {
+        <li class="categoria-item" [class.active]="i === categoriaSeleccionada">
+          <div class="categoria-principal" (click)="seleccionarCategoria(i)">
+            <div class="categoria-info">
+              <i class="fa fa-folder"></i>
+              <span>{{ cat.nombre }}</span>
+            </div>
+            @if (cat.subcategorias?.length) {
+              <i class="fa fa-chevron-right arrow-icon" [class.rotate]="i === categoriaSeleccionada"></i>
+            }
+          </div>
+
+          @if (cat.subcategorias?.length && i === categoriaSeleccionada) {
+            <ul class="subcategorias">
+              @for (sub of cat.subcategorias; track sub) {
+                <li class="subcategoria-item" (click)="seleccionarSubcategoria(sub)">
+                  <i class="fa fa-angle-right"></i>
+                  {{ sub }}
+                </li>
+              }
+            </ul>
+          }
+        </li>
+      }
+    </ul>
+
+    <div class="menu-footer">
+      <button class="btn-ver-todas" (click)="toggleMenu()">
+        <i class="fa fa-grip-horizontal"></i>
+        Ver todas las categorías
+      </button>
+    </div>
+  </aside>
+
+  <!-- BOTÓN DE MENÚ DE CATEGORÍAS -->
+  <button class="btn-menu-categorias" (click)="toggleMenu()">
+    <i class="fa fa-bars"></i> 
+    <span>CATEGORÍAS</span>
+  </button>
+
+  <!-- CARRUSEL DE CATEGORÍAS -->
+  <div class="carrusel-container">
+    <button (click)="anterior()" class="arrow-btn left">
+      <i class="fa fa-chevron-left"></i>
+    </button>
+
+    <div class="categoria-grid" #categoriaGrid>
+      @for (cat of categorias; track cat.nombre; let i = $index) {
+        <div class="categoria-card" [class.active]="i === categoriaSeleccionada" (click)="seleccionarCategoria(i)">
+          <img [src]="cat.imagen" [alt]="cat.nombre" />
+          <p>{{ cat.nombre }}</p>
+        </div>
+      }
+    </div>
+
+    <button (click)="siguiente()" class="arrow-btn right">
+      <i class="fa fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <!-- SUBCATEGORÍAS -->
+  @if (categorias[categoriaSeleccionada]?.subcategorias?.length) {
+    <div class="subcategorias-container">
+      <h3 class="subcategorias-titulo">
+        <i class="fa fa-list"></i>
+        Subcategorías de {{ categorias[categoriaSeleccionada].nombre }}
+      </h3>
+      <div class="subcategorias-grid">
+        @for (sub of categorias[categoriaSeleccionada].subcategorias; track sub) {
+          <button 
+            class="subcategoria-btn"
+            [class.active]="subcategoriaSeleccionada === sub"
+            (click)="seleccionarSubcategoria(sub)"
+          >
+            <i class="fa fa-tag"></i>
+            {{ sub }}
+          </button>
+        }
+        <button 
+          class="subcategoria-btn todas"
+          [class.active]="!subcategoriaSeleccionada"
+          (click)="seleccionarSubcategoria(null)"
+        >
+          <i class="fa fa-th"></i>
+          Ver todas
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb-container">
+    <div class="breadcrumb">
+      <span (click)="limpiarBusqueda()">Inicio</span>
+      @if (busqueda.trim() !== '') {
+        <i class="fa fa-chevron-right"></i>
+        <span class="actual">Resultados de búsqueda: "{{ busqueda }}"</span>
+      } @else {
+        <i class="fa fa-chevron-right"></i>
+        <span>{{ categorias[categoriaSeleccionada]?.nombre || 'Productos' }}</span>
+        @if (subcategoriaSeleccionada) {
+          <i class="fa fa-chevron-right"></i>
+          <span class="actual">{{ subcategoriaSeleccionada }}</span>
+        }
+      }
+    </div>
+    <div class="ordenar-por">
+      <label>Ordenar por</label>
+      <select [(ngModel)]="ordenamiento" (change)="ordenarProductos()">
+        <option value="relevantes">Más relevantes</option>
+        <option value="menor-precio">Menor precio</option>
+        <option value="mayor-precio">Mayor precio</option>
+        <option value="mas-vendidos">Más vendidos</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="main-content">
+    <!-- FILTROS -->
+    <aside class="filtros-panel">
+      <h3 class="filtros-titulo">Filtros</h3>
+
+      <div class="filtro-seccion">
+        <h4 class="filtro-subtitulo">Condición</h4>
+        <label class="filtro-checkbox">
+          <input type="checkbox" [(ngModel)]="filtros.nuevo" (change)="aplicarFiltros()" />
+          <span>Nuevo</span>
+        </label>
+        <label class="filtro-checkbox">
+          <input type="checkbox" [(ngModel)]="filtros.usado" (change)="aplicarFiltros()" />
+          <span>Usado</span>
+        </label>
+      </div>
+
+      <div class="filtro-seccion">
+        <h4 class="filtro-subtitulo">Precio</h4>
+        <div class="precio-inputs">
+          <input type="number" placeholder="Mínimo" [(ngModel)]="filtros.precioMin" (change)="aplicarFiltros()" />
+          <span>-</span>
+          <input type="number" placeholder="Máximo" [(ngModel)]="filtros.precioMax" (change)="aplicarFiltros()" />
+        </div>
+      </div>
+
+      @if (marcasDisponibles.length > 0) {
+        <div class="filtro-seccion">
+          <h4 class="filtro-subtitulo">Marca</h4>
+          <div class="filtro-buscar">
+            <input type="text" placeholder="Buscar marca..." [(ngModel)]="buscarMarca" />
+          </div>
+          <div class="filtro-lista">
+            @for (marca of marcasDisponibles | slice:0:5; track marca) {
+              <label class="filtro-checkbox">
+                <input type="checkbox" [checked]="filtros.marcas.includes(marca)" (change)="toggleMarca(marca)" />
+                <span>{{ marca }}</span>
+              </label>
+            }
+          </div>
+          @if (marcasDisponibles.length > 5) {
+            <button class="ver-mas-btn">Ver todas las marcas</button>
+          }
+        </div>
+      }
+
+      <div class="filtro-seccion">
+        <h4 class="filtro-subtitulo">Calificación</h4>
+        <label class="filtro-checkbox">
+          <input type="radio" name="calificacion" [(ngModel)]="filtros.calificacion" value="5" (change)="aplicarFiltros()" />
+          <span>
+            <i class="fa fa-star star-filled"></i>
+            <i class="fa fa-star star-filled"></i>
+            <i class="fa fa-star star-filled"></i>
+            <i class="fa fa-star star-filled"></i>
+            <i class="fa fa-star star-filled"></i>
+          </span>
+        </label>
+        <label class="filtro-checkbox">
+          <input type="radio" name="calificacion" [(ngModel)]="filtros.calificacion" value="4" (change)="aplicarFiltros()" />
+          <span>
+            <i class="fa fa-star star-filled"></i>
+            <i class="fa fa-star star-filled"></i>
+            <i class="fa fa-star star-filled"></i>
+            <i class="fa fa-star star-filled"></i>
+            <i class="fa fa-star star-empty"></i>
+            o más
+          </span>
+        </label>
+        <label class="filtro-checkbox">
+          <input type="radio" name="calificacion" [(ngModel)]="filtros.calificacion" value="3" (change)="aplicarFiltros()" />
+          <span>
+            <i class="fa fa-star star-filled"></i>
+            <i class="fa fa-star star-filled"></i>
+            <i class="fa fa-star star-filled"></i>
+            <i class="fa fa-star star-empty"></i>
+            <i class="fa fa-star star-empty"></i>
+            o más
+          </span>
+        </label>
+      </div>
+
+      <button class="limpiar-filtros-btn" (click)="limpiarFiltros()">
+        <i class="fa fa-times"></i>
+        Limpiar filtros
+      </button>
+    </aside>
+
+    <!-- PRODUCTOS -->
+    <section class="productos-seccion">
+      <div class="productos-header">
+        @if (busqueda.trim() !== '') {
+          <h2>Resultados para "{{ busqueda }}"</h2>
+        } @else {
+          <h2>{{ categorias[categoriaSeleccionada]?.nombre || 'Productos' }}</h2>
+        }
+        <p class="resultados-count">{{ productosFiltrados.length }} resultados</p>
+      </div>
+
+      <div class="productos-grid">
+        @for (prod of productosFiltrados; track prod.id_producto) {
+          <div class="producto-card-grid" (click)="verDetalleProducto(prod)">
+            <div class="producto-imagen-container">
+              <img [src]="prod.imagen" [alt]="prod.nombre" />
+            </div>
+
+            <div class="producto-info">
+              <h3 class="producto-nombre">{{ prod.nombre }}</h3>
+
+              @if (prod.marca) {
+                <p class="producto-marca">{{ prod.marca }}</p>
+              }
+
+              <div class="producto-precio-container">
+                <span class="precio">${{ prod.precio | number:'1.0-0' }}</span>
+              </div>
+
+              <div class="producto-rating-reviews">
+                <div class="estrellas">
+                  @for (star of [1,2,3,4,5]; track star) {
+                    <i class="fa fa-star" [class.filled]="star <= (prod.calificacion || 0)" [class.empty]="star > (prod.calificacion || 0)"></i>
+                  }
+                </div>
+                <span class="reviews-text">({{ prod.reviews || 0 }})</span>
+              </div>
+
+              <p class="producto-vendedor">
+                <i class="fa fa-store"></i>
+                {{ prod.vendedor }}
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (productosFiltrados.length === 0 && !productosCargando) {
+        <div class="no-productos">
+          <i class="fa fa-box-open fa-3x"></i>
+          <h3>No se encontraron productos</h3>
+          <p>Intenta ajustando los filtros o cambia de categoría</p>
+        </div>
+      }
+
+      @if (productosCargando) {
+        <div class="loading">
+          <i class="fa fa-spinner fa-spin fa-3x"></i>
+          <p>Cargando productos...</p>
+        </div>
+      }
+    </section>
+  </div>
+</div>

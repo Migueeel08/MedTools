@@ -1,0 +1,452 @@
+<div class="admin-categorias-container">
+  
+  <!-- ===== HEADER ===== -->
+  <div class="admin-header">
+    <div class="header-left">
+      <button class="btn-volver" (click)="volverPanel()">
+        <i class="fas fa-arrow-left"></i> Volver al Panel
+      </button>
+      <div class="header-title">
+        <h1><i class="fas fa-list"></i> Gestión de Categorías</h1>
+        <p>Administra las categorías de productos</p>
+      </div>
+    </div>
+    <button class="btn-crear" (click)="abrirModalCrear()">
+      <i class="fas fa-plus"></i> Nueva Categoría
+    </button>
+  </div>
+
+  <!-- ===== BREADCRUMB ===== -->
+  <div class="breadcrumb">
+    <span (click)="volverPanel()">Admin</span>
+    <i class="fas fa-chevron-right"></i>
+    <span class="active">Categorías</span>
+  </div>
+
+  <!-- ===== ESTADÍSTICAS ===== -->
+  <div class="stats-row">
+    <div class="stat-mini total">
+      <i class="fas fa-tags"></i>
+      <div>
+        <h3>{{ stats.total }}</h3>
+        <p>Total Categorías</p>
+      </div>
+    </div>
+    
+    <div class="stat-mini con-productos">
+      <i class="fas fa-check-circle"></i>
+      <div>
+        <h3>{{ stats.conProductos }}</h3>
+        <p>Con Productos</p>
+      </div>
+    </div>
+    
+    <div class="stat-mini sin-productos">
+      <i class="fas fa-exclamation-circle"></i>
+      <div>
+        <h3>{{ stats.sinProductos }}</h3>
+        <p>Sin Productos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BUSCADOR ===== -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="busqueda"
+        (input)="buscarCategorias()"
+        placeholder="Buscar por nombre o descripción..."
+      />
+      @if (busqueda) {
+        <button class="btn-clear" (click)="busqueda = ''; buscarCategorias()">
+          <i class="fas fa-times"></i>
+        </button>
+      }
+    </div>
+    
+    <button class="btn-refresh" (click)="cargarCategorias()" title="Recargar">
+      <i class="fas fa-sync-alt"></i>
+    </button>
+  </div>
+
+  <!-- ===== TABLA DE CATEGORÍAS ===== -->
+  <div class="table-container">
+    @if (cargando) {
+      <div class="loading">
+        <i class="fas fa-spinner fa-spin fa-3x"></i>
+        <p>Cargando categorías...</p>
+      </div>
+    } @else if (categoriasFiltradas.length === 0) {
+      <div class="empty-state">
+        <i class="fas fa-folder-open fa-3x"></i>
+        <h3>No se encontraron categorías</h3>
+        <p>Intenta con otro término de búsqueda o crea una nueva categoría</p>
+        <button class="btn-crear-empty" (click)="abrirModalCrear()">
+          <i class="fas fa-plus"></i> Crear Primera Categoría
+        </button>
+      </div>
+    } @else {
+      <table class="categorias-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Productos</th>
+            <th>Subcategorías</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (categoria of categoriasFiltradas; track categoria.id_categoria) {
+            <tr>
+              <td>{{ categoria.id_categoria }}</td>
+              <td class="nombre-col">
+                <div class="categoria-info">
+                  <i class="fas fa-tag categoria-icon"></i>
+                  <strong>{{ categoria.nombre }}</strong>
+                </div>
+              </td>
+              <td>
+                <span 
+                  class="badge-productos"
+                  [class.productos-existe]="categoria.cantidad_productos > 0"
+                  [class.productos-vacio]="!categoria.cantidad_productos || categoria.cantidad_productos === 0"
+                >
+                  <i class="fas fa-box"></i>
+                  {{ categoria.cantidad_productos || 0 }} productos
+                </span>
+              </td>
+              <td>
+                <span 
+                  class="badge-subcategorias"
+                  [class.tiene-subcategorias]="categoria.cantidad_subcategorias > 0"
+                  [class.sin-subcategorias]="!categoria.cantidad_subcategorias || categoria.cantidad_subcategorias === 0"
+                >
+                  <i class="fas fa-folder"></i>
+                  {{ categoria.cantidad_subcategorias || 0 }} subcategorías
+                </span>
+              </td>
+              <td class="acciones-col">
+                <button 
+                  class="btn-accion ver" 
+                  (click)="verDetalles(categoria)"
+                  title="Ver detalles"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+
+                <button 
+                  class="btn-accion subcategorias" 
+                  (click)="gestionarSubcategorias(categoria)"
+                  title="Gestionar subcategorías"
+                >
+                  <i class="fas fa-folder-open"></i>
+                </button>
+                
+                <button 
+                  class="btn-accion editar" 
+                  (click)="abrirModalEditar(categoria)"
+                  title="Editar categoría"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                
+                <button 
+                  class="btn-accion eliminar" 
+                  (click)="eliminarCategoria(categoria)"
+                  [disabled]="categoria.cantidad_productos > 0 || categoria.cantidad_subcategorias > 0"
+                  [title]="categoria.cantidad_productos > 0 || categoria.cantidad_subcategorias > 0 ? 'No se puede eliminar: tiene productos o subcategorías' : 'Eliminar categoría'"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      
+      <div class="table-footer">
+        <p>Mostrando {{ categoriasFiltradas.length }} de {{ categorias.length }} categorías</p>
+      </div>
+    }
+  </div>
+
+  <!-- ===== MODAL DE DETALLES ===== -->
+  @if (modalVisible && categoriaSeleccionada) {
+    <div class="modal-overlay" (click)="cerrarModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2><i class="fas fa-tag"></i> Detalles de la Categoría</h2>
+          <button class="btn-close-modal" (click)="cerrarModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="detail-section">
+            <div class="categoria-icon-large">
+              <i class="fas fa-tags"></i>
+            </div>
+
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label><i class="fas fa-id-badge"></i> ID</label>
+                <p>{{ categoriaSeleccionada.id_categoria }}</p>
+              </div>
+
+              <div class="detail-item">
+                <label><i class="fas fa-tag"></i> Nombre</label>
+                <p class="categoria-nombre">{{ categoriaSeleccionada.nombre }}</p>
+              </div>
+
+              <div class="detail-item">
+                <label><i class="fas fa-box"></i> Productos Asociados</label>
+                <p>
+                  <span 
+                    class="badge-productos large"
+                    [class.productos-existe]="categoriaSeleccionada.cantidad_productos > 0"
+                    [class.productos-vacio]="!categoriaSeleccionada.cantidad_productos || categoriaSeleccionada.cantidad_productos === 0"
+                  >
+                    {{ categoriaSeleccionada.cantidad_productos || 0 }} productos
+                  </span>
+                </p>
+              </div>
+
+              <div class="detail-item">
+                <label><i class="fas fa-folder"></i> Subcategorías</label>
+                <p>
+                  <span 
+                    class="badge-subcategorias large"
+                    [class.tiene-subcategorias]="categoriaSeleccionada.cantidad_subcategorias > 0"
+                    [class.sin-subcategorias]="!categoriaSeleccionada.cantidad_subcategorias || categoriaSeleccionada.cantidad_subcategorias === 0"
+                  >
+                    {{ categoriaSeleccionada.cantidad_subcategorias || 0 }} subcategorías
+                  </span>
+                </p>
+              </div>
+
+              @if (categoriaSeleccionada.subcategorias && categoriaSeleccionada.subcategorias.length > 0) {
+                <div class="detail-item full-width">
+                  <label><i class="fas fa-list"></i> Lista de Subcategorías</label>
+                  <div class="subcategorias-list">
+                    @for (sub of categoriaSeleccionada.subcategorias; track sub.id_subcategoria) {
+                      <span class="subcategoria-badge">
+                        <i class="fas fa-tag"></i> {{ sub.nombre }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-modal btn-secondary" (click)="cerrarModal()">
+            <i class="fas fa-times"></i> Cerrar
+          </button>
+          <button 
+            class="btn-modal btn-primary" 
+            (click)="abrirModalEditar(categoriaSeleccionada); cerrarModal()"
+          >
+            <i class="fas fa-edit"></i> Editar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ===== MODAL DE CREAR/EDITAR ===== -->
+  @if (modalFormVisible) {
+    <div class="modal-overlay" (click)="cerrarModalForm()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>
+            <i [class]="modoEdicion ? 'fas fa-edit' : 'fas fa-plus'"></i> 
+            {{ modoEdicion ? 'Editar Categoría' : 'Nueva Categoría' }}
+          </h2>
+          <button class="btn-close-modal" (click)="cerrarModalForm()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <form class="form-categoria">
+            <div class="form-group">
+              <label for="nombre">
+                <i class="fas fa-tag"></i> Nombre de la Categoría *
+              </label>
+              <input 
+                type="text" 
+                id="nombre"
+                [(ngModel)]="formulario.nombre"
+                name="nombre"
+                placeholder="Ej: Electrónica, Ropa, Deportes..."
+                required
+              />
+            </div>
+
+            <p class="form-note">
+              <i class="fas fa-info-circle"></i>
+              El nombre de la categoría es obligatorio
+            </p>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-modal btn-secondary" (click)="cerrarModalForm()">
+            <i class="fas fa-times"></i> Cancelar
+          </button>
+          <button 
+            class="btn-modal btn-primary" 
+            (click)="guardarCategoria()"
+          >
+            <i [class]="modoEdicion ? 'fas fa-save' : 'fas fa-plus'"></i> 
+            {{ modoEdicion ? 'Guardar Cambios' : 'Crear Categoría' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ===== MODAL DE GESTIÓN DE SUBCATEGORÍAS ===== -->
+  @if (modalSubcategoriasVisible && categoriaSeleccionada) {
+    <div class="modal-overlay" (click)="cerrarModalSubcategorias()">
+      <div class="modal-content modal-large" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>
+            <i class="fas fa-folder-open"></i> 
+            Subcategorías de "{{ categoriaSeleccionada.nombre }}"
+          </h2>
+          <button class="btn-close-modal" (click)="cerrarModalSubcategorias()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="subcategorias-header">
+            <p>Gestiona las subcategorías de esta categoría</p>
+            <button class="btn-add-sub" (click)="abrirModalCrearSubcategoria()">
+              <i class="fas fa-plus"></i> Nueva Subcategoría
+            </button>
+          </div>
+
+          @if (categoriaSeleccionada.subcategorias && categoriaSeleccionada.subcategorias.length > 0) {
+            <div class="subcategorias-grid">
+              @for (sub of categoriaSeleccionada.subcategorias; track sub.id_subcategoria) {
+                <div class="subcategoria-card">
+                  <div class="sub-header">
+                    <h3><i class="fas fa-tag"></i> {{ sub.nombre }}</h3>
+                  </div>
+                  @if (sub.descripcion) {
+                    <p class="sub-desc">{{ sub.descripcion }}</p>
+                  }
+                  <div class="sub-actions">
+                    <button 
+                      class="btn-sub editar" 
+                      (click)="abrirModalEditarSubcategoria(sub)"
+                      title="Editar"
+                    >
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button 
+                      class="btn-sub eliminar" 
+                      (click)="eliminarSubcategoria(sub)"
+                      title="Eliminar"
+                    >
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="empty-subcategorias">
+              <i class="fas fa-folder-open fa-3x"></i>
+              <p>No hay subcategorías en esta categoría</p>
+              <button class="btn-add-first" (click)="abrirModalCrearSubcategoria()">
+                <i class="fas fa-plus"></i> Crear Primera Subcategoría
+              </button>
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-modal btn-secondary" (click)="cerrarModalSubcategorias()">
+            <i class="fas fa-times"></i> Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ===== MODAL DE CREAR/EDITAR SUBCATEGORÍA ===== -->
+  @if (modalSubcategoriaFormVisible) {
+    <div class="modal-overlay" (click)="cerrarModalSubcategoriaForm()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>
+            <i [class]="modoEdicionSubcategoria ? 'fas fa-edit' : 'fas fa-plus'"></i> 
+            {{ modoEdicionSubcategoria ? 'Editar Subcategoría' : 'Nueva Subcategoría' }}
+          </h2>
+          <button class="btn-close-modal" (click)="cerrarModalSubcategoriaForm()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <form class="form-categoria">
+            <div class="form-group">
+              <label for="nombreSub">
+                <i class="fas fa-tag"></i> Nombre de la Subcategoría *
+              </label>
+              <input 
+                type="text" 
+                id="nombreSub"
+                [(ngModel)]="formularioSubcategoria.nombre"
+                name="nombreSub"
+                placeholder="Ej: Smartphones, Laptops, Tablets..."
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="descripcionSub">
+                <i class="fas fa-align-left"></i> Descripción (opcional)
+              </label>
+              <textarea 
+                id="descripcionSub"
+                [(ngModel)]="formularioSubcategoria.descripcion"
+                name="descripcionSub"
+                placeholder="Descripción de la subcategoría..."
+                rows="3"
+              ></textarea>
+            </div>
+
+            <p class="form-note">
+              <i class="fas fa-info-circle"></i>
+              La subcategoría se creará dentro de "{{ categoriaSeleccionada?.nombre }}"
+            </p>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-modal btn-secondary" (click)="cerrarModalSubcategoriaForm()">
+            <i class="fas fa-times"></i> Cancelar
+          </button>
+          <button 
+            class="btn-modal btn-primary" 
+            (click)="guardarSubcategoria()"
+          >
+            <i [class]="modoEdicionSubcategoria ? 'fas fa-save' : 'fas fa-plus'"></i> 
+            {{ modoEdicionSubcategoria ? 'Guardar Cambios' : 'Crear Subcategoría' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

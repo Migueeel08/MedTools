@@ -1,0 +1,86 @@
+<div class="perfil-container">
+  <header class="header">
+    <div class="logo">
+      <span class="logo-text">FOCOSHOP</span>
+      <i class="fa fa-shopping-cart"></i>
+    </div>
+    <button class="btn-volver" (click)="volver()">Volver</button>
+  </header>
+
+  <div class="perfil-card">
+    <h2>Configuración de Perfil</h2>
+
+    <!-- SECCIÓN FOTO -->
+    <div class="foto-section">
+      <img [src]="user.imagen" alt="Foto de perfil" class="foto-perfil" />
+      <input type="file" id="fotoInput" (change)="onFileSelected($event)" hidden />
+      <button class="btn-foto" (click)="abrirSelectorFoto()">Cambiar foto</button>
+    </div>
+
+    <!-- FORMULARIO PERFIL -->
+    <form (ngSubmit)="guardarCambios()" class="perfil-form">
+      
+      <!-- Nombre -->
+      <div class="input-group">
+        <label>Nombre</label>
+        <input type="text" [(ngModel)]="user.nombre" name="nombre" required />
+      </div>
+
+      <!-- Apellido -->
+      <div class="input-group">
+        <label>Apellido</label>
+        <input type="text" [(ngModel)]="user.apellido" name="apellido" required />
+      </div>
+
+      <!-- Correo -->
+      <div class="input-group">
+        <label>Correo electrónico</label>
+        <input type="email" [(ngModel)]="user.email" name="email" disabled />
+      </div>
+
+      <!-- Teléfono con lada -->
+      <div class="input-group">
+        <label>Número de teléfono</label>
+        <div class="telefono-container">
+          <select [(ngModel)]="user.lada" name="lada" class="lada-select">
+            <option value="+52">🇲🇽 +52</option>
+            <option value="+1">🇺🇸 +1</option>
+            <option value="+44">🇬🇧 +44</option>
+            <option value="+34">🇪🇸 +34</option>
+            <!-- Agrega más países según necesites -->
+          </select>
+          <input type="text" [(ngModel)]="user.telefono" name="telefono" placeholder="6681234567" />
+        </div>
+      </div>
+
+      <button type="submit" class="btn-guardar">Guardar cambios</button>
+    </form>
+  </div>
+</div>
+<!-- ✅ Alerta animada con foco (sintaxis moderna) -->
+@if (mostrarAlerta) {
+  <div class="alerta-overlay">
+    <div class="alerta-container">
+      <div class="foco-animado">
+        <div class="foco-base"></div>
+        <div class="foco-luz"></div>
+        <div class="filamento"></div>
+      </div>
+      <p class="mensaje-exito">{{ mensajeAlerta }}</p>
+    </div>
+  </div>
+}
+
+<!-- ESTILOS BÁSICOS PARA TELEFONO Y SELECT -->
+<style>
+.telefono-container {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.lada-select {
+  padding: 0 5px;
+  height: 35px;
+}
+</style>

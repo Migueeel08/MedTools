@@ -1,0 +1,96 @@
+<div class="login-container">
+  <!-- 🔹 ALERTA MODAL CENTRADO -->
+  <div *ngIf="alertaVisible" class="alerta-modal">
+    <div class="alerta-card" [ngClass]="tipoAlerta">
+      <h3>{{ mensajeAlerta }}</h3>
+    </div>
+  </div>
+
+  <!-- CONTENEDOR CON DOS COLUMNAS -->
+  <div class="login-wrapper">
+    
+    <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+    <div class="login-card">
+      <!-- LOGO -->
+      <div class="logo-section">
+        <h1 class="logo-text">FOCOSHOP</h1>
+        <i class="fa fa-shopping-cart"></i>
+      </div>
+
+      <!-- TABS DE LOGIN Y REGISTRO -->
+      <div class="tabs">
+        <button 
+          class="tab" 
+          [class.active]="!isRegisterMode"
+          (click)="switchToLogin()"
+          type="button">
+          Iniciar Sesión
+        </button>
+        <button 
+          class="tab" 
+          [class.active]="isRegisterMode"
+          (click)="switchToRegister()"
+          type="button">
+          Registrarse
+        </button>
+      </div>
+
+      <!-- FORMULARIO -->
+      <form (ngSubmit)="onSubmit()">
+        <!-- Campos solo para registro -->
+        <div *ngIf="isRegisterMode" class="input-group">
+          <label>Nombre</label>
+          <input type="text" [(ngModel)]="nombre" name="nombre" required />
+        </div>
+
+        <div *ngIf="isRegisterMode" class="input-group">
+          <label>Apellido</label>
+          <input type="text" [(ngModel)]="apellido" name="apellido" required />
+        </div>
+
+        <!-- Correo electrónico -->
+        <div class="input-group">
+          <label>Correo Electrónico</label>
+          <input type="email" [(ngModel)]="email" name="email" required />
+        </div>
+
+        <!-- Contraseña -->
+        <div class="input-group">
+          <label>Contraseña</label>
+          <input type="password" [(ngModel)]="contrasena" name="contrasena" required />
+        </div>
+
+        <!-- BOTÓN PRINCIPAL -->
+        <button type="submit" class="btn-login">
+          {{ isRegisterMode ? 'REGISTRARME' : 'INICIAR SESIÓN' }}
+          <i class="fa fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <!-- DIVIDER -->
+      <div class="divider">
+        <span>O</span>
+      </div>
+
+      <!-- BOTÓN DE GOOGLE -->
+      <button class="btn-google" type="button">
+        <i class="fab fa-google"></i>
+        Inicio con Google
+      </button>
+    </div>
+
+    <!-- COLUMNA DERECHA: ILUSTRACIÓN -->
+    <div class="illustration-section">
+      <div class="illustration-content">
+        <img src="assets/img/delivery-character.png" alt="Delivery" class="character-img" />
+        <div class="floating-icons">
+          <div class="icon-circle" style="--delay: 0s; --x: 50px; --y: 30px;">📦</div>
+          <div class="icon-circle" style="--delay: 1s; --x: -40px; --y: 60px;">🎁</div>
+          <div class="icon-circle" style="--delay: 2s; --x: 70px; --y: -20px;">⭐</div>
+          <div class="icon-circle" style="--delay: 1.5s; --x: -60px; --y: -40px;">💡</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

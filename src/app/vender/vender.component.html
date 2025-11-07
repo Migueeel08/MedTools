@@ -1,0 +1,225 @@
+<div class="vender-container">
+  <div class="vender-card">
+    <!-- HEADER -->
+    <header class="vender-header">
+      <div class="header-left">
+        <button class="btn-volver" (click)="volver()">
+          <i class="fa fa-arrow-left"></i>
+        </button>
+        <div class="header-info">
+          <h1>FOCOSHOP</h1>
+          <p>Publicar Producto</p>
+        </div>
+      </div>
+
+      <div class="user-section">
+        <span class="user-name">{{ userName }}</span>
+        <img [src]="userImage" alt="Perfil" class="user-avatar" />
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <div class="vender-content">
+      <!-- LEFT COLUMN - Image Upload -->
+      <div class="left-column">
+        <div class="image-upload-box" (click)="fileInput.click()">
+          <!-- ✅ ACTUALIZADO: Si no hay imagen, mostrar el icono de upload -->
+          <ng-container *ngIf="!imagenPreview">
+            <i class="fa fa-upload upload-icon"></i>
+            <h3>INSERTAR IMAGEN</h3>
+            <p>Click para subir o arrastra la imagen aquí</p>
+            <span class="upload-hint">PNG, JPG, GIF o WEBP (máx. 5MB)</span>
+          </ng-container>
+
+          <!-- ✅ ACTUALIZADO: Si hay imagen, mostrar el preview -->
+          <ng-container *ngIf="imagenPreview">
+            <img [src]="imagenPreview" alt="Producto" class="main-image" />
+            <button type="button" class="btn-change-img" (click)="$event.stopPropagation(); removeImage()">
+              <i class="fa fa-times"></i> Cambiar imagen
+            </button>
+          </ng-container>
+
+          <input
+            #fileInput
+            type="file"
+            accept="image/*"
+            style="display: none"
+            (change)="onImageUpload($event)"
+          />
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN - Product Details -->
+      <div class="right-column">
+        <div class="product-form">
+          <!-- Nombre del Producto -->
+          <div class="form-section">
+            <h2>NOMBRE DEL PRODUCTO</h2>
+            <input
+              type="text"
+              class="form-input"
+              placeholder="Ej: iPhone 15 Pro Max"
+              [(ngModel)]="nombreProducto"
+            />
+          </div>
+
+          <!-- Vendedor -->
+          <div class="form-row">
+            <div class="form-field">
+              <label>Vendedor:</label>
+              <span class="vendedor-name">{{ userName }}</span>
+            </div>
+            <div class="form-field">
+              <label>Disponibilidad:</label>
+              <button class="btn-disponibilidad" [class.disponible]="disponible" (click)="toggleDisponibilidad()">
+                {{ disponible ? 'DISPONIBLE' : 'NO DISPONIBLE' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Precio -->
+          <div class="form-section">
+            <label class="form-label">
+              <i class="fa fa-dollar-sign"></i> Precio
+            </label>
+            <input
+              type="number"
+              class="form-input price-input"
+              placeholder="0.00"
+              [(ngModel)]="precio"
+            />
+          </div>
+
+          <!-- Categoría -->
+          <div class="form-section">
+            <label class="form-label">
+              <i class="fa fa-tag"></i> Categoría
+            </label>
+            <select class="form-select" [(ngModel)]="categoriaId" (change)="onCategoriaChange()">
+              <option [value]="0">Seleccionar categoría</option>
+              <option *ngFor="let cat of categorias" [value]="cat.id_categoria">{{ cat.nombre }}</option>
+            </select>
+          </div>
+
+          <!-- Subcategoría -->
+          <div class="form-section" *ngIf="categoriaId > 0 && subcategorias.length > 0">
+            <label class="form-label">
+              <i class="fa fa-tags"></i> Subcategoría
+            </label>
+            <select class="form-select" [(ngModel)]="subcategoriaId" (change)="onSubcategoriaChange()">
+              <option [value]="0">Seleccionar subcategoría</option>
+              <option *ngFor="let sub of subcategorias" [value]="sub.id_subcategoria">{{ sub.nombre }}</option>
+            </select>
+          </div>
+
+          <!-- Color (solo para ciertas categorías) -->
+          <div class="form-section" *ngIf="necesitaColor()">
+            <label class="form-label">
+              <i class="fa fa-palette"></i> Color
+            </label>
+            <div class="color-options">
+              <div
+                class="color-option"
+                *ngFor="let c of colores"
+                [style.background]="c.hex"
+                [class.selected]="color === c.nombre"
+                (click)="color = c.nombre"
+                [title]="c.nombre"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Talla/Tamaño (solo para ciertas categorías) -->
+          <div class="form-section" *ngIf="necesitaTalla()">
+            <label class="form-label">
+              <i class="fa fa-ruler"></i> Talla / Tamaño
+            </label>
+            <input
+              type="text"
+              class="form-input"
+              placeholder="Ej: M, XL, 42, etc."
+              [(ngModel)]="talla"
+            />
+          </div>
+
+          <!-- Marca (solo para ciertas categorías) -->
+          <div class="form-section" *ngIf="necesitaMarca()">
+            <label class="form-label">
+              <i class="fa fa-copyright"></i> Marca
+            </label>
+            <input
+              type="text"
+              class="form-input"
+              placeholder="Ej: Nike, Apple, Samsung, etc."
+              [(ngModel)]="marca"
+            />
+          </div>
+
+          <!-- Condición -->
+          <div class="form-section">
+            <label class="form-label">
+              <i class="fa fa-box"></i> Condición
+            </label>
+            <div class="condition-options">
+              <button
+                class="btn-condition"
+                [class.active]="condicion === 'nuevo'"
+                (click)="condicion = 'nuevo'"
+              >
+                Nuevo
+              </button>
+              <button
+                class="btn-condition"
+                [class.active]="condicion === 'usado'"
+                (click)="condicion = 'usado'"
+              >
+                Usado
+              </button>
+              <button
+                class="btn-condition"
+                [class.active]="condicion === 'reacondicionado'"
+                (click)="condicion = 'reacondicionado'"
+              >
+                Reacondicionado
+              </button>
+            </div>
+          </div>
+
+          <!-- Descripción -->
+          <div class="form-section">
+            <label class="form-label">
+              <i class="fa fa-info-circle"></i> Descripción
+            </label>
+            <textarea
+              class="form-textarea"
+              rows="4"
+              placeholder="Describe tu producto en detalle..."
+              [(ngModel)]="descripcion"
+            ></textarea>
+          </div>
+
+          <!-- Stock/Cantidad -->
+          <div class="form-section">
+            <label class="form-label">
+              <i class="fa fa-boxes"></i> Cantidad en Stock
+            </label>
+            <div class="quantity-control">
+              <button class="btn-quantity" (click)="decrementarCantidad()">
+                <i class="fa fa-minus"></i>
+              </button>
+              <input type="number" class="quantity-input" [(ngModel)]="cantidad" min="1" />
+              <button class="btn-quantity" (click)="incrementarCantidad()">
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Botón Publicar -->
+          <button class="btn-publicar" (click)="publicarProducto()">
+            PUBLICAR PRODUCTO
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

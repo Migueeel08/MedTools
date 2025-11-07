@@ -1,0 +1,433 @@
+<div class="carrito-container">
+  <!-- HEADER (mismo de FocoShop) -->
+  <header class="header">
+    <div class="logo" (click)="volverInicio()">
+      <span class="logo-text">FOCOSHOP</span>
+      <i class="fas fa-shopping-cart"></i>
+    </div>
+
+    <div class="header-title">
+      <i class="fas fa-shopping-bag"></i>
+      <span>Mi Carrito</span>
+    </div>
+
+    <!-- USUARIO -->
+    <div class="auth-links">
+      @if (isLoggedIn) {
+        <div class="user-info" (click)="toggleUserMenu()">
+          <img [src]="userImage" alt="Perfil" class="user-icon" />
+
+          <div class="user-menu" [class.open]="userMenuOpen">
+            <div class="user-name-header">{{ userName }}</div>
+
+            <button (click)="irPerfil()">
+              <i class="fas fa-user"></i> Mi perfil
+            </button>
+
+            <button (click)="irVender()">
+              <i class="fas fa-tag"></i> Vender
+            </button>
+
+            <button (click)="irConfiguracion()">
+              <i class="fas fa-cog"></i> Configuración
+            </button>
+
+            <div class="divider"></div>
+
+            <button class="logout-btn" (click)="logout()">
+              <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="carrito-content">
+    
+    <!-- LOADING -->
+    @if (cargando) {
+      <div class="loading">
+        <i class="fas fa-spinner fa-spin fa-3x"></i>
+        <p>Cargando carrito...</p>
+      </div>
+    }
+
+    <!-- CARRITO CON PRODUCTOS -->
+    @else if (carrito && carrito.items.length > 0) {
+      <div class="carrito-grid">
+        
+        <!-- COLUMNA IZQUIERDA: ITEMS -->
+        <div class="items-section">
+          <div class="section-header">
+            <h2>
+              <i class="fas fa-shopping-basket"></i>
+              Productos en tu carrito
+            </h2>
+            <button class="btn-vaciar" (click)="vaciarCarrito()">
+              <i class="fas fa-trash"></i>
+              Vaciar carrito
+            </button>
+          </div>
+
+          <!-- LISTA DE ITEMS -->
+          <div class="items-lista">
+            @for (item of carrito.items; track item.id_carrito) {
+              <div class="item-card" [class.no-disponible]="!item.producto_disponible">
+                
+                <!-- Imagen -->
+                <div class="item-imagen" (click)="irAProducto(item.id_producto)">
+                  <img [src]="construirUrlImagen(item.producto_imagen)" [alt]="item.producto_nombre" />
+                  @if (!item.producto_disponible) {
+                    <div class="badge-no-disponible">No disponible</div>
+                  }
+                </div>
+
+                <!-- Información -->
+                <div class="item-info">
+                  <h3 class="item-nombre" (click)="irAProducto(item.id_producto)">
+                    {{ item.producto_nombre }}
+                  </h3>
+
+                  <!-- Color y Talla -->
+                  @if (item.color || item.talla) {
+                    <div class="item-variantes">
+                      @if (item.color) {
+                        <span class="variante">
+                          <i class="fas fa-circle" [style.color]="item.color"></i>
+                          Color: {{ item.color }}
+                        </span>
+                      }
+                      @if (item.talla) {
+                        <span class="variante">
+                          <i class="fas fa-ruler"></i>
+                          Talla: {{ item.talla }}
+                        </span>
+                      }
+                    </div>
+                  }
+
+                  <!-- Stock -->
+                  <div class="item-stock">
+                    @if (item.producto_disponible) {
+                      @if (item.producto_cantidad_disponible <= 5) {
+                        <span class="stock-bajo">
+                          <i class="fas fa-exclamation-triangle"></i>
+                          Solo quedan {{ item.producto_cantidad_disponible }} disponibles
+                        </span>
+                      } @else {
+                        <span class="stock-ok">
+                          <i class="fas fa-check-circle"></i>
+                          En stock
+                        </span>
+                      }
+                    } @else {
+                      <span class="stock-no-disponible">
+                        <i class="fas fa-times-circle"></i>
+                        Producto no disponible
+                      </span>
+                    }
+                  </div>
+
+                  <!-- Precio -->
+                  <div class="item-precio">
+                    <span class="precio-unitario">
+                      ${{ item.precio_unitario | number:'1.0-0' }} c/u
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Controles -->
+                <div class="item-controles">
+                  <!-- Cantidad -->
+                  <div class="cantidad-control">
+                    <button 
+                      class="btn-cantidad" 
+                      (click)="decrementarCantidad(item)"
+                      [disabled]="item.cantidad <= 1"
+                    >
+                      <i class="fas fa-minus"></i>
+                    </button>
+                    <span class="cantidad-numero">{{ item.cantidad }}</span>
+                    <button 
+                      class="btn-cantidad" 
+                      (click)="incrementarCantidad(item)"
+                      [disabled]="item.cantidad >= item.producto_cantidad_disponible || !item.producto_disponible"
+                    >
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </div>
+
+                  <!-- Subtotal -->
+                  <div class="item-subtotal">
+                    ${{ item.subtotal | number:'1.0-0' }}
+                  </div>
+
+                  <!-- Eliminar -->
+                  <button class="btn-eliminar" (click)="eliminarItem(item)">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: RESUMEN -->
+        <div class="resumen-section">
+          <div class="resumen-card">
+            <h3>
+              <i class="fas fa-receipt"></i>
+              Resumen de compra
+            </h3>
+
+            <!-- Desglose -->
+            <div class="resumen-desglose">
+              <div class="resumen-item">
+                <span>Productos ({{ carrito.total_productos }})</span>
+                <span>${{ carrito.subtotal | number:'1.0-0' }}</span>
+              </div>
+
+              <div class="resumen-item">
+                <span>Envío</span>
+                <span class="envio-gratis">GRATIS</span>
+              </div>
+
+              <div class="resumen-divider"></div>
+
+              <div class="resumen-total">
+                <span>Total</span>
+                <span>${{ carrito.subtotal | number:'1.0-0' }}</span>
+              </div>
+            </div>
+
+            <!-- Botón Proceder -->
+            <button class="btn-proceder" (click)="procederAlPago()">
+              <i class="fas fa-lock"></i>
+              Proceder al pago
+            </button>
+
+            <!-- Botón Continuar -->
+            <button class="btn-continuar" (click)="continuarComprando()">
+              <i class="fas fa-arrow-left"></i>
+              Continuar comprando
+            </button>
+
+            <!-- Info de seguridad -->
+            <div class="info-seguridad">
+              <div class="seguridad-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Compra 100% segura</span>
+              </div>
+              <div class="seguridad-item">
+                <i class="fas fa-truck"></i>
+                <span>Envío gratis</span>
+              </div>
+              <div class="seguridad-item">
+                <i class="fas fa-undo"></i>
+                <span>Devolución gratis</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- CARRITO VACÍO -->
+    @else {
+      <div class="carrito-vacio">
+        <div class="vacio-icon">
+          <i class="fas fa-shopping-cart"></i>
+        </div>
+        <h2>Tu carrito está vacío</h2>
+        <p>¡Descubre miles de productos y comienza a agregar!</p>
+        <button class="btn-explorar" (click)="continuarComprando()">
+          <i class="fas fa-search"></i>
+          Explorar productos
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- ===== MODAL DE CHECKOUT ===== ✅ NUEVO -->
+  @if (modalCheckoutVisible) {
+    <div class="modal-overlay" (click)="cerrarModalCheckout()">
+      <div class="modal-checkout" (click)="$event.stopPropagation()">
+        <div class="modal-header-checkout">
+          <h2>
+            <i class="fas fa-shopping-bag"></i>
+            Finalizar Compra
+          </h2>
+          <button class="btn-close-modal" (click)="cerrarModalCheckout()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body-checkout">
+          <!-- RESUMEN DE PRODUCTOS -->
+          <div class="seccion-checkout">
+            <h3><i class="fas fa-box"></i> Resumen de tu pedido</h3>
+            <div class="productos-resumen-lista">
+              @for (item of carrito!.items; track item.id_carrito) {
+                @if (item.producto_disponible) {
+                  <div class="producto-resumen-mini">
+                    <img [src]="construirUrlImagen(item.producto_imagen)" [alt]="item.producto_nombre">
+                    <div class="producto-resumen-info-mini">
+                      <h4>{{ item.producto_nombre }}</h4>
+                      <p class="cantidad-resumen">Cantidad: {{ item.cantidad }}</p>
+                      @if (item.color) {
+                        <p><strong>Color:</strong> {{ item.color }}</p>
+                      }
+                      @if (item.talla) {
+                        <p><strong>Talla:</strong> {{ item.talla }}</p>
+                      }
+                    </div>
+                    <div class="precio-resumen-mini">
+                      <span class="precio-unitario">${{ item.precio_unitario | number:'1.0-0' }} c/u</span>
+                      <span class="precio-total-mini">${{ item.subtotal | number:'1.0-0' }}</span>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+
+          <!-- INFORMACIÓN DEL COMPRADOR -->
+          <div class="seccion-checkout">
+            <h3><i class="fas fa-user"></i> Información del comprador</h3>
+            <div class="info-comprador">
+              <div class="dato-comprador">
+                <i class="fas fa-user-circle"></i>
+                <div>
+                  <label>Nombre</label>
+                  <p>{{ userName }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DIRECCIÓN DE ENVÍO -->
+          <div class="seccion-checkout">
+            <h3><i class="fas fa-map-marker-alt"></i> Dirección de envío</h3>
+            @if (direcciones.length > 0) {
+              <div class="direcciones-lista">
+                @for (direccion of direcciones; track direccion.id_direccion) {
+                  <div 
+                    class="direccion-card"
+                    [class.selected]="direccionSeleccionada?.id_direccion === direccion.id_direccion"
+                    (click)="seleccionarDireccion(direccion)"
+                  >
+                    <div class="direccion-radio">
+                      <i [class]="direccionSeleccionada?.id_direccion === direccion.id_direccion ? 'fas fa-check-circle' : 'far fa-circle'"></i>
+                    </div>
+                    <div class="direccion-info">
+                      <p class="direccion-titulo">{{ direccion.nombre_contacto }}</p>
+                      <p>{{ direccion.calle }} {{ direccion.numero_exterior }}</p>
+                      <p>{{ direccion.colonia }}, {{ direccion.ciudad }}</p>
+                      <p>{{ direccion.estado }}, {{ direccion.codigo_postal }}</p>
+                      <p class="direccion-telefono">
+                        <i class="fas fa-phone"></i> {{ direccion.telefono_contacto }}
+                      </p>
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="sin-datos">
+                <i class="fas fa-map-marked-alt fa-2x"></i>
+                <p>No tienes direcciones guardadas</p>
+                <button class="btn-agregar-dato" (click)="irConfiguracion()">
+                  <i class="fas fa-plus"></i> Agregar dirección
+                </button>
+              </div>
+            }
+          </div>
+
+          <!-- MÉTODO DE PAGO -->
+          <div class="seccion-checkout">
+            <h3><i class="fas fa-credit-card"></i> Método de pago</h3>
+            @if (metodosPago.length > 0) {
+              <div class="metodos-pago-lista">
+                @for (metodo of metodosPago; track metodo.id_metodo_pago) {
+                  <div 
+                    class="metodo-card"
+                    [class.selected]="metodoPagoSeleccionado?.id_metodo_pago === metodo.id_metodo_pago"
+                    (click)="seleccionarMetodoPago(metodo)"
+                  >
+                    <div class="metodo-radio">
+                      <i [class]="metodoPagoSeleccionado?.id_metodo_pago === metodo.id_metodo_pago ? 'fas fa-check-circle' : 'far fa-circle'"></i>
+                    </div>
+                    
+                    <!-- Logo de la marca de tarjeta -->
+                    <div class="tarjeta-logo">
+                      <img 
+                        [src]="obtenerLogoTarjeta(metodo)" 
+                        [alt]="obtenerNombreMarca(metodo)"
+                        class="logo-marca-tarjeta"
+                      />
+                    </div>
+                    
+                    <div class="metodo-info">
+                      <p class="metodo-tipo">
+                        {{ obtenerNombreMarca(metodo) }}
+                        <span class="tipo-badge">{{ metodo.tipo_tarjeta === 'credito' ? 'Crédito' : 'Débito' }}</span>
+                      </p>
+                      <p class="metodo-numero">•••• {{ metodo.ultimos_digitos }}</p>
+                      @if (metodo.banco && !metodo.banco.toLowerCase().includes('visa') && !metodo.banco.toLowerCase().includes('mastercard')) {
+                        <p class="metodo-banco">{{ metodo.banco }}</p>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="sin-datos">
+                <i class="fas fa-credit-card fa-2x"></i>
+                <p>No tienes métodos de pago guardados</p>
+                <button class="btn-agregar-dato" (click)="irConfiguracion()">
+                  <i class="fas fa-plus"></i> Agregar método de pago
+                </button>
+              </div>
+            }
+          </div>
+
+          <!-- TOTAL -->
+          <div class="seccion-total">
+            <div class="total-desglose">
+              <div class="total-item">
+                <span>Subtotal ({{ carrito!.total_productos }} {{ carrito!.total_productos === 1 ? 'producto' : 'productos' }})</span>
+                <span>${{ carrito!.subtotal | number:'1.0-0' }}</span>
+              </div>
+              <div class="total-item">
+                <span>Envío</span>
+                <span class="envio-gratis">GRATIS</span>
+              </div>
+              <div class="total-final">
+                <span>Total</span>
+                <span>${{ carrito!.subtotal | number:'1.0-0' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer-checkout">
+          <button class="btn-cancelar" (click)="cerrarModalCheckout()">
+            <i class="fas fa-times"></i> Cancelar
+          </button>
+          <button 
+            class="btn-confirmar-compra" 
+            (click)="confirmarCompra()"
+            [disabled]="procesandoPago || !direccionSeleccionada || !metodoPagoSeleccionado"
+          >
+            @if (procesandoPago) {
+              <i class="fas fa-spinner fa-spin"></i> Procesando...
+            } @else {
+              <i class="fas fa-lock"></i> Confirmar Compra
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

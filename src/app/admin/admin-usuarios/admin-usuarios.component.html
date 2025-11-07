@@ -1,0 +1,232 @@
+<div class="admin-usuarios-container">
+  
+  <!-- ===== HEADER ===== -->
+  <div class="admin-header">
+    <div class="header-left">
+      <button class="btn-volver" (click)="volverPanel()">
+        <i class="fas fa-arrow-left"></i> Volver al Panel
+      </button>
+      <div class="header-title">
+        <h1><i class="fas fa-users-cog"></i> Gestión de Usuarios</h1>
+        <p>Administra las cuentas de usuario del sistema</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BREADCRUMB ===== -->
+  <div class="breadcrumb">
+    <span (click)="volverPanel()">Admin</span>
+    <i class="fas fa-chevron-right"></i>
+    <span class="active">Usuarios</span>
+  </div>
+
+  <!-- ===== ESTADÍSTICAS ===== -->
+  <div class="stats-row">
+    <div class="stat-mini total">
+      <i class="fas fa-users"></i>
+      <div>
+        <h3>{{ stats.total }}</h3>
+        <p>Total Usuarios</p>
+      </div>
+    </div>
+    
+    <div class="stat-mini admins">
+      <i class="fas fa-user-shield"></i>
+      <div>
+        <h3>{{ stats.admins }}</h3>
+        <p>Administradores</p>
+      </div>
+    </div>
+    
+    <div class="stat-mini usuarios">
+      <i class="fas fa-user"></i>
+      <div>
+        <h3>{{ stats.usuarios }}</h3>
+        <p>Usuarios Normales</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BUSCADOR ===== -->
+  <div class="search-section">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="busqueda"
+        (input)="buscarUsuarios()"
+        placeholder="Buscar por nombre, apellido o email..."
+      />
+      @if (busqueda) {
+        <button class="btn-clear" (click)="busqueda = ''; buscarUsuarios()">
+          <i class="fas fa-times"></i>
+        </button>
+      }
+    </div>
+    
+    <button class="btn-refresh" (click)="cargarUsuarios()" title="Recargar">
+      <i class="fas fa-sync-alt"></i>
+    </button>
+  </div>
+
+  <!-- ===== TABLA DE USUARIOS ===== -->
+  <div class="table-container">
+    @if (cargando) {
+      <div class="loading">
+        <i class="fas fa-spinner fa-spin fa-3x"></i>
+        <p>Cargando usuarios...</p>
+      </div>
+    } @else if (usuariosFiltrados.length === 0) {
+      <div class="empty-state">
+        <i class="fas fa-user-slash fa-3x"></i>
+        <h3>No se encontraron usuarios</h3>
+        <p>Intenta con otro término de búsqueda</p>
+      </div>
+    } @else {
+      <table class="usuarios-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (usuario of usuariosFiltrados; track usuario.id_usuario) {
+            <tr>
+              <td>{{ usuario.id_usuario }}</td>
+              <td class="nombre-col">
+                <div class="user-info">
+                  <img 
+                    [src]="usuario.imagen || 'assets/img/profile.jpeg'" 
+                    alt="Foto"
+                    class="user-avatar"
+                  />
+                  <div>
+                    <strong>{{ usuario.nombre }} {{ usuario.apellido || '' }}</strong>
+                  </div>
+                </div>
+              </td>
+              <td>{{ usuario.email }}</td>
+              <td>{{ usuario.telefono || '-' }}</td>
+              <td>
+                <span class="badge" [class.badge-admin]="usuario.rol === 'admin'">
+                  <i [class]="usuario.rol === 'admin' ? 'fas fa-shield-alt' : 'fas fa-user'"></i>
+                  {{ usuario.rol === 'admin' ? 'Admin' : 'Usuario' }}
+                </span>
+              </td>
+              <td class="acciones-col">
+                <button 
+                  class="btn-accion ver" 
+                  (click)="verDetalles(usuario)"
+                  title="Ver detalles"
+                >
+                  <i class="fas fa-eye"></i>
+                </button>
+                
+                <button 
+                  class="btn-accion cambiar-rol" 
+                  (click)="cambiarRol(usuario)"
+                  [title]="usuario.rol === 'admin' ? 'Quitar admin' : 'Hacer admin'"
+                >
+                  <i class="fas fa-exchange-alt"></i>
+                </button>
+                
+                <button 
+                  class="btn-accion eliminar" 
+                  (click)="eliminarUsuario(usuario)"
+                  [disabled]="usuario.rol === 'admin'"
+                  title="Eliminar usuario"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      
+      <div class="table-footer">
+        <p>Mostrando {{ usuariosFiltrados.length }} de {{ usuarios.length }} usuarios</p>
+      </div>
+    }
+  </div>
+
+  <!-- ===== MODAL DE DETALLES ===== -->
+  @if (modalVisible && usuarioSeleccionado) {
+    <div class="modal-overlay" (click)="cerrarModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2><i class="fas fa-user-circle"></i> Detalles del Usuario</h2>
+          <button class="btn-close-modal" (click)="cerrarModal()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="detail-section">
+            <div class="user-avatar-large">
+              <img 
+                [src]="usuarioSeleccionado.imagen || 'assets/img/profile.jpeg'" 
+                alt="Foto de perfil"
+              />
+            </div>
+
+            <div class="detail-grid">
+              <div class="detail-item">
+                <label><i class="fas fa-id-badge"></i> ID</label>
+                <p>{{ usuarioSeleccionado.id_usuario }}</p>
+              </div>
+
+              <div class="detail-item">
+                <label><i class="fas fa-user"></i> Nombre Completo</label>
+                <p>{{ usuarioSeleccionado.nombre }} {{ usuarioSeleccionado.apellido || '' }}</p>
+              </div>
+
+              <div class="detail-item">
+                <label><i class="fas fa-envelope"></i> Email</label>
+                <p>{{ usuarioSeleccionado.email }}</p>
+              </div>
+
+              <div class="detail-item">
+                <label><i class="fas fa-phone"></i> Teléfono</label>
+                <p>{{ usuarioSeleccionado.telefono || 'No especificado' }}</p>
+              </div>
+
+              <div class="detail-item">
+                <label><i class="fas fa-shield-alt"></i> Rol</label>
+                <p>
+                  <span class="badge" [class.badge-admin]="usuarioSeleccionado.rol === 'admin'">
+                    {{ usuarioSeleccionado.rol === 'admin' ? 'Administrador' : 'Usuario' }}
+                  </span>
+                </p>
+              </div>
+
+              <div class="detail-item">
+                <label><i class="fas fa-calendar"></i> Fecha de Registro</label>
+                <p>{{ usuarioSeleccionado.fecha_registro ? (usuarioSeleccionado.fecha_registro | date:'dd/MM/yyyy HH:mm') : 'No disponible' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-modal btn-secondary" (click)="cerrarModal()">
+            <i class="fas fa-times"></i> Cerrar
+          </button>
+          <button 
+            class="btn-modal btn-primary" 
+            (click)="cambiarRol(usuarioSeleccionado); cerrarModal()"
+          >
+            <i class="fas fa-exchange-alt"></i> 
+            {{ usuarioSeleccionado.rol === 'admin' ? 'Quitar Admin' : 'Hacer Admin' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

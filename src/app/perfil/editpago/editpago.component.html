@@ -1,0 +1,211 @@
+<div class="edit-pago-container">
+  <header class="edit-header">
+    <div class="logo">
+      <span class="logo-text">FOCOSHOP</span>
+      <i class="fa fa-shopping-cart"></i>
+    </div>
+
+    <button (click)="volver()" class="btn-volver-header">
+      <i class="fa fa-arrow-left"></i> Volver
+    </button>
+  </header>
+
+  <main class="edit-content">
+    <div class="form-card">
+      <div class="form-header">
+        <i class="fa fa-credit-card"></i>
+        <h2>Editar Método de Pago</h2>
+      </div>
+
+      <div class="pago-content">
+        <!-- Vista previa de la tarjeta -->
+        <div class="tarjeta-preview">
+          <div class="tarjeta-container" [class.flipped]="tarjetaFlipped">
+            <!-- Frente de la tarjeta -->
+            <div class="tarjeta-front" [style.background]="tarjeta.colorTarjeta">
+              <div class="tarjeta-chip">
+                <svg viewBox="0 0 50 40" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="50" height="40" rx="5" fill="#f9a825"/>
+                  <rect x="5" y="5" width="40" height="30" rx="3" fill="#fbc02d"/>
+                  <rect x="10" y="10" width="15" height="10" rx="2" fill="#fff9c4" opacity="0.5"/>
+                  <rect x="25" y="10" width="15" height="10" rx="2" fill="#fff9c4" opacity="0.5"/>
+                  <rect x="10" y="20" width="15" height="10" rx="2" fill="#fff9c4" opacity="0.5"/>
+                  <rect x="25" y="20" width="15" height="10" rx="2" fill="#fff9c4" opacity="0.5"/>
+                </svg>
+              </div>
+
+              <div class="tarjeta-numero">
+                {{ tarjeta.numero || '**** **** **** ****' }}
+              </div>
+
+              <div class="tarjeta-info">
+                <div class="tarjeta-titular">
+                  <label>Titular</label>
+                  <div class="valor">{{ tarjeta.nombreTitular || 'NOMBRE DEL TITULAR' }}</div>
+                </div>
+
+                <div class="tarjeta-expiracion">
+                  <label>Vence</label>
+                  <div class="valor">{{ tarjeta.mesExpiracion || 'MM' }}/{{ tarjeta.anioExpiracion || 'AA' }}</div>
+                </div>
+              </div>
+
+              <div class="tarjeta-logo">
+                <ng-container *ngIf="tarjeta.tipoTarjeta === 'Visa'">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa">
+                </ng-container>
+                <ng-container *ngIf="tarjeta.tipoTarjeta === 'Mastercard'">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                </ng-container>
+                <ng-container *ngIf="tarjeta.tipoTarjeta === 'Amex'">
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg" alt="American Express">
+                </ng-container>
+              </div>
+
+              <div class="tarjeta-banco" *ngIf="tarjeta.banco && tarjeta.banco !== 'Desconocido'">
+                {{ tarjeta.banco }}
+              </div>
+            </div>
+
+            <!-- Reverso de la tarjeta -->
+            <div class="tarjeta-back" [style.background]="tarjeta.colorTarjeta">
+              <div class="tarjeta-banda"></div>
+              <div class="tarjeta-cvv-container">
+                <label>CVV</label>
+                <div class="tarjeta-cvv">{{ tarjeta.cvv || '***' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="seguridad-info">
+            <i class="fa fa-shield-alt"></i>
+            <p>Tu información está protegida con encriptación SSL de 256 bits</p>
+          </div>
+        </div>
+
+        <!-- Formulario -->
+        <form class="pago-form" (ngSubmit)="guardarTarjeta()">
+          <div class="form-group">
+            <label><i class="fa fa-credit-card"></i> Número de Tarjeta <span class="required">*</span></label>
+            <input 
+              type="text" 
+              [(ngModel)]="tarjeta.numero"
+              name="numero"
+              (input)="onNumeroChange()"
+              (keypress)="onlyNumbers($event)"
+              placeholder="1234 5678 9012 3456"
+              maxlength="19"
+              required
+              class="input-field"
+              autocomplete="cc-number"
+            />
+            <small class="helper-text success" *ngIf="tarjeta.banco && tarjeta.banco !== 'Desconocido'">
+              <i class="fa fa-check-circle"></i> {{ tarjeta.banco }} - {{ tarjeta.tipoTarjeta }}
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label><i class="fa fa-user"></i> Nombre del Titular <span class="required">*</span></label>
+            <input 
+              type="text" 
+              [(ngModel)]="tarjeta.nombreTitular"
+              name="nombreTitular"
+              (input)="onNombreChange()"
+              placeholder="COMO APARECE EN LA TARJETA"
+              required
+              class="input-field"
+              autocomplete="cc-name"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label><i class="fa fa-calendar"></i> Fecha de Expiración <span class="required">*</span></label>
+              <div class="fecha-expiracion">
+                <select 
+                  [(ngModel)]="tarjeta.mesExpiracion"
+                  name="mesExpiracion"
+                  required
+                  class="input-field"
+                  autocomplete="cc-exp-month"
+                >
+                  <option value="">Mes</option>
+                  <option *ngFor="let mes of meses" [value]="mes">{{ mes }}</option>
+                </select>
+
+                <select 
+                  [(ngModel)]="tarjeta.anioExpiracion"
+                  name="anioExpiracion"
+                  required
+                  class="input-field"
+                  autocomplete="cc-exp-year"
+                >
+                  <option value="">Año</option>
+                  <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label><i class="fa fa-lock"></i> CVV <span class="required">*</span></label>
+              <input 
+                type="text" 
+                [(ngModel)]="tarjeta.cvv"
+                name="cvv"
+                (keypress)="onlyNumbers($event)"
+                (focus)="flipCard(true)"
+                (blur)="flipCard(false)"
+                placeholder="123"
+                maxlength="4"
+                required
+                class="input-field"
+                autocomplete="cc-csc"
+              />
+              <small class="helper-text">3 o 4 dígitos al reverso</small>
+            </div>
+          </div>
+
+          <div class="info-seguridad">
+            <div class="info-item">
+              <i class="fa fa-lock"></i>
+              <div>
+                <strong>Conexión Segura</strong>
+                <p>Certificado SSL</p>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="fa fa-shield-alt"></i>
+              <div>
+                <strong>Datos Encriptados</strong>
+                <p>AES-256</p>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="fa fa-check-circle"></i>
+              <div>
+                <strong>PCI Compliant</strong>
+                <p>Nivel 1</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" (click)="volver()" class="btn-cancelar">
+              <i class="fa fa-times"></i> Cancelar
+            </button>
+            <button type="submit" class="btn-guardar">
+              <i class="fa fa-save"></i> Guardar Método de Pago
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="alerta-exitosa" *ngIf="mostrarAlerta">
+  <div class="alerta-contenido">
+    <i class="fa fa-check-circle"></i>
+    <p>{{ mensajeAlerta }}</p>
+  </div>
+</div>
