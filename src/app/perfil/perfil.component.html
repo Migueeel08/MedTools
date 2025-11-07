@@ -7,7 +7,9 @@
     </button>
 
     <div class="perfil-info">
-      <img [src]="user.imagen" alt="Foto perfil" class="perfil-foto-dashboard"/>
+      <div class="perfil-icono">
+        <i class="fas fa-user-circle fa-6x"></i>
+      </div>
       <div class="perfil-texto">
         <h2>{{ user.nombre }}</h2>
         <p>{{ user.email }}</p>
@@ -18,24 +20,8 @@
     </div>
   </div>
 
-  <!-- TABS -->
+  <!-- TABS (solo compras) -->
   <div class="tabs-perfil">
-    <button 
-      [class.active]="tabSeleccionado==='vendiendo'" 
-      (click)="seleccionarTab('vendiendo')">
-      <i class="fas fa-store"></i> En venta
-      @if (productosVendiendo.length > 0) {
-        <span class="badge">{{ productosVendiendo.length }}</span>
-      }
-    </button>
-    <button 
-      [class.active]="tabSeleccionado==='vendidos'" 
-      (click)="seleccionarTab('vendidos')">
-      <i class="fas fa-check-circle"></i> Vendidos
-      @if (productosVendidos.length > 0) {
-        <span class="badge">{{ productosVendidos.length }}</span>
-      }
-    </button>
     <button 
       [class.active]="tabSeleccionado==='compras'" 
       (click)="seleccionarTab('compras')">
@@ -61,335 +47,25 @@
             <div class="producto-detalles">
               <h4>{{ producto.nombre }}</h4>
               <p class="precio">${{ producto.precio | number:'1.0-0' }}</p>
-              @if (tabSeleccionado === 'vendidos' && producto.fecha_venta) {
+              @if (tabSeleccionado === 'compras' && producto.fecha_venta) {
                 <p class="fecha-venta">
                   <i class="fas fa-calendar"></i>
                   {{ producto.fecha_venta | date:'dd/MM/yyyy' }}
                 </p>
               }
-              @if (producto.estado) {
-                <span class="estado-badge" [class]="'estado-' + producto.estado">
-                  {{ producto.estado }}
-                </span>
-              }
             </div>
           </div>
         } @empty {
           <div class="vacio">
-            @if (tabSeleccionado === 'vendiendo') {
-              <i class="fas fa-box-open fa-3x"></i>
-              <p>No tienes productos en venta</p>
-              <button class="btn-vender" (click)="irAVender()">
-                <i class="fas fa-plus"></i> Publicar producto
-              </button>
-            } @else if (tabSeleccionado === 'vendidos') {
-              <i class="fas fa-receipt fa-3x"></i>
-              <p>Aún no has vendido ningún producto</p>
-            } @else {
-              <i class="fas fa-shopping-cart fa-3x"></i>
-              <p>No has realizado ninguna compra</p>
-              <button class="btn-vender" (click)="explorarProductos()">
-                <i class="fas fa-search"></i> Explorar productos
-              </button>
-            }
+            <i class="fas fa-shopping-cart fa-3x"></i>
+            <p>No has realizado ninguna compra</p>
+            <button class="btn-vender" (click)="explorarProductos()">
+              <i class="fas fa-search"></i> Explorar productos
+            </button>
           </div>
         }
       </div>
     }
   </div>
-
-  <!-- ===== MODAL DE GESTIÓN DEL PRODUCTO ===== -->
-  @if (modalGestionVisible && productoSeleccionado) {
-    <div class="modal-overlay" (click)="cerrarModalGestion()">
-      <div class="modal-content modal-gestion" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>
-            <i class="fas fa-cog"></i> 
-            Gestionar Producto
-          </h2>
-          <button class="btn-close-modal" (click)="cerrarModalGestion()">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <!-- Info del producto -->
-          <div class="producto-preview">
-            <img [src]="productoSeleccionado.imagen" [alt]="productoSeleccionado.nombre">
-            <div class="producto-info">
-              <h3>{{ productoSeleccionado.nombre }}</h3>
-              <p class="precio-modal">${{ productoSeleccionado.precio | number:'1.0-0' }}</p>
-              <p class="stock-modal">
-                <i class="fas fa-boxes"></i>
-                Stock: {{ productoSeleccionado.cantidad_disponible }} unidades
-              </p>
-            </div>
-          </div>
-
-          <!-- Opciones de gestión -->
-          <div class="opciones-gestion">
-            <button class="opcion-btn stock" (click)="abrirModalStock()">
-              <div class="opcion-icon">
-                <i class="fas fa-boxes fa-2x"></i>
-              </div>
-              <div class="opcion-texto">
-                <h4>Editar Stock</h4>
-                <p>Actualiza la cantidad disponible</p>
-              </div>
-              <i class="fas fa-chevron-right"></i>
-            </button>
-
-            <button class="opcion-btn info" (click)="editarProducto()">
-              <div class="opcion-icon">
-                <i class="fas fa-edit fa-2x"></i>
-              </div>
-              <div class="opcion-texto">
-                <h4>Editar Información</h4>
-                <p>Modifica nombre, precio, descripción...</p>
-              </div>
-              <i class="fas fa-chevron-right"></i>
-            </button>
-
-            <button class="opcion-btn eliminar" (click)="eliminarProducto()">
-              <div class="opcion-icon">
-                <i class="fas fa-trash fa-2x"></i>
-              </div>
-              <div class="opcion-texto">
-                <h4>Eliminar Producto</h4>
-                <p>Quita el producto de tu tienda</p>
-              </div>
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  }
-
-  <!-- ===== MODAL DE EDITAR STOCK ===== -->
-  @if (modalStockVisible && productoSeleccionado) {
-    <div class="modal-overlay" (click)="cerrarModalStock()">
-      <div class="modal-content modal-stock" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>
-            <i class="fas fa-boxes"></i> 
-            Actualizar Stock
-          </h2>
-          <button class="btn-close-modal" (click)="cerrarModalStock()">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <div class="producto-mini">
-            <img [src]="productoSeleccionado.imagen" [alt]="productoSeleccionado.nombre">
-            <div>
-              <h4>{{ productoSeleccionado.nombre }}</h4>
-              <p>Stock actual: {{ productoSeleccionado.cantidad_disponible }} unidades</p>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="nuevoStock">
-              <i class="fas fa-boxes"></i> Cantidad Disponible
-            </label>
-            <div class="stock-input">
-              <button 
-                class="btn-stock-control" 
-                (click)="nuevoStock = nuevoStock > 0 ? nuevoStock - 1 : 0"
-                [disabled]="nuevoStock <= 0"
-              >
-                <i class="fas fa-minus"></i>
-              </button>
-              <input 
-                type="number" 
-                id="nuevoStock"
-                [(ngModel)]="nuevoStock"
-                min="0"
-                class="input-stock"
-              />
-              <button 
-                class="btn-stock-control" 
-                (click)="nuevoStock = nuevoStock + 1"
-              >
-                <i class="fas fa-plus"></i>
-              </button>
-            </div>
-            <p class="stock-help">
-              <i class="fas fa-info-circle"></i>
-              Ajusta la cantidad de productos disponibles para la venta
-            </p>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn-modal btn-secondary" (click)="cerrarModalStock()">
-            <i class="fas fa-times"></i> Cancelar
-          </button>
-          <button class="btn-modal btn-primary" (click)="guardarStock()">
-            <i class="fas fa-save"></i> Guardar Stock
-          </button>
-        </div>
-      </div>
-    </div>
-  }
-
-  <!-- ===== MODAL DE EDITAR INFORMACIÓN DEL PRODUCTO ===== -->
-  @if (modalEditarVisible && productoSeleccionado) {
-    <div class="modal-overlay" (click)="cerrarModalEditar()">
-      <div class="modal-content modal-editar" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-          <h2>
-            <i class="fas fa-edit"></i> 
-            Editar Producto
-          </h2>
-          <button class="btn-close-modal" (click)="cerrarModalEditar()">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <!-- Preview imagen -->
-          <div class="imagen-preview">
-            <img [src]="productoSeleccionado.imagen" [alt]="productoSeleccionado.nombre">
-          </div>
-
-          <!-- Formulario de edición -->
-          <form class="form-editar">
-            <div class="form-group">
-              <label for="nombre">
-                <i class="fas fa-tag"></i> Nombre del Producto *
-              </label>
-              <input 
-                type="text" 
-                id="nombre"
-                [(ngModel)]="formularioEdicion.nombre"
-                name="nombre"
-                placeholder="Ej: iPhone 15 Pro Max"
-                required
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="descripcion">
-                <i class="fas fa-align-left"></i> Descripción
-              </label>
-              <textarea 
-                id="descripcion"
-                [(ngModel)]="formularioEdicion.descripcion"
-                name="descripcion"
-                placeholder="Describe tu producto..."
-                rows="4"
-              ></textarea>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="precio">
-                  <i class="fas fa-dollar-sign"></i> Precio *
-                </label>
-                <input 
-                  type="number" 
-                  id="precio"
-                  [(ngModel)]="formularioEdicion.precio"
-                  name="precio"
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                  required
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="condicion">
-                  <i class="fas fa-star"></i> Condición
-                </label>
-                <select 
-                  id="condicion"
-                  [(ngModel)]="formularioEdicion.condicion"
-                  name="condicion"
-                >
-                  <option value="nuevo">Nuevo</option>
-                  <option value="usado">Usado</option>
-                  <option value="reacondicionado">Reacondicionado</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="categoria">
-                <i class="fas fa-folder"></i> Categoría
-              </label>
-              <select 
-                id="categoria"
-                [(ngModel)]="formularioEdicion.categoria"
-                name="categoria"
-              >
-                <option value="">Selecciona una categoría</option>
-                @for (cat of categorias; track cat.id_categoria) {
-                  <option [value]="cat.id_categoria">{{ cat.nombre }}</option>
-                }
-              </select>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="marca">
-                  <i class="fas fa-copyright"></i> Marca
-                </label>
-                <input 
-                  type="text" 
-                  id="marca"
-                  [(ngModel)]="formularioEdicion.marca"
-                  name="marca"
-                  placeholder="Ej: Apple, Samsung..."
-                />
-              </div>
-
-              <div class="form-group">
-                <label for="color">
-                  <i class="fas fa-palette"></i> Color
-                </label>
-                <input 
-                  type="text" 
-                  id="color"
-                  [(ngModel)]="formularioEdicion.color"
-                  name="color"
-                  placeholder="Ej: Negro, Blanco..."
-                />
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="talla">
-                <i class="fas fa-ruler"></i> Talla
-              </label>
-              <input 
-                type="text" 
-                id="talla"
-                [(ngModel)]="formularioEdicion.talla"
-                name="talla"
-                placeholder="Ej: M, L, XL..."
-              />
-            </div>
-
-            <p class="form-note">
-              <i class="fas fa-info-circle"></i>
-              Los campos marcados con * son obligatorios
-            </p>
-          </form>
-        </div>
-
-        <div class="modal-footer">
-          <button class="btn-modal btn-secondary" (click)="cerrarModalEditar()">
-            <i class="fas fa-times"></i> Cancelar
-          </button>
-          <button class="btn-modal btn-primary" (click)="guardarCambiosProducto()">
-            <i class="fas fa-save"></i> Guardar Cambios
-          </button>
-        </div>
-      </div>
-    </div>
-  }
 
 </div>
