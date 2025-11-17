@@ -272,6 +272,79 @@
     </div>
   }
 
+  <!-- ============================================
+       ✨ SECCIÓN DE PRODUCTOS RECOMENDADOS CON IA
+       ============================================ -->
+  @if (producto && !cargando) {
+    <div class="recomendaciones-section">
+      <div class="recomendaciones-header">
+        <h2>
+          <i class="fas fa-brain"></i>
+          También te podría interesar
+        </h2>
+        <p>Productos seleccionados especialmente para ti con Inteligencia Artificial</p>
+      </div>
+
+      @if (cargandoRecomendaciones) {
+        <div class="recomendaciones-loading">
+          <i class="fas fa-spinner fa-spin fa-2x"></i>
+          <p>Analizando productos similares...</p>
+        </div>
+      }
+
+      @if (!cargandoRecomendaciones && productosRecomendados.length > 0) {
+        <div class="recomendaciones-grid">
+          @for (prod of productosRecomendados; track prod.id_producto) {
+            <div class="producto-recomendado-card" (click)="verProductoRecomendado(prod.id_producto)">
+              <div class="producto-rec-imagen">
+                <img [src]="prod.imagen" [alt]="prod.nombre" onerror="this.src='assets/img/producto-default.jpg'" />
+                
+                <!-- Badge de similitud alta -->
+                @if (prod.similitud >= 0.8) {
+                  <div class="badge-similitud">
+                    <i class="fas fa-fire"></i>
+                    {{ (prod.similitud * 100) | number:'1.0-0' }}% Similar
+                  </div>
+                }
+              </div>
+              
+              <div class="producto-rec-info">
+                <p class="categoria-rec">{{ prod.categoria }}</p>
+                <h3>{{ prod.nombre }}</h3>
+                
+                @if (prod.marca) {
+                  <p class="marca-rec">
+                    <i class="fas fa-tag"></i>
+                    {{ prod.marca }}
+                  </p>
+                }
+                
+                <div class="precio-rec">
+                  <span class="precio">${{ prod.precio | number:'1.0-0' }}</span>
+                </div>
+                
+                <div class="stock-rec">
+                  <i class="fas fa-box"></i>
+                  <span [class.bajo-stock]="prod.stock < 5">
+                    {{ prod.stock }} disponibles
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (!cargandoRecomendaciones && productosRecomendados.length === 0) {
+        <div class="sin-recomendaciones">
+          <i class="fas fa-robot fa-3x"></i>
+          <p>No hay recomendaciones disponibles en este momento</p>
+          <span class="texto-secundario">Estamos trabajando en encontrar productos perfectos para ti</span>
+        </div>
+      }
+    </div>
+  }
+
   <!-- LOADING -->
   @if (!producto && cargando) {
     <div class="loading">
@@ -290,6 +363,113 @@
         <i class="fas fa-arrow-left"></i>
         Volver al inicio
       </button>
+    </div>
+  }
+
+  <!-- ===== MODAL PRODUCTO AGREGADO AL CARRITO ===== -->
+  @if (modalCarritoVisible && productoAgregado) {
+    <div class="modal-overlay" (click)="cerrarModalCarrito()">
+      <div class="modal-carrito-agregado" (click)="$event.stopPropagation()">
+        <div class="modal-header-carrito">
+          <div class="check-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <h2>¡Producto agregado al carrito!</h2>
+          <button class="btn-close-modal-x" (click)="cerrarModalCarrito()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body-carrito">
+          <div class="producto-agregado-info">
+            <img [src]="productoAgregado.imagen" [alt]="productoAgregado.nombre">
+            <div class="info-texto">
+              <h3>{{ productoAgregado.nombre }}</h3>
+              <p class="cantidad-agregada">Cantidad: {{ productoAgregado.cantidadAgregada }}</p>
+              <p class="precio-agregado">${{ productoAgregado.precio | number:'1.0-0' }} c/u</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer-carrito">
+          <button class="btn-seguir-comprando" (click)="seguirComprando()">
+            <i class="fas fa-arrow-left"></i>
+            Seguir comprando
+          </button>
+          <button class="btn-ir-carrito" (click)="irAlCarritoDesdeModal()">
+            <i class="fas fa-shopping-cart"></i>
+            Ir al carrito
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ===== MODAL DE COMPRA EXITOSA ===== -->
+  @if (modalCompraExitosaVisible) {
+    <div class="modal-overlay" (click)="cerrarModalCompraExitosa()">
+      <div class="modal-compra-exitosa" (click)="$event.stopPropagation()">
+        <div class="modal-header-compra-exitosa">
+          <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <h2>¡Compra realizada con éxito!</h2>
+          <button class="btn-close-modal-x" (click)="cerrarModalCompraExitosa()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body-compra-exitosa">
+          <div class="compra-info">
+            <div class="info-item">
+              <i class="fas fa-box"></i>
+              <div>
+                <strong>Producto:</strong>
+                <p>{{ producto.nombre }}</p>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <i class="fas fa-shopping-bag"></i>
+              <div>
+                <strong>Cantidad:</strong>
+                <p>{{ cantidadComprar }} {{ cantidadComprar === 1 ? 'unidad' : 'unidades' }}</p>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <i class="fas fa-dollar-sign"></i>
+              <div>
+                <strong>Total pagado:</strong>
+                <p class="total-pagado">${{ calcularTotal() | number:'1.0-0' }}</p>
+              </div>
+            </div>
+
+            <div class="info-item">
+              <i class="fas fa-truck"></i>
+              <div>
+                <strong>Envío:</strong>
+                <p>Tu pedido llegará en 3-5 días hábiles</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mensaje-agradecimiento">
+            <p><i class="fas fa-heart"></i> Gracias por tu compra en FocoShop</p>
+          </div>
+        </div>
+
+        <div class="modal-footer-compra-exitosa">
+          <button class="btn-seguir-comprando-exitosa" (click)="seguirComprandoDesdeExito()">
+            <i class="fas fa-shopping-bag"></i>
+            Seguir comprando
+          </button>
+          <button class="btn-ver-compras" (click)="irAMisCompras()">
+            <i class="fas fa-receipt"></i>
+            Ver mis compras
+          </button>
+        </div>
+      </div>
     </div>
   }
 
@@ -417,17 +597,77 @@
                     </div>
                   </div>
                 }
+                
+                <!-- BOTÓN PAGAR CON NUEVA TARJETA (STRIPE) -->
+                <div class="metodo-card agregar-nuevo-stripe" (click)="pagarConNuevaTarjeta()">
+                  <div class="agregar-icono stripe-icon">
+                    <i class="fas fa-credit-card"></i>
+                  </div>
+                  <div class="agregar-texto">
+                    <p class="agregar-titulo">
+                      <i class="fas fa-bolt"></i> Pagar con nueva tarjeta
+                    </p>
+                    <p class="agregar-descripcion">Procesado de forma segura por Stripe</p>
+                  </div>
+                  <div class="agregar-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                  </div>
+                </div>
+
+                <!-- BOTÓN AGREGAR MÉTODO DE PAGO (guardar para después) -->
+                <div class="metodo-card agregar-nuevo" (click)="agregarMetodoPago()">
+                  <div class="agregar-icono">
+                    <i class="fas fa-plus-circle"></i>
+                  </div>
+                  <div class="agregar-texto">
+                    <p class="agregar-titulo">Guardar nuevo método de pago</p>
+                    <p class="agregar-descripcion">Añade una tarjeta para usar después</p>
+                  </div>
+                  <div class="agregar-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                  </div>
+                </div>
               </div>
             } @else {
               <div class="sin-datos">
                 <i class="fas fa-credit-card fa-2x"></i>
                 <p>No tienes métodos de pago guardados</p>
-                <button class="btn-agregar-dato">
+                <button class="btn-agregar-dato" (click)="agregarMetodoPago()">
                   <i class="fas fa-plus"></i> Agregar método de pago
                 </button>
               </div>
             }
           </div>
+
+          <!-- FORMULARIO DE PAGO CON STRIPE -->
+          @if (mostrarFormularioStripe) {
+            <div class="seccion-checkout stripe-payment-section">
+              <h3><i class="fas fa-credit-card"></i> Ingresa los datos de tu tarjeta</h3>
+              
+              <div class="stripe-form-container">
+                <div id="card-element" class="stripe-card-element"></div>
+                
+                @if (errorStripe) {
+                  <div class="stripe-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ errorStripe }}
+                  </div>
+                }
+                
+                <div class="stripe-security-info">
+                  <i class="fas fa-lock"></i>
+                  <span>Pago seguro procesado por Stripe</span>
+                </div>
+                
+                <div class="tarjetas-aceptadas">
+                  <span class="texto-tarjetas">Aceptamos:</span>
+                  <img src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons/flat/visa.svg" alt="Visa">
+                  <img src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons/flat/mastercard.svg" alt="Mastercard">
+                  <img src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons/flat/amex.svg" alt="American Express">
+                </div>
+              </div>
+            </div>
+          }
 
           <!-- TOTAL -->
           <div class="seccion-total">
@@ -449,20 +689,37 @@
         </div>
 
         <div class="modal-footer-checkout">
-          <button class="btn-cancelar" (click)="cerrarModalCheckout()">
-            <i class="fas fa-times"></i> Cancelar
-          </button>
-          <button 
-            class="btn-confirmar-compra" 
-            (click)="confirmarCompra()"
-            [disabled]="procesandoPago || !direccionSeleccionada || !metodoPagoSeleccionado"
-          >
-            @if (procesandoPago) {
-              <i class="fas fa-spinner fa-spin"></i> Procesando...
-            } @else {
-              <i class="fas fa-lock"></i> Confirmar Compra
-            }
-          </button>
+          @if (mostrarFormularioStripe) {
+            <button class="btn-cancelar" (click)="cancelarStripe()" [disabled]="procesandoStripe">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button 
+              class="btn-confirmar-compra" 
+              (click)="procesarPagoConStripe()"
+              [disabled]="procesandoStripe"
+            >
+              @if (procesandoStripe) {
+                <i class="fas fa-spinner fa-spin"></i> Procesando pago...
+              } @else {
+                <i class="fas fa-lock"></i> Pagar ${{ calcularTotal() | number:'1.0-0' }}
+              }
+            </button>
+          } @else {
+            <button class="btn-cancelar" (click)="cerrarModalCheckout()">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button 
+              class="btn-confirmar-compra" 
+              (click)="confirmarCompra()"
+              [disabled]="procesandoPago || !direccionSeleccionada"
+            >
+              @if (procesandoPago) {
+                <i class="fas fa-spinner fa-spin"></i> Procesando...
+              } @else {
+                <i class="fas fa-lock"></i> Confirmar Compra
+              }
+            </button>
+          }
         </div>
       </div>
     </div>

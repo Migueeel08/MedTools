@@ -2,14 +2,14 @@
   <!-- HEADER PRINCIPAL -->
   <header class="header">
     <div class="logo">
-      <span class="logo-text">MEDTOOLS</span>
-      <i class="fa fa-heartbeat"></i>
+      <span class="logo-text">FOCOSHOP</span>
+      <i class="fa fa-shopping-cart"></i>
     </div>
 
     <div class="search-box">
       <input
         type="text"
-        placeholder="Buscar productos médicos..."
+        placeholder="Buscar productos..."
         [(ngModel)]="busqueda"
         (ngModelChange)="onBusquedaChange()"
       />
@@ -41,14 +41,17 @@
       <!-- USUARIO -->
       @if (isLoggedIn) {
         <div class="user-info" (click)="toggleUserMenu()">
-          <!-- 🔹 Aquí se reemplazó la imagen por el ícono de usuario -->
-          <i class="fa fa-user user-icon"></i>
+          <img [src]="userImage" alt="Perfil" class="user-icon" />
 
           <div class="user-menu" [class.open]="userMenuOpen">
             <div class="user-name-header">{{ userName }}</div>
 
             <button (click)="irPerfil()">
               <i class="fa fa-user"></i> Mi perfil
+            </button>
+
+            <button (click)="irVender()">
+              <i class="fa fa-tag"></i> Vender
             </button>
 
             <button (click)="irConfiguracion()">
@@ -82,7 +85,7 @@
           </div>
           <p class="categoria-nombre">{{ cat.nombre }}</p>
           @if (cat.subcategorias?.length > 0) {
-            <span class="categoria-count">{{ cat.subcategorias.length }} items</span>
+            <span class="categoria-count">{{ cat.subcategorias.length }} Subcategorias</span>
           }
         </div>
       }

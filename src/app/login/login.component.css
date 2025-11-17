@@ -104,6 +104,17 @@ html, body {
   color: #5a4fff;
 }
 
+/* ===== SECCIÓN DE GOOGLE ===== */
+.google-section {
+  margin-bottom: 20px;
+}
+
+#buttonDiv {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
 /* INPUTS */
 .input-group {
   margin-bottom: 20px;
@@ -177,7 +188,7 @@ html, body {
   content: '';
   position: absolute;
   top: 50%;
-  width: 45%;
+  width: 42%;
   height: 1px;
   background: #e5e5e5;
 }

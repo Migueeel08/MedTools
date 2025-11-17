@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
+
+declare var google: any;
 
 @Component({
   selector: 'app-login',
@@ -11,7 +13,7 @@ import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http'
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit, AfterViewInit {
   isRegisterMode = false;
   nombre = '';
   apellido = '';
@@ -27,6 +29,145 @@ export class LoginComponent {
   private baseUrl = 'http://localhost:8000'; // URL base para imágenes
 
   constructor(public router: Router, private http: HttpClient) {}
+
+  ngOnInit(): void {
+    // Cargar el script de Google
+    this.loadGoogleScript();
+  }
+
+  ngAfterViewInit(): void {
+    // Inicializar Google Sign-In después de que la vista esté lista
+    setTimeout(() => {
+      this.initializeGoogleSignIn();
+    }, 500);
+  }
+
+  // ===========================
+  // GOOGLE SIGN-IN
+  // ===========================
+  loadGoogleScript(): void {
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  }
+
+  initializeGoogleSignIn(): void {
+    if (typeof google !== 'undefined') {
+      google.accounts.id.initialize({
+        client_id: '287808420980-s2poeedgd6veoojkev5j3huia9no8uh2.apps.googleusercontent.com',
+        callback: this.handleCredentialResponse.bind(this)
+      });
+
+      google.accounts.id.renderButton(
+        document.getElementById('buttonDiv'),
+        { 
+          theme: 'outline', 
+          size: 'large',
+          width: '100%',
+          text: 'signin_with',
+          shape: 'rectangular',
+          logo_alignment: 'left'
+        }
+      );
+    }
+  }
+
+  handleCredentialResponse(response: any): void {
+    // Decodificar el JWT token que Google nos envía
+    const payload = this.parseJwt(response.credential);
+    
+    console.log('📦 Payload completo de Google:', payload);
+
+    // Enviar datos al backend
+    const userData = {
+      email: payload.email,
+      nombre: payload.given_name || payload.name || 'Usuario',
+      apellido: payload.family_name || '',
+      imagen: payload.picture || 'assets/img/profile.jpeg',
+      google_id: payload.sub,
+      email_verified: payload.email_verified || false
+    };
+
+    console.log('📤 Datos que se enviarán al backend:', userData);
+
+    this.http.post<any>(`${this.apiUrl}/usuarios/google-login`, userData)
+      .subscribe({
+        next: (response) => {
+          console.log('✅ Login con Google exitoso:', response);
+
+          // Construir URL completa de la imagen
+          let imagenUrl = response.imagen;
+          
+          if (response.imagen && !response.imagen.startsWith('http')) {
+            if (response.imagen.startsWith('/uploads')) {
+              imagenUrl = `${this.baseUrl}${response.imagen}`;
+            } else if (response.imagen.startsWith('uploads')) {
+              imagenUrl = `${this.baseUrl}/${response.imagen}`;
+            } else if (response.imagen.startsWith('assets/')) {
+              imagenUrl = response.imagen;
+            } else {
+              imagenUrl = `${this.baseUrl}/uploads/perfiles/${response.imagen}`;
+            }
+          }
+
+          // Guardar usuario completo CON ROL
+          const userData = {
+            id: response.id_usuario,
+            id_usuario: response.id_usuario,
+            nombre: response.nombre,
+            apellido: response.apellido || '',
+            email: response.email,
+            telefono: response.telefono || '',
+            imagen: imagenUrl,
+            rol: response.rol
+          };
+
+          console.log('💾 Guardando en localStorage:', userData);
+
+          localStorage.setItem('user', JSON.stringify(userData));
+          localStorage.setItem('email', response.email);
+          localStorage.setItem('userId', response.id_usuario.toString());
+          
+          // Emitir evento para actualizar el header
+          window.dispatchEvent(new Event('storage'));
+
+          // Redirigir según el rol
+          if (response.rol === 'admin') {
+            console.log('🔐 Usuario ADMIN detectado, redirigiendo al panel admin...');
+            this.mostrarAlerta(`¡Bienvenido Admin ${response.nombre}! 👑`, 'exito');
+            setTimeout(() => {
+              this.router.navigate(['/admin']);
+            }, 1000);
+          } else {
+            console.log('👤 Usuario NORMAL detectado, redirigiendo a la tienda...');
+            this.mostrarAlerta(`¡Hola ${response.nombre}! Inicio de sesión correcto 🔥`, 'exito');
+            setTimeout(() => {
+              this.router.navigate(['/']);
+            }, 1000);
+          }
+        },
+        error: (error) => {
+          console.error('❌ Error completo:', error);
+          console.error('❌ Error status:', error.status);
+          console.error('❌ Error detail:', error.error);
+          this.mostrarAlerta('Error al iniciar sesión con Google', 'error');
+        }
+      });
+  }
+
+  parseJwt(token: string): any {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  }
 
   // ===========================
   // Cambiar entre Login y Registro
@@ -122,7 +263,6 @@ export class LoginComponent {
       return;
     }
 
-    // ✅ NUEVO: Usar el endpoint /login simple que devuelve el usuario completo
     const credentials = {
       email: this.email,
       password: this.contrasena
@@ -154,7 +294,7 @@ export class LoginComponent {
           }
         }
 
-        // ✅ Guardar usuario completo CON ROL
+        // Guardar usuario completo CON ROL
         const userData = {
           id: response.id_usuario,
           id_usuario: response.id_usuario,
@@ -163,7 +303,7 @@ export class LoginComponent {
           email: response.email,
           telefono: response.telefono || '',
           imagen: imagenUrl,
-          rol: response.rol  // ✅ CAMPO CLAVE
+          rol: response.rol
         };
 
         console.log('💾 Guardando en localStorage:', userData);
@@ -175,7 +315,7 @@ export class LoginComponent {
         // Emitir evento para actualizar el header
         window.dispatchEvent(new Event('storage'));
 
-        // ✅ REDIRIGIR SEGÚN EL ROL
+        // Redirigir según el rol
         if (response.rol === 'admin') {
           console.log('🔐 Usuario ADMIN detectado, redirigiendo al panel admin...');
           this.mostrarAlerta(`¡Bienvenido Admin ${response.nombre}! 👑`, 'exito');

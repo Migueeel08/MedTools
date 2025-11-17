@@ -22,16 +22,22 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+  background: #000;
   padding: 0 2rem;
   z-index: 1000;
-  box-shadow: 0 4px 15px rgba(30, 60, 114, 0.4);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
 }
 
 .logo-text {
@@ -42,61 +48,23 @@ body {
   letter-spacing: 2px;
 }
 
-.header i {
+.header i,
+.header .fas {
   color: rgb(255, 255, 255);
   font-size: 1.5rem;
 }
 
-.search-box {
-  position: relative;
-  width: 350px;
-}
-
-.search-box input {
-  width: 100%;
-  padding: 10px 40px 10px 15px;
-  border-radius: 25px;
-  border: none;
-  outline: none;
-  font-size: 14px;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-}
-
-.search-box input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.search-box i {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #ffffff;
-}
-
-/* ======= NUEVO: TÍTULO "MI CARRITO" ======= */
 .header-title {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex: 1;
-  text-align: center;
+  gap: 12px;
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 600;
 }
 
 .header-title i {
-  font-size: 2rem;
-  color: #ffffff;
-  margin-right: 10px;
-}
-
-.header-title h1 {
-  color: #ffffff;
-  font-size: 2.2rem;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 800;
-  margin: 0;
-  letter-spacing: 1px;
+  color: #a68efc;
 }
 
 /* Usuario */
@@ -195,7 +163,6 @@ body {
   margin: 0 auto;
   padding: 20px;
 }
-
 
 /* ======= LOADING ======= */
 .loading {
@@ -1286,128 +1253,269 @@ body {
     padding: 20px;
   }
 }
-/* ======= HEADER ======= */
-/* LOGO IZQUIERDO */
+/* ============================================
+   💳 ESTILOS PARA STRIPE EN EL CARRITO
+   AGREGAR AL FINAL DE carrito.component.css
+   ============================================ */
 
-/* TÍTULO CENTRAL */
-.header-title {
+/* Sección de pago Stripe */
+.stripe-payment-section {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 30px;
+  border-radius: 15px;
+  border: 2px solid #667eea;
+  animation: fadeInSlideDown 0.4s ease;
+  margin-top: 20px;
+}
+
+@keyframes fadeInSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stripe-form-container {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Elemento de tarjeta de Stripe */
+.stripe-card-element {
+  padding: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  transition: all 0.3s ease;
+  min-height: 50px;
+}
+
+.stripe-card-element:hover {
+  border-color: #667eea;
+}
+
+.stripe-card-element:focus-within {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Error de Stripe */
+.stripe-error {
+  margin-top: 15px;
+  padding: 12px 15px;
+  background: #fee;
+  border-left: 4px solid #f44;
+  border-radius: 6px;
+  color: #c33;
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
+  font-size: 0.9rem;
+  animation: shake 0.5s ease;
 }
 
-/* SECCIÓN DE USUARIO */
-.auth-links {
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.stripe-error i {
+  font-size: 1.2rem;
+}
+
+/* Info de seguridad */
+.stripe-security-info {
+  margin-top: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
+  color: #666;
+  font-size: 0.85rem;
 }
 
-.user-info {
+.stripe-security-info i {
+  color: #00a650;
+  font-size: 1rem;
+}
+
+/* Tarjetas aceptadas */
+.tarjetas-aceptadas {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.texto-tarjetas {
+  font-size: 0.85rem;
+  color: #999;
+  font-weight: 500;
+}
+
+.tarjetas-aceptadas img {
+  height: 25px;
+  width: auto;
+  opacity: 0.7;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.tarjetas-aceptadas img:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* ===== BOTÓN PAGAR CON NUEVA TARJETA STRIPE ===== */
+.metodo-card.agregar-nuevo-stripe {
+  border: 2px solid #635bff;
+  background: linear-gradient(135deg, rgba(99, 91, 255, 0.08) 0%, rgba(99, 91, 255, 0.03) 100%);
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
+  overflow: hidden;
 }
 
-/* ICONO DE USUARIO (FontAwesome) */
-.user-icon {
-  font-size: 1.8rem;
-  color: #ffcc00;
-  background: #222;
-  border: 2px solid #ffcc00;
-  border-radius: 50%;
-  padding: 10px;
-  width: 46px;
-  height: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: 0.3s ease;
-}
-
-.user-icon:hover {
-  background: #ffcc00;
-  color: #111;
-  transform: scale(1.05);
-}
-
-/* MENÚ DESPLEGABLE */
-.user-menu {
+.metodo-card.agregar-nuevo-stripe::before {
+  content: '';
   position: absolute;
-  top: 55px;
-  right: 0;
-  background: #222;
-  color: #fff;
-  border-radius: 10px;
-  padding: 10px 0;
-  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
-  min-width: 180px;
-  display: none;
-  flex-direction: column;
-  z-index: 100;
-}
-
-.user-menu.open {
-  display: flex;
-}
-
-.user-name-header {
-  font-weight: 600;
-  text-align: center;
-  margin-bottom: 6px;
-  border-bottom: 1px solid #333;
-  padding-bottom: 6px;
-}
-
-.user-menu button {
-  background: none;
-  border: none;
-  color: #ddd;
-  text-align: left;
-  padding: 10px 18px;
+  top: 0;
+  left: -100%;
   width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(99, 91, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.metodo-card.agregar-nuevo-stripe:hover::before {
+  left: 100%;
+}
+
+.metodo-card.agregar-nuevo-stripe:hover {
+  border-color: #635bff;
+  background: linear-gradient(135deg, rgba(99, 91, 255, 0.12) 0%, rgba(99, 91, 255, 0.06) 100%);
+  transform: translateX(5px);
+  box-shadow: 0 8px 20px rgba(99, 91, 255, 0.2);
+}
+
+.agregar-icono {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #667eea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.agregar-icono.stripe-icon {
+  background: linear-gradient(135deg, #635bff 0%, #4f46e5 100%);
+  box-shadow: 0 4px 12px rgba(99, 91, 255, 0.3);
+}
+
+.agregar-texto {
+  flex: 1;
+}
+
+.agregar-titulo {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #333;
+  margin: 0 0 4px;
+}
+
+.metodo-card.agregar-nuevo-stripe .agregar-titulo {
+  color: #635bff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.metodo-card.agregar-nuevo-stripe .agregar-titulo i.fa-bolt {
+  color: #fbbf24;
+  font-size: 1rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.agregar-descripcion {
+  font-size: 0.85rem;
+  color: #999;
+  margin: 0;
+}
+
+.metodo-card.agregar-nuevo-stripe .agregar-descripcion {
+  color: #635bff;
+  font-weight: 500;
+}
+
+.agregar-arrow {
+  flex-shrink: 0;
+  color: #999;
+  font-size: 1.2rem;
+}
+
+.metodo-card.agregar-nuevo-stripe .agregar-arrow i {
+  color: #635bff;
+}
+
+.metodo-card.agregar-nuevo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  border: 2px dashed #ddd;
+  border-radius: 12px;
   cursor: pointer;
-  font-size: 0.95rem;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
+  background: #fafafa;
+  margin-top: 10px;
 }
 
-.user-menu button:hover {
-  background: #333;
-  color: #ffcc00;
+.metodo-card.agregar-nuevo:hover {
+  border-color: #667eea;
+  border-style: solid;
+  background: #f0f3ff;
+  transform: translateX(5px);
 }
 
-.divider {
-  height: 1px;
-  background: #333;
-  margin: 6px 0;
-}
-
-/* BOTÓN CERRAR SESIÓN */
-.logout-btn {
-  color: #e53935 !important;
-}
-
-.logout-btn:hover {
-  background: #3b0a0a !important;
-  color: #fff !important;
-}
-
-/* RESPONSIVE */
+/* Responsive para Stripe */
 @media (max-width: 768px) {
-  .header {
+  .stripe-payment-section {
+    padding: 20px;
+  }
+  
+  .stripe-form-container {
+    padding: 20px;
+  }
+  
+  .tarjetas-aceptadas {
     flex-direction: column;
     gap: 10px;
-    text-align: center;
   }
-
-  .header-title {
-    font-size: 1.5rem;
+  
+  .tarjetas-aceptadas img {
+    height: 20px;
   }
 }

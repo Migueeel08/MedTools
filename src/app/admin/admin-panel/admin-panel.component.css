@@ -162,15 +162,15 @@
 }
 
 .stat-card.usuarios {
-  border-color: #4CAF50;
-}
-
-.stat-card.productos {
   border-color: #2196F3;
 }
 
-.stat-card.categorias {
+.stat-card.productos {
   border-color: #FF9800;
+}
+
+.stat-card.categorias {
+  border-color: #4CAF50;
 }
 
 .stat-card.ventas {
@@ -189,17 +189,17 @@
 
 .stat-card.usuarios .stat-icon {
   background: rgba(76, 175, 80, 0.1);
-  color: #4CAF50;
+  color: #2196F3;
 }
 
 .stat-card.productos .stat-icon {
   background: rgba(33, 150, 243, 0.1);
-  color: #2196F3;
+  color: #FF9800;
 }
 
 .stat-card.categorias .stat-icon {
   background: rgba(255, 152, 0, 0.1);
-  color: #FF9800;
+  color: #4CAF50;
 }
 
 .stat-card.ventas .stat-icon {
@@ -291,17 +291,17 @@
 
 .action-icon.usuarios {
   background: rgba(76, 175, 80, 0.1);
-  color: #4CAF50;
+  color: #2196F3;
 }
 
 .action-icon.productos {
   background: rgba(33, 150, 243, 0.1);
-  color: #2196F3;
+  color: #FF9800;
 }
 
 .action-icon.categorias {
   background: rgba(255, 152, 0, 0.1);
-  color: #FF9800;
+  color: #4CAF50;
 }
 
 .action-icon.reportes {

@@ -1,0 +1,233 @@
+<div class="favoritos-container">
+  <!-- HEADER PRINCIPAL -->
+  <header class="main-header">
+    <div class="header-logo" (click)="irInicio()">
+      <span class="logo-text">FOCOSHOP</span>
+      <i class="fa fa-shopping-cart"></i>
+    </div>
+
+    <div class="header-search">
+      <input
+        type="text"
+        placeholder="Buscar productos..."
+        [(ngModel)]="busqueda"
+        (keyup.enter)="buscarProducto()"
+      />
+      <i class="fa fa-search"></i>
+    </div>
+
+    <!-- LINKS DE NAVEGACIÓN -->
+    <div class="header-actions">
+      <!-- FAVORITOS -->
+      <div class="header-icon favoritos-activo">
+        <i class="fa fa-heart"></i>
+        @if (contadorFavoritos > 0) {
+          <span class="icon-badge">{{ contadorFavoritos }}</span>
+        }
+      </div>
+
+      <!-- CARRITO -->
+      <div class="header-icon" (click)="irAlCarrito()">
+        <i class="fa fa-shopping-cart"></i>
+        @if (contadorCarrito > 0) {
+          <span class="icon-badge carrito">{{ contadorCarrito }}</span>
+        }
+      </div>
+
+      <!-- USUARIO -->
+      <div class="user-dropdown" (click)="toggleUserMenu()">
+        <img [src]="userImage" alt="Perfil" class="user-avatar" />
+
+        <div class="dropdown-menu" [class.show]="userMenuOpen">
+          <div class="dropdown-header">{{ userName }}</div>
+          <button (click)="irPerfil()"><i class="fa fa-user"></i> Mi perfil</button>
+          <button (click)="irVender()"><i class="fa fa-tag"></i> Vender</button>
+          <button (click)="irConfiguracion()"><i class="fa fa-cog"></i> Configuración</button>
+          <div class="dropdown-divider"></div>
+          <button class="btn-logout" (click)="logout()">
+            <i class="fa fa-sign-out-alt"></i> Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="page-content">
+    <!-- TÍTULO -->
+    <div class="page-title">
+      <div class="title-left">
+        <i class="fa fa-heart"></i>
+        <h1>Mis Favoritos</h1>
+      </div>
+      <p class="subtitle">{{ favoritos.length }} productos guardados</p>
+    </div>
+
+    <!-- FILTROS -->
+    <div class="filters">
+      <button 
+        class="filter-btn"
+        [class.active]="filtroActivo === 'todos'"
+        (click)="cambiarFiltro('todos')"
+      >
+        <i class="fa fa-th"></i> Todos
+      </button>
+      <button 
+        class="filter-btn"
+        [class.active]="filtroActivo === 'disponibles'"
+        (click)="cambiarFiltro('disponibles')"
+      >
+        <i class="fa fa-check-circle"></i> Disponibles
+      </button>
+      <button 
+        class="filter-btn"
+        [class.active]="filtroActivo === 'rebajados'"
+        (click)="cambiarFiltro('rebajados')"
+      >
+        <i class="fa fa-tag"></i> Con descuento
+      </button>
+      <button 
+        class="filter-btn"
+        [class.active]="filtroActivo === 'recientes'"
+        (click)="cambiarFiltro('recientes')"
+      >
+        <i class="fa fa-clock"></i> Recientes
+      </button>
+    </div>
+
+    <!-- GRID DE PRODUCTOS -->
+    @if (favoritosFiltrados.length > 0) {
+      <div class="products-grid">
+        @for (item of favoritosFiltrados; track item.id_favorito) {
+          <div class="product-card">
+            <!-- Botón eliminar -->
+            <button class="btn-remove" (click)="eliminarFavorito(item.id_favorito, $event)">
+              <i class="fa fa-times"></i>
+            </button>
+
+            <!-- Badge -->
+            @if (!item.producto.disponible || item.producto.cantidad_disponible === 0) {
+              <span class="badge sold-out">Agotado</span>
+            } @else if (item.producto.descuento > 0) {
+              <span class="badge discount">-{{ item.producto.descuento }}%</span>
+            }
+
+            <!-- Imagen -->
+            <div class="product-image" (click)="verDetalleProducto(item.producto.id_producto)">
+              <img [src]="item.producto.imagen" [alt]="item.producto.nombre" />
+            </div>
+
+            <!-- Info -->
+            <div class="product-details">
+              <h3 class="product-name" (click)="verDetalleProducto(item.producto.id_producto)">
+                {{ item.producto.nombre }}
+              </h3>
+
+              @if (item.producto.marca) {
+                <p class="product-brand">{{ item.producto.marca }}</p>
+              }
+
+              <!-- Precios -->
+              <div class="product-price">
+                @if (item.producto.precio_anterior && item.producto.precio_anterior > item.producto.precio) {
+                  <span class="old-price">${{ item.producto.precio_anterior | number:'1.0-0' }}</span>
+                }
+                <span class="current-price">${{ item.producto.precio | number:'1.0-0' }}</span>
+              </div>
+
+              <!-- Rating -->
+              <div class="product-rating">
+                <div class="stars">
+                  @for (star of [1,2,3,4,5]; track star) {
+                    <i class="fa fa-star" [class.filled]="star <= (item.producto.calificacion || 0)"></i>
+                  }
+                </div>
+                <span class="reviews">({{ item.producto.reviews || 0 }})</span>
+              </div>
+
+              <!-- Botón agregar -->
+              @if (item.producto.disponible && item.producto.cantidad_disponible > 0) {
+                <button class="btn-add-cart" (click)="agregarAlCarrito(item.producto, $event)">
+                  <i class="fa fa-shopping-cart"></i> Agregar al carrito
+                </button>
+              } @else {
+                <button class="btn-unavailable" disabled>
+                  <i class="fa fa-ban"></i> No disponible
+                </button>
+              }
+
+              <!-- Fecha -->
+              <p class="date-added">
+                <i class="fa fa-clock"></i>
+                {{ item.fecha_agregado | date:'dd/MM/yyyy' }}
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- ESTADO VACÍO -->
+    @if (favoritos.length === 0 && !cargando) {
+      <div class="empty-state">
+        <i class="fa fa-heart-broken empty-icon"></i>
+        <h2>No tienes favoritos aún</h2>
+        <p>Explora nuestra tienda y guarda los productos que te gusten</p>
+        <button class="btn-primary" (click)="irInicio()">
+          <i class="fa fa-compass"></i> Explorar productos
+        </button>
+      </div>
+    }
+
+    <!-- SIN RESULTADOS -->
+    @if (favoritos.length > 0 && favoritosFiltrados.length === 0 && !cargando) {
+      <div class="empty-state">
+        <i class="fa fa-filter empty-icon"></i>
+        <h2>No se encontraron productos</h2>
+        <p>Intenta con otro filtro</p>
+        <button class="btn-primary" (click)="cambiarFiltro('todos')">
+          <i class="fa fa-times"></i> Limpiar filtros
+        </button>
+      </div>
+    }
+
+    <!-- LOADING -->
+    @if (cargando) {
+      <div class="loading-state">
+        <i class="fa fa-spinner fa-spin"></i>
+        <p>Cargando favoritos...</p>
+      </div>
+    }
+  </main>
+
+  <!-- BOTÓN ELIMINAR TODOS -->
+  @if (favoritos.length > 0 && !cargando) {
+    <div class="footer-actions">
+      <button class="btn-danger" (click)="confirmarEliminarTodos()">
+        <i class="fa fa-trash"></i> Eliminar todos los favoritos
+      </button>
+    </div>
+  }
+</div>
+
+<!-- MODAL DE CONFIRMACIÓN -->
+@if (mostrarModalConfirmacion) {
+  <div class="modal-backdrop" (click)="cerrarModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <i class="fa fa-exclamation-triangle"></i>
+        <h3>Confirmar acción</h3>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar todos tus favoritos?</p>
+        <p class="warning">Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-danger" (click)="eliminarTodosFavoritos()">
+          <i class="fa fa-trash"></i> Eliminar todos
+        </button>
+      </div>
+    </div>
+  </div>
+}

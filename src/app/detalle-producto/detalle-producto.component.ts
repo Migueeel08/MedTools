@@ -1,8 +1,9 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { StripeCheckoutService } from '../services/stripe-checkout.service';
 
 @Component({
   selector: 'app-detalle-producto',
@@ -11,10 +12,11 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
   templateUrl: './detalle-producto.component.html',
   styleUrl: './detalle-producto.component.css'
 })
-export class DetalleProductoComponent implements OnInit {
+export class DetalleProductoComponent implements OnInit, OnDestroy {
   
   // ===== API =====
   private apiUrl = 'http://localhost:8000/api';
+  baseUrl = 'http://localhost:8000'; // ✅ Hacer público para usar en template
 
   // ===== PRODUCTO =====
   producto: any = null;
@@ -26,7 +28,11 @@ export class DetalleProductoComponent implements OnInit {
   colorSeleccionado: string = '';
   tallaSeleccionada: string = '';
   cantidadComprar: number = 1;
+  
+  // ✅ FAVORITOS CON BACKEND
   esFavorito: boolean = false;
+  idFavorito: number | null = null;
+  cargandoFavorito: boolean = false;
 
   // ===== USUARIO =====
   isLoggedIn: boolean = false;
@@ -46,22 +52,49 @@ export class DetalleProductoComponent implements OnInit {
   metodoPagoSeleccionado: any = null;
   procesandoPago: boolean = false;
 
+  // ===== MODAL AGREGAR AL CARRITO =====
+  modalCarritoVisible: boolean = false;
+  productoAgregado: any = null;
+
+  // ===== MODAL COMPRA EXITOSA =====
+  modalCompraExitosaVisible: boolean = false;
+
+  // ===== SISTEMA DE RECOMENDACIONES IA =====
+  productosRecomendados: any[] = [];
+  cargandoRecomendaciones: boolean = false;
+
+  // ===== STRIPE =====
+  mostrarFormularioStripe: boolean = false;
+  procesandoStripe: boolean = false;
+  errorStripe: string = '';
+  stripeInicializado: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private http: HttpClient
+    private http: HttpClient,
+    private stripeService: StripeCheckoutService
   ) {}
 
   ngOnInit() {
+    this.cargarUsuario();
+    
     this.route.params.subscribe(params => {
       this.productId = +params['id'];
       if (this.productId) {
         this.cargarProducto();
+        
+        if (this.userId) {
+          this.verificarFavorito();
+        }
       }
     });
+  }
 
-    this.cargarUsuario();
-    this.verificarFavorito();
+  ngOnDestroy() {
+    if (this.stripeInicializado) {
+      this.stripeService.destroyElements();
+    }
   }
 
   // ===== CARGAR PRODUCTO =====
@@ -101,6 +134,9 @@ export class DetalleProductoComponent implements OnInit {
         this.tallaSeleccionada = this.producto.talla;
 
         this.cargando = false;
+        
+        // ✅ Cargar recomendaciones después de cargar el producto
+        this.cargarRecomendaciones();
       },
       error: (error) => {
         console.error('Error al cargar producto:', error);
@@ -155,49 +191,98 @@ export class DetalleProductoComponent implements OnInit {
     this.imagenSeleccionada = index;
   }
 
-  // ===== FAVORITOS =====
-  toggleFavorito() {
-    this.esFavorito = !this.esFavorito;
-    
-    if (this.esFavorito) {
-      this.agregarAFavoritos();
-    } else {
-      this.quitarDeFavoritos();
-    }
+  // ===== FAVORITOS CON BACKEND =====
+  
+  verificarFavorito() {
+    if (!this.userId || !this.productId) return;
+
+    this.http.get<any>(
+      `${this.apiUrl}/favoritos/check?id_usuario=${this.userId}&id_producto=${this.productId}`
+    ).subscribe({
+      next: (data) => {
+        this.esFavorito = data.en_favoritos;
+        this.idFavorito = data.id_favorito || null;
+        console.log('✅ Estado favorito:', this.esFavorito);
+      },
+      error: (error) => {
+        console.error('Error al verificar favorito:', error);
+        this.esFavorito = false;
+      }
+    });
   }
 
-  verificarFavorito() {
-    const favoritos = localStorage.getItem('favoritos');
-    if (favoritos) {
-      const listaFavoritos = JSON.parse(favoritos);
-      this.esFavorito = listaFavoritos.includes(this.productId);
+  toggleFavorito() {
+    if (!this.isLoggedIn) {
+      alert('Debes iniciar sesión para agregar a favoritos');
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (!this.producto?.id_producto) {
+      alert('Error: Producto no válido');
+      return;
+    }
+
+    if (this.cargandoFavorito) return;
+
+    this.cargandoFavorito = true;
+
+    if (this.esFavorito) {
+      this.quitarDeFavoritos();
+    } else {
+      this.agregarAFavoritos();
     }
   }
 
   agregarAFavoritos() {
-    let favoritos = [];
-    const favoritosStr = localStorage.getItem('favoritos');
-    
-    if (favoritosStr) {
-      favoritos = JSON.parse(favoritosStr);
-    }
-    
-    if (!favoritos.includes(this.productId)) {
-      favoritos.push(this.productId);
-      localStorage.setItem('favoritos', JSON.stringify(favoritos));
-      console.log('✅ Producto agregado a favoritos');
-    }
+    const favorito = {
+      id_usuario: this.userId,
+      id_producto: this.producto.id_producto
+    };
+
+    this.http.post<any>(`${this.apiUrl}/favoritos`, favorito).subscribe({
+      next: (response) => {
+        console.log('✅ Agregado a favoritos:', response);
+        this.esFavorito = true;
+        this.idFavorito = response.id_favorito;
+        this.cargandoFavorito = false;
+        
+        window.dispatchEvent(new Event('favoritosActualizado'));
+      },
+      error: (error) => {
+        console.error('Error al agregar a favoritos:', error);
+        this.cargandoFavorito = false;
+        
+        if (error.status === 400) {
+          alert('Este producto ya está en tus favoritos');
+        } else {
+          alert('Error al agregar a favoritos. Intenta de nuevo.');
+        }
+      }
+    });
   }
 
   quitarDeFavoritos() {
-    const favoritosStr = localStorage.getItem('favoritos');
-    
-    if (favoritosStr) {
-      let favoritos = JSON.parse(favoritosStr);
-      favoritos = favoritos.filter((id: number) => id !== this.productId);
-      localStorage.setItem('favoritos', JSON.stringify(favoritos));
-      console.log('❌ Producto quitado de favoritos');
+    if (!this.idFavorito) {
+      this.cargandoFavorito = false;
+      return;
     }
+
+    this.http.delete(`${this.apiUrl}/favoritos/${this.idFavorito}`).subscribe({
+      next: () => {
+        console.log('✅ Eliminado de favoritos');
+        this.esFavorito = false;
+        this.idFavorito = null;
+        this.cargandoFavorito = false;
+        
+        window.dispatchEvent(new Event('favoritosActualizado'));
+      },
+      error: (error) => {
+        console.error('Error al eliminar de favoritos:', error);
+        this.cargandoFavorito = false;
+        alert('Error al eliminar de favoritos. Intenta de nuevo.');
+      }
+    });
   }
 
   // ===== CANTIDAD =====
@@ -233,21 +318,14 @@ export class DetalleProductoComponent implements OnInit {
     this.http.get<any[]>(`${this.apiUrl}/direcciones/usuario/${this.userId}`).subscribe({
       next: (direcciones) => {
         console.log('✅ Direcciones recibidas:', direcciones);
-        console.log('📊 Cantidad de direcciones:', direcciones.length);
-        
         this.direcciones = direcciones;
         
         if (direcciones.length > 0) {
           this.direccionSeleccionada = direcciones[0];
-          console.log('✅ Dirección seleccionada por defecto:', this.direccionSeleccionada);
-        } else {
-          console.warn('⚠️ No hay direcciones disponibles');
         }
       },
       error: (error) => {
         console.error('❌ Error cargando direcciones:', error);
-        console.error('📝 Detalles del error:', error.error);
-        console.error('🔗 URL llamada:', `${this.apiUrl}/direcciones/usuario/${this.userId}`);
         this.direcciones = [];
       }
     });
@@ -260,21 +338,10 @@ export class DetalleProductoComponent implements OnInit {
     this.http.get<any[]>(`${this.apiUrl}/metodos-pago/usuario/${this.userId}`).subscribe({
       next: (metodos) => {
         console.log('✅ Métodos de pago recibidos:', metodos);
-        console.log('📊 Cantidad de métodos:', metodos.length);
-        
         this.metodosPago = metodos;
-        
-        if (metodos.length > 0) {
-          this.metodoPagoSeleccionado = metodos[0];
-          console.log('✅ Método seleccionado por defecto:', this.metodoPagoSeleccionado);
-        } else {
-          console.warn('⚠️ No hay métodos de pago disponibles');
-        }
       },
       error: (error) => {
         console.error('❌ Error cargando métodos de pago:', error);
-        console.error('📝 Detalles del error:', error.error);
-        console.error('🔗 URL llamada:', `${this.apiUrl}/metodos-pago/usuario/${this.userId}`);
         this.metodosPago = [];
       }
     });
@@ -285,6 +352,12 @@ export class DetalleProductoComponent implements OnInit {
     this.modalCheckoutVisible = false;
     this.direccionSeleccionada = null;
     this.metodoPagoSeleccionado = null;
+    this.mostrarFormularioStripe = false;
+    this.errorStripe = '';
+    if (this.stripeInicializado) {
+      this.stripeService.destroyElements();
+      this.stripeInicializado = false;
+    }
   }
 
   // ===== SELECCIONAR DIRECCIÓN =====
@@ -295,6 +368,13 @@ export class DetalleProductoComponent implements OnInit {
   // ===== SELECCIONAR MÉTODO DE PAGO =====
   seleccionarMetodoPago(metodo: any) {
     this.metodoPagoSeleccionado = metodo;
+    if (this.mostrarFormularioStripe) {
+      this.mostrarFormularioStripe = false;
+      if (this.stripeInicializado) {
+        this.stripeService.destroyElements();
+        this.stripeInicializado = false;
+      }
+    }
   }
 
   // ===== DETECTAR MARCA DE TARJETA POR BANCO =====
@@ -303,7 +383,6 @@ export class DetalleProductoComponent implements OnInit {
     
     const bancoLower = banco.toLowerCase();
     
-    // Detectar por nombre del banco
     const marcasPorBanco: { [key: string]: string } = {
       'visa': 'visa',
       'mastercard': 'mastercard',
@@ -317,7 +396,6 @@ export class DetalleProductoComponent implements OnInit {
       'maestro': 'maestro'
     };
 
-    // Buscar coincidencias
     for (const [key, marca] of Object.entries(marcasPorBanco)) {
       if (bancoLower.includes(key)) {
         return marca;
@@ -331,7 +409,6 @@ export class DetalleProductoComponent implements OnInit {
   obtenerLogoTarjeta(metodo: any): string {
     let marca = 'generic';
 
-    // Intentar detectar marca por banco
     if (metodo.banco) {
       marca = this.detectarMarcaTarjeta(metodo.banco);
     }
@@ -378,43 +455,139 @@ export class DetalleProductoComponent implements OnInit {
   }
 
   // ===== CONFIRMAR COMPRA =====
-  confirmarCompra() {
+  async confirmarCompra() {
     if (!this.direccionSeleccionada) {
       alert('Debes seleccionar una dirección de envío');
       return;
     }
 
     if (!this.metodoPagoSeleccionado) {
-      alert('Debes seleccionar un método de pago');
+      alert('Debes seleccionar un método de pago o usar "Pagar con nueva tarjeta"');
       return;
     }
 
+    this.procesarPagoConMetodoGuardado();
+  }
+
+  // ===== PAGAR CON NUEVA TARJETA (STRIPE) =====
+  async pagarConNuevaTarjeta() {
+    this.metodoPagoSeleccionado = null;
+    this.mostrarFormularioStripe = true;
+    
+    setTimeout(() => {
+      const stripeSection = document.querySelector('.stripe-payment-section');
+      if (stripeSection) {
+        stripeSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+    
+    setTimeout(async () => {
+      try {
+        await this.stripeService.initializeStripe('card-element');
+        this.stripeInicializado = true;
+        console.log('✅ Stripe inicializado para nueva tarjeta');
+      } catch (error) {
+        console.error('❌ Error al inicializar Stripe:', error);
+        this.errorStripe = 'Error al cargar el formulario de pago';
+      }
+    }, 300);
+  }
+
+  // ===== PROCESAR PAGO CON STRIPE =====
+  async procesarPagoConStripe() {
+    this.procesandoStripe = true;
+    this.errorStripe = '';
+
+    try {
+      const paymentIntentData = {
+        amount: this.calcularTotal(),
+        id_usuario: this.userId,
+        id_producto: this.producto.id_producto,
+        cantidad: this.cantidadComprar,
+        descripcion: `Compra de ${this.producto.nombre}`
+      };
+
+      console.log('📤 Creando PaymentIntent...', paymentIntentData);
+
+      const response = await this.stripeService
+        .createPaymentIntent(paymentIntentData)
+        .toPromise();
+
+      console.log('✅ PaymentIntent creado:', response);
+
+      const paymentIntent = await this.stripeService.confirmCardPayment(
+        response.client_secret
+      );
+
+      console.log('✅ Pago confirmado:', paymentIntent);
+
+      const confirmData = {
+        payment_intent_id: paymentIntent.id,
+        id_usuario: this.userId,
+        id_producto: this.producto.id_producto,
+        cantidad: this.cantidadComprar,
+        precio_total: this.calcularTotal(),
+        id_direccion: this.direccionSeleccionada.id_direccion
+      };
+
+      const ventaResponse = await this.stripeService
+        .confirmPayment(confirmData)
+        .toPromise();
+
+      console.log('✅ Venta registrada:', ventaResponse);
+
+      this.procesandoStripe = false;
+      this.cerrarModalCheckout();
+      this.stripeService.destroyElements();
+      
+      this.modalCompraExitosaVisible = true;
+
+    } catch (error: any) {
+      console.error('❌ Error en el pago:', error);
+      this.procesandoStripe = false;
+      this.errorStripe = error.message || 'Error al procesar el pago. Intenta de nuevo.';
+    }
+  }
+
+  // ===== CANCELAR FORMULARIO STRIPE =====
+  cancelarStripe() {
+    this.mostrarFormularioStripe = false;
+    this.errorStripe = '';
+    if (this.stripeInicializado) {
+      this.stripeService.destroyElements();
+      this.stripeInicializado = false;
+    }
+  }
+
+  // ===== PROCESAR CON MÉTODO GUARDADO =====
+  async procesarPagoConMetodoGuardado() {
     this.procesandoPago = true;
 
     setTimeout(() => {
-      const venta = {
-        id_producto: this.producto.id_producto,
-        id_comprador: this.userId,
-        id_vendedor: this.producto.id_vendedor,
-        cantidad: this.cantidadComprar,
-        precio_total: this.calcularTotal(),
-        direccion: this.direccionSeleccionada,
-        metodo_pago: this.metodoPagoSeleccionado,
-        color: this.colorSeleccionado,
-        talla: this.tallaSeleccionada,
-        fecha: new Date()
-      };
-
-      console.log('✅ Venta confirmada:', venta);
-
+      console.log('✅ Pago procesado con método guardado');
       this.procesandoPago = false;
       this.cerrarModalCheckout();
-      alert('¡Compra realizada exitosamente! 🎉');
-      this.router.navigate(['/perfil']);
+      
+      this.modalCompraExitosaVisible = true;
     }, 2000);
   }
 
-  // ===== AGREGAR AL CARRITO ===== ✅ CORREGIDO
+  // ===== MODAL COMPRA EXITOSA =====
+  cerrarModalCompraExitosa() {
+    this.modalCompraExitosaVisible = false;
+  }
+
+  seguirComprandoDesdeExito() {
+    this.cerrarModalCompraExitosa();
+    this.router.navigate(['/']);
+  }
+
+  irAMisCompras() {
+    this.cerrarModalCompraExitosa();
+    this.router.navigate(['/perfil'], { queryParams: { seccion: 'compras' } });
+  }
+
+  // ===== AGREGAR AL CARRITO CON MODAL =====
   agregarAlCarrito() {
     if (!this.isLoggedIn) {
       alert('Debes iniciar sesión para agregar productos al carrito');
@@ -431,24 +604,24 @@ export class DetalleProductoComponent implements OnInit {
     };
 
     console.log('🛒 Enviando al carrito:', carritoData);
-    console.log('👤 Usuario ID:', this.userId);
 
-    // ✅ CORREGIDO: Agregado / antes de ?
     this.http.post(
       `${this.apiUrl}/carrito/?id_usuario=${this.userId}`,
       carritoData
     ).subscribe({
       next: (response) => {
         console.log('✅ Respuesta del servidor:', response);
-        alert('✅ Producto agregado al carrito exitosamente');
         
-        // Emitir evento para actualizar el contador del carrito
+        this.productoAgregado = {
+          ...this.producto,
+          cantidadAgregada: this.cantidadComprar
+        };
+        this.modalCarritoVisible = true;
+        
         window.dispatchEvent(new CustomEvent('carritoActualizado'));
       },
       error: (error) => {
-        console.error('❌ Error completo:', error);
-        console.error('Status:', error.status);
-        console.error('Error detail:', error.error);
+        console.error('❌ Error:', error);
         
         if (error.status === 500) {
           alert('Error del servidor. Por favor intenta de nuevo.');
@@ -457,6 +630,71 @@ export class DetalleProductoComponent implements OnInit {
         } else {
           alert('Error al agregar al carrito: ' + (error.error?.detail || 'Error desconocido'));
         }
+      }
+    });
+  }
+
+  // ===== CERRAR MODAL CARRITO =====
+  cerrarModalCarrito() {
+    this.modalCarritoVisible = false;
+    this.productoAgregado = null;
+  }
+
+  // ===== IR AL CARRITO DESDE MODAL =====
+  irAlCarritoDesdeModal() {
+    this.cerrarModalCarrito();
+    this.router.navigate(['/carrito']);
+  }
+
+  // ===== SEGUIR COMPRANDO =====
+  seguirComprando() {
+    this.cerrarModalCarrito();
+    this.router.navigate(['/']);
+  }
+
+  // ===== AGREGAR MÉTODO DE PAGO =====
+  agregarMetodoPago() {
+    this.cerrarModalCheckout();
+    this.router.navigate(['/configuracion'], { queryParams: { seccion: 'metodos-pago' } });
+  }
+
+  // ===== CARGAR RECOMENDACIONES CON IA =====
+  cargarRecomendaciones() {
+    if (!this.productId) return;
+    
+    this.cargandoRecomendaciones = true;
+    
+    const url = `${this.apiUrl}/recomendaciones/productos/${this.productId}/recomendaciones?limite=6`;
+    
+    this.http.get<any[]>(url).subscribe({
+      next: (recomendaciones) => {
+        console.log('🤖 Recomendaciones IA recibidas:', recomendaciones);
+        
+        // Construir URLs de imágenes
+        this.productosRecomendados = recomendaciones.map((prod: any) => ({
+          ...prod,
+          imagen: this.construirUrlImagen(prod.imagen)
+        }));
+        
+        this.cargandoRecomendaciones = false;
+      },
+      error: (error) => {
+        console.error('❌ Error al cargar recomendaciones:', error);
+        this.cargandoRecomendaciones = false;
+        this.productosRecomendados = [];
+      }
+    });
+  }
+
+  // ===== VER PRODUCTO RECOMENDADO =====
+  verProductoRecomendado(productoId: number) {
+    this.router.navigate(['/producto', productoId]).then(() => {
+      window.scrollTo(0, 0);
+      // Recargar datos del nuevo producto
+      this.productId = productoId;
+      this.cargarProducto();
+      if (this.userId) {
+        this.verificarFavorito();
       }
     });
   }

@@ -35,6 +35,14 @@
         </button>
       </div>
 
+      <!-- ✅ BOTÓN DE GOOGLE (Solo en modo Login) -->
+      <div *ngIf="!isRegisterMode" class="google-section">
+        <div id="buttonDiv"></div>
+        <div class="divider">
+          <span>O continúa con email</span>
+        </div>
+      </div>
+
       <!-- FORMULARIO -->
       <form (ngSubmit)="onSubmit()">
         <!-- Campos solo para registro -->
@@ -67,16 +75,18 @@
         </button>
       </form>
 
-      <!-- DIVIDER -->
-      <div class="divider">
-        <span>O</span>
-      </div>
+      <!-- DIVIDER Y GOOGLE (Solo en modo Registro) -->
+      <div *ngIf="isRegisterMode">
+        <div class="divider">
+          <span>O</span>
+        </div>
 
-      <!-- BOTÓN DE GOOGLE -->
-      <button class="btn-google" type="button">
-        <i class="fab fa-google"></i>
-        Inicio con Google
-      </button>
+        <!-- BOTÓN DE GOOGLE MANUAL (para registro) -->
+        <button class="btn-google" type="button" (click)="switchToLogin()">
+          <i class="fab fa-google"></i>
+          Registrarse con Google
+        </button>
+      </div>
     </div>
 
     <!-- COLUMNA DERECHA: ILUSTRACIÓN -->

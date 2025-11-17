@@ -113,21 +113,21 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
 
   getIconoCategoria(nombreCategoria: string): string {
     const iconos: { [key: string]: string } = {
-      'CARDIOLOGÍA': 'fa fa-heartbeat',
-      'NEUROLOGÍA': 'fa fa-brain',
-      'TRAUMATOLOGÍA': 'fa fa-bone',
-      'OFTALMOLOGÍA': 'fa fa-eye',
-      'ODONTOLOGÍA': 'fa fa-tooth',
-      'PEDIATRÍA': 'fa fa-baby',
-      'GINECOLOGÍA': 'fa fa-venus',
-      'DERMATOLOGÍA': 'fa fa-hand-sparkles',
-      'LABORATORIO': 'fa fa-flask',
-      'CIRUGÍA': 'fa fa-scalpel',
-      'DIAGNÓSTICO': 'fa fa-stethoscope',
-      'REHABILITACIÓN': 'fa fa-wheelchair'
+      'TECNOLOGÍA': 'fa fa-laptop',
+      'VESTIMENTA': 'fa fa-tshirt',
+      'CALZADO': 'fa fa-shoe-prints',
+      'VIDEOJUEGOS': 'fa fa-gamepad',
+      'JUGUETES': 'fa fa-puzzle-piece',
+      'HOGAR': 'fa fa-home',
+      'DEPORTE': 'fa fa-running',
+      'LIBROS': 'fa fa-book',
+      'MÚSICA': 'fa fa-music',
+      'AUTOMÓVIL': 'fa fa-car',
+      'BELLEZA': 'fa fa-spa',
+      'ALIMENTOS': 'fa fa-utensils'
     };
     
-    return iconos[nombreCategoria.toUpperCase()] || 'fa fa-medkit';
+    return iconos[nombreCategoria.toUpperCase()] || 'fa fa-tag';
   }
 
   validarPrecioMinimo() {
@@ -225,34 +225,19 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
         console.error('Error al cargar categorías:', error);
         this.categorias = [
           { 
-            nombre: 'CARDIOLOGÍA', 
-            imagen: 'assets/img/cardiologia.jpg', 
-            subcategorias: ['Electrocardiógrafos', 'Monitores Cardíacos', 'Desfibriladores', 'Holter']
+            nombre: 'TECNOLOGÍA', 
+            imagen: 'assets/img/tecnologia.jpeg', 
+            subcategorias: ['Laptops', 'Celulares', 'Tablets', 'Accesorios']
           },
           { 
-            nombre: 'NEUROLOGÍA', 
-            imagen: 'assets/img/neurologia.jpg', 
-            subcategorias: ['Electroencefalógrafos', 'Escáneres', 'Equipos de Diagnóstico', 'Martillos Neurológicos']
+            nombre: 'VESTIMENTA', 
+            imagen: 'assets/img/emma.jpg', 
+            subcategorias: ['Camisas', 'Pantalones', 'Zapatos', 'Vestidos']
           },
           { 
-            nombre: 'TRAUMATOLOGÍA', 
-            imagen: 'assets/img/traumatologia.jpg', 
-            subcategorias: ['Férulas', 'Yesos', 'Instrumental Quirúrgico', 'Prótesis']
-          },
-          { 
-            nombre: 'OFTALMOLOGÍA', 
-            imagen: 'assets/img/oftalmologia.jpg', 
-            subcategorias: ['Oftalmoscopios', 'Lámparas de Hendidura', 'Tonómetros', 'Autorrefractómetros']
-          },
-          { 
-            nombre: 'ODONTOLOGÍA', 
-            imagen: 'assets/img/odontologia.jpg', 
-            subcategorias: ['Unidades Dentales', 'Instrumental', 'Materiales de Obturación', 'Equipos de Radiografía']
-          },
-          { 
-            nombre: 'LABORATORIO', 
-            imagen: 'assets/img/laboratorio.jpg', 
-            subcategorias: ['Microscopios', 'Centrífugas', 'Analizadores', 'Material de Vidrio']
+            nombre: 'CALZADO', 
+            imagen: 'assets/img/calzadooo.png', 
+            subcategorias: ['Deportivos', 'Casuales', 'Formales', 'Botas']
           }
         ];
         this.categoriasCargadas = true;
@@ -263,20 +248,15 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
 
   getImagenCategoria(nombre: string): string {
     const imagenes: any = {
-      'CARDIOLOGÍA': 'assets/img/cardiologia.jpg',
-      'NEUROLOGÍA': 'assets/img/neurologia.jpg',
-      'TRAUMATOLOGÍA': 'assets/img/traumatologia.jpg',
-      'OFTALMOLOGÍA': 'assets/img/oftalmologia.jpg',
-      'ODONTOLOGÍA': 'assets/img/odontologia.jpg',
-      'PEDIATRÍA': 'assets/img/pediatria.jpg',
-      'GINECOLOGÍA': 'assets/img/ginecologia.jpg',
-      'DERMATOLOGÍA': 'assets/img/dermatologia.jpg',
-      'LABORATORIO': 'assets/img/laboratorio.jpg',
-      'CIRUGÍA': 'assets/img/cirugia.jpg',
-      'DIAGNÓSTICO': 'assets/img/diagnostico.jpg',
-      'REHABILITACIÓN': 'assets/img/rehabilitacion.jpg'
+      'TECNOLOGÍA': 'assets/img/tecnologia.jpeg',
+      'VESTIMENTA': 'assets/img/emma.jpg',
+      'CALZADO': 'assets/img/calzadooo.png',
+      'VIDEOJUEGOS': 'assets/img/videojuegos.jpg',
+      'JUGUETES': 'assets/img/juguetes.jpg',
+      'HOGAR': 'assets/img/hogar.jpg',
+      'DEPORTE': 'assets/img/deporte.jpg'
     };
-    return imagenes[nombre.toUpperCase()] || 'assets/img/medico-default.jpg';
+    return imagenes[nombre.toUpperCase()] || 'assets/img/tecnologia.jpeg';
   }
 
   cargarProductos() {
@@ -302,7 +282,7 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
           subcategoria: prod.subcategoria || '',
           disponible: prod.disponible,
           cantidad_disponible: prod.cantidad_disponible,
-          vendedor: prod.vendedor_nombre || 'Proveedor Médico',
+          vendedor: prod.vendedor_nombre || 'Vendedor',
           id_vendedor: prod.id_vendedor,
           vistas: prod.vistas || 0,
           estado: prod.estado,
@@ -571,6 +551,11 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
   irPerfil() {
     this.userMenuOpen = false;
     this.router.navigate(['/perfil']);
+  }
+
+  irVender() {
+    this.userMenuOpen = false;
+    this.router.navigate(['/vender']);
   }
 
   cargarUsuario() {
