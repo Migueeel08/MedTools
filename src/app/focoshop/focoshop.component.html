@@ -2,18 +2,18 @@
   <!-- HEADER PRINCIPAL -->
   <header class="header">
     <div class="logo">
-      <span class="logo-text">FOCOSHOP</span>
-      <i class="fa fa-shopping-cart"></i>
+      <i class="fas fa-heartbeat"></i>
+      <span class="logo-text">MEDTOOLS</span>
     </div>
 
     <div class="search-box">
       <input
         type="text"
-        placeholder="Buscar productos..."
+        placeholder="Buscar equipo médico..."
         [(ngModel)]="busqueda"
         (ngModelChange)="onBusquedaChange()"
       />
-      <i class="fa fa-search"></i>
+      <i class="fas fa-search"></i>
     </div>
 
     <!-- LINKS DE AUTENTICACIÓN Y CARRITO -->
@@ -21,7 +21,7 @@
       <!-- ÍCONO DE FAVORITOS (solo si está logueado) -->
       @if (isLoggedIn) {
         <div class="favoritos-header" (click)="irFavoritos()">
-          <i class="fa fa-heart"></i>
+          <i class="fas fa-heart"></i>
           @if (contadorFavoritos > 0) {
             <span class="favoritos-badge">{{ contadorFavoritos }}</span>
           }
@@ -31,7 +31,7 @@
       <!-- ÍCONO DEL CARRITO (solo si está logueado) -->
       @if (isLoggedIn) {
         <div class="carrito-header" (click)="irAlCarrito()">
-          <i class="fa fa-shopping-cart"></i>
+          <i class="fas fa-shopping-cart"></i>
           @if (contadorCarrito > 0) {
             <span class="carrito-badge">{{ contadorCarrito }}</span>
           }
@@ -44,29 +44,35 @@
           <img [src]="userImage" alt="Perfil" class="user-icon" />
 
           <div class="user-menu" [class.open]="userMenuOpen">
-            <div class="user-name-header">{{ userName }}</div>
+            <div class="user-name-header">
+              <i class="fas fa-user-md"></i>
+              {{ userName }}
+            </div>
 
             <button (click)="irPerfil()">
-              <i class="fa fa-user"></i> Mi perfil
+              <i class="fas fa-user"></i> Mi perfil
             </button>
 
             <button (click)="irVender()">
-              <i class="fa fa-tag"></i> Vender
+              <i class="fas fa-box"></i> Vender equipo
             </button>
 
             <button (click)="irConfiguracion()">
-              <i class="fa fa-cog"></i> Configuración
+              <i class="fas fa-cog"></i> Configuración
             </button>
 
             <div class="divider"></div>
 
             <button class="logout-btn" (click)="logout()">
-              <i class="fa fa-sign-out-alt"></i> Cerrar sesión
+              <i class="fas fa-sign-out-alt"></i> Cerrar sesión
             </button>
           </div>
         </div>
       } @else {
-        <a [routerLink]="['/login']" class="auth-link">Iniciar Sesión</a>
+        <a [routerLink]="['/login']" class="auth-link">
+          <i class="fas fa-sign-in-alt"></i>
+          Iniciar Sesión
+        </a>
       }
     </div>
   </header>
@@ -74,7 +80,7 @@
   <!-- CARRUSEL DE CATEGORÍAS -->
   <div class="carrusel-container">
     <button (click)="anterior()" class="arrow-btn left">
-      <i class="fa fa-chevron-left"></i>
+      <i class="fas fa-chevron-left"></i>
     </button>
 
     <div class="categoria-grid" #categoriaGrid>
@@ -85,14 +91,14 @@
           </div>
           <p class="categoria-nombre">{{ cat.nombre }}</p>
           @if (cat.subcategorias?.length > 0) {
-            <span class="categoria-count">{{ cat.subcategorias.length }} Subcategorias</span>
+            <span class="categoria-count">{{ cat.subcategorias.length }} Subcategorías</span>
           }
         </div>
       }
     </div>
 
     <button (click)="siguiente()" class="arrow-btn right">
-      <i class="fa fa-chevron-right"></i>
+      <i class="fas fa-chevron-right"></i>
     </button>
   </div>
 
@@ -100,7 +106,7 @@
   @if (categorias[categoriaSeleccionada]?.subcategorias?.length) {
     <div class="subcategorias-container">
       <h3 class="subcategorias-titulo">
-        <i class="fa fa-list"></i>
+        <i class="fas fa-list-ul"></i>
         Subcategorías de {{ categorias[categoriaSeleccionada].nombre }}
       </h3>
       <div class="subcategorias-grid">
@@ -109,7 +115,7 @@
           [class.active]="!subcategoriaSeleccionada"
           (click)="seleccionarSubcategoria(null)"
         >
-          <i class="fa fa-th"></i>
+          <i class="fas fa-th-large"></i>
           Ver todas
         </button>
         @for (sub of categorias[categoriaSeleccionada].subcategorias; track sub) {
@@ -118,7 +124,7 @@
             [class.active]="subcategoriaSeleccionada === sub"
             (click)="seleccionarSubcategoria(sub)"
           >
-            <i class="fa fa-tag"></i>
+            <i class="fas fa-angle-right"></i>
             {{ sub }}
           </button>
         }
@@ -129,21 +135,27 @@
   <!-- BREADCRUMB -->
   <div class="breadcrumb-container">
     <div class="breadcrumb">
-      <span (click)="limpiarBusqueda()">Inicio</span>
+      <span (click)="limpiarBusqueda()">
+        <i class="fas fa-home"></i>
+        Inicio
+      </span>
       @if (busqueda.trim() !== '') {
-        <i class="fa fa-chevron-right"></i>
-        <span class="actual">Resultados de búsqueda: "{{ busqueda }}"</span>
+        <i class="fas fa-chevron-right"></i>
+        <span class="actual">
+          <i class="fas fa-search"></i>
+          Resultados: "{{ busqueda }}"
+        </span>
       } @else {
-        <i class="fa fa-chevron-right"></i>
+        <i class="fas fa-chevron-right"></i>
         <span>{{ categorias[categoriaSeleccionada]?.nombre || 'Productos' }}</span>
         @if (subcategoriaSeleccionada) {
-          <i class="fa fa-chevron-right"></i>
+          <i class="fas fa-chevron-right"></i>
           <span class="actual">{{ subcategoriaSeleccionada }}</span>
         }
       }
     </div>
     <div class="ordenar-por">
-      <label>Ordenar por</label>
+      <label><i class="fas fa-sort"></i> Ordenar por</label>
       <select [(ngModel)]="ordenamiento" (change)="ordenarProductos()">
         <option value="relevantes">Más relevantes</option>
         <option value="menor-precio">Menor precio</option>
@@ -157,22 +169,31 @@
   <div class="main-content">
     <!-- FILTROS -->
     <aside class="filtros-panel">
-      <h3 class="filtros-titulo">Filtros</h3>
+      <h3 class="filtros-titulo">
+        <i class="fas fa-filter"></i>
+        Filtros
+      </h3>
 
       <div class="filtro-seccion">
-        <h4 class="filtro-subtitulo">Condición</h4>
+        <h4 class="filtro-subtitulo">
+          <i class="fas fa-box-open"></i>
+          Condición
+        </h4>
         <label class="filtro-checkbox">
           <input type="checkbox" [(ngModel)]="filtros.nuevo" (change)="aplicarFiltros()" />
-          <span>Nuevo</span>
+          <span><i class="fas fa-certificate"></i> Nuevo</span>
         </label>
         <label class="filtro-checkbox">
           <input type="checkbox" [(ngModel)]="filtros.usado" (change)="aplicarFiltros()" />
-          <span>Usado</span>
+          <span><i class="fas fa-recycle"></i> Reacondicionado</span>
         </label>
       </div>
 
       <div class="filtro-seccion">
-        <h4 class="filtro-subtitulo">Precio</h4>
+        <h4 class="filtro-subtitulo">
+          <i class="fas fa-dollar-sign"></i>
+          Precio
+        </h4>
         <div class="precio-inputs">
           <input 
             type="number" 
@@ -193,14 +214,21 @@
           />
         </div>
         @if (errorPrecio) {
-          <p class="error-precio">{{ errorPrecio }}</p>
+          <p class="error-precio">
+            <i class="fas fa-exclamation-circle"></i>
+            {{ errorPrecio }}
+          </p>
         }
       </div>
 
       @if (marcasDisponibles.length > 0) {
         <div class="filtro-seccion">
-          <h4 class="filtro-subtitulo">Marca</h4>
+          <h4 class="filtro-subtitulo">
+            <i class="fas fa-tag"></i>
+            Marca
+          </h4>
           <div class="filtro-buscar">
+            <i class="fas fa-search"></i>
             <input type="text" placeholder="Buscar marca..." [(ngModel)]="buscarMarca" />
           </div>
           <div class="filtro-lista">
@@ -212,49 +240,55 @@
             }
           </div>
           @if (marcasDisponibles.length > 5) {
-            <button class="ver-mas-btn">Ver todas las marcas</button>
+            <button class="ver-mas-btn">
+              <i class="fas fa-angle-down"></i>
+              Ver todas las marcas
+            </button>
           }
         </div>
       }
 
       <div class="filtro-seccion">
-        <h4 class="filtro-subtitulo">Calificación</h4>
+        <h4 class="filtro-subtitulo">
+          <i class="fas fa-star"></i>
+          Calificación
+        </h4>
         <label class="filtro-checkbox">
           <input type="radio" name="calificacion" [(ngModel)]="filtros.calificacion" value="5" (change)="aplicarFiltros()" />
           <span>
-            <i class="fa fa-star star-filled"></i>
-            <i class="fa fa-star star-filled"></i>
-            <i class="fa fa-star star-filled"></i>
-            <i class="fa fa-star star-filled"></i>
-            <i class="fa fa-star star-filled"></i>
+            <i class="fas fa-star star-filled"></i>
+            <i class="fas fa-star star-filled"></i>
+            <i class="fas fa-star star-filled"></i>
+            <i class="fas fa-star star-filled"></i>
+            <i class="fas fa-star star-filled"></i>
           </span>
         </label>
         <label class="filtro-checkbox">
           <input type="radio" name="calificacion" [(ngModel)]="filtros.calificacion" value="4" (change)="aplicarFiltros()" />
           <span>
-            <i class="fa fa-star star-filled"></i>
-            <i class="fa fa-star star-filled"></i>
-            <i class="fa fa-star star-filled"></i>
-            <i class="fa fa-star star-filled"></i>
-            <i class="fa fa-star star-empty"></i>
+            <i class="fas fa-star star-filled"></i>
+            <i class="fas fa-star star-filled"></i>
+            <i class="fas fa-star star-filled"></i>
+            <i class="fas fa-star star-filled"></i>
+            <i class="far fa-star star-empty"></i>
             o más
           </span>
         </label>
         <label class="filtro-checkbox">
           <input type="radio" name="calificacion" [(ngModel)]="filtros.calificacion" value="3" (change)="aplicarFiltros()" />
           <span>
-            <i class="fa fa-star star-filled"></i>
-            <i class="fa fa-star star-filled"></i>
-            <i class="fa fa-star star-filled"></i>
-            <i class="fa fa-star star-empty"></i>
-            <i class="fa fa-star star-empty"></i>
+            <i class="fas fa-star star-filled"></i>
+            <i class="fas fa-star star-filled"></i>
+            <i class="fas fa-star star-filled"></i>
+            <i class="far fa-star star-empty"></i>
+            <i class="far fa-star star-empty"></i>
             o más
           </span>
         </label>
       </div>
 
       <button class="limpiar-filtros-btn" (click)="limpiarFiltros()">
-        <i class="fa fa-times"></i>
+        <i class="fas fa-times-circle"></i>
         Limpiar filtros
       </button>
     </aside>
@@ -263,11 +297,20 @@
     <section class="productos-seccion">
       <div class="productos-header">
         @if (busqueda.trim() !== '') {
-          <h2>Resultados para "{{ busqueda }}"</h2>
+          <h2>
+            <i class="fas fa-search"></i>
+            Resultados para "{{ busqueda }}"
+          </h2>
         } @else {
-          <h2>{{ categorias[categoriaSeleccionada]?.nombre || 'Productos' }}</h2>
+          <h2>
+            <i [class]="getIconoCategoria(categorias[categoriaSeleccionada]?.nombre || '')"></i>
+            {{ categorias[categoriaSeleccionada]?.nombre || 'Productos Médicos' }}
+          </h2>
         }
-        <p class="resultados-count">{{ productosFiltrados.length }} resultados</p>
+        <p class="resultados-count">
+          <i class="fas fa-list"></i>
+          {{ productosFiltrados.length }} productos disponibles
+        </p>
       </div>
 
       <div class="productos-grid">
@@ -275,32 +318,49 @@
           <div class="producto-card-grid" (click)="verDetalleProducto(prod)">
             <div class="producto-imagen-container">
               <img [src]="prod.imagen" [alt]="prod.nombre" />
+              @if (prod.condicion === 'nuevo') {
+                <span class="badge-nuevo">
+                  <i class="fas fa-certificate"></i>
+                  Nuevo
+                </span>
+              }
             </div>
 
             <div class="producto-info">
               <h3 class="producto-nombre">{{ prod.nombre }}</h3>
 
               @if (prod.marca) {
-                <p class="producto-marca">{{ prod.marca }}</p>
+                <p class="producto-marca">
+                  <i class="fas fa-building"></i>
+                  {{ prod.marca }}
+                </p>
               }
 
               <div class="producto-precio-container">
                 <span class="precio">${{ prod.precio | number:'1.0-0' }}</span>
+                <span class="precio-desc">MXN</span>
               </div>
 
               <div class="producto-rating-reviews">
                 <div class="estrellas">
                   @for (star of [1,2,3,4,5]; track star) {
-                    <i class="fa fa-star" [class.filled]="star <= (prod.calificacion || 0)" [class.empty]="star > (prod.calificacion || 0)"></i>
+                    <i class="fas fa-star" [class.filled]="star <= (prod.calificacion || 0)" [class.empty]="star > (prod.calificacion || 0)"></i>
                   }
                 </div>
                 <span class="reviews-text">({{ prod.reviews || 0 }})</span>
               </div>
 
               <p class="producto-vendedor">
-                <i class="fa fa-store"></i>
+                <i class="fas fa-hospital"></i>
                 {{ prod.vendedor }}
               </p>
+
+              @if (prod.cantidad_disponible < 5 && prod.cantidad_disponible > 0) {
+                <p class="stock-bajo">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  ¡Solo {{ prod.cantidad_disponible }} disponibles!
+                </p>
+              }
             </div>
           </div>
         }
@@ -308,16 +368,22 @@
 
       @if (productosFiltrados.length === 0 && !productosCargando) {
         <div class="no-productos">
-          <i class="fa fa-box-open fa-3x"></i>
+          <i class="fas fa-box-open fa-4x"></i>
           <h3>No se encontraron productos</h3>
           <p>Intenta ajustando los filtros o cambia de categoría</p>
+          <button class="btn-limpiar-todo" (click)="limpiarFiltros()">
+            <i class="fas fa-redo"></i>
+            Limpiar filtros
+          </button>
         </div>
       }
 
       @if (productosCargando) {
         <div class="loading">
-          <i class="fa fa-spinner fa-spin fa-3x"></i>
-          <p>Cargando productos...</p>
+          <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin fa-3x"></i>
+          </div>
+          <p>Cargando equipamiento médico...</p>
         </div>
       }
     </section>

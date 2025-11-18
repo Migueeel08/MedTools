@@ -111,23 +111,23 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
     return producto.id_producto || index;
   }
 
+  // ===== ICONOS DE CATEGORÍAS MÉDICAS =====
   getIconoCategoria(nombreCategoria: string): string {
     const iconos: { [key: string]: string } = {
-      'TECNOLOGÍA': 'fa fa-laptop',
-      'VESTIMENTA': 'fa fa-tshirt',
-      'CALZADO': 'fa fa-shoe-prints',
-      'VIDEOJUEGOS': 'fa fa-gamepad',
-      'JUGUETES': 'fa fa-puzzle-piece',
-      'HOGAR': 'fa fa-home',
-      'DEPORTE': 'fa fa-running',
-      'LIBROS': 'fa fa-book',
-      'MÚSICA': 'fa fa-music',
-      'AUTOMÓVIL': 'fa fa-car',
-      'BELLEZA': 'fa fa-spa',
-      'ALIMENTOS': 'fa fa-utensils'
+      'EQUIPO MÉDICO': 'fas fa-heartbeat',
+      'INSTRUMENTAL QUIRÚRGICO': 'fas fa-briefcase-medical',
+      'MOBILIARIO CLÍNICO': 'fas fa-bed',
+      'CONSUMIBLES MÉDICOS': 'fas fa-syringe',
+      'EQUIPOS DE DIAGNÓSTICO': 'fas fa-stethoscope',
+      'ORTOPEDIA Y REHABILITACIÓN': 'fas fa-wheelchair',
+      'URGENCIAS Y EMERGENCIAS': 'fas fa-ambulance',
+      'LABORATORIO CLÍNICO': 'fas fa-microscope',
+      'DENTAL': 'fas fa-tooth',
+      'FARMACIA': 'fas fa-pills',
+      'RADIOLOGÍA': 'fas fa-x-ray'
     };
     
-    return iconos[nombreCategoria.toUpperCase()] || 'fa fa-tag';
+    return iconos[nombreCategoria.toUpperCase()] || 'fas fa-hospital';
   }
 
   validarPrecioMinimo() {
@@ -164,7 +164,7 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
         this.contadorCarrito = data.total_productos || 0;
       },
       error: (error) => {
-        console.error('Error al cargar contador:', error);
+        console.error('❌ Error al cargar contador:', error);
         this.contadorCarrito = 0;
       }
     });
@@ -178,7 +178,7 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
         this.contadorFavoritos = data.total_favoritos || 0;
       },
       error: (error) => {
-        console.error('Error al cargar contador favoritos:', error);
+        console.error('❌ Error al cargar contador favoritos:', error);
         this.contadorFavoritos = 0;
       }
     });
@@ -205,39 +205,41 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
   cargarCategorias() {
     this.http.get<any[]>(`${this.apiUrl}/categorias`).subscribe({
       next: (data) => {
-        console.log('📦 Datos RAW del backend:', data);
+        console.log('📦 Categorías del backend:', data);
         
         this.categorias = data.map(cat => ({
           id_categoria: cat.id_categoria,
           nombre: cat.nombre,
-          imagen: this.getImagenCategoria(cat.nombre),
           subcategorias: cat.subcategorias || []
         }));
         this.categoriasCargadas = true;
         
-        console.log('✅ Categorías procesadas:', this.categorias);
-        console.log('🔍 Primera categoría subcategorías:', this.categorias[0]?.subcategorias);
-        console.log('📊 Total categorías:', this.categorias.length);
-        
+        console.log('✅ Categorías cargadas:', this.categorias);
         this.filtrarProductos();
       },
       error: (error) => {
-        console.error('Error al cargar categorías:', error);
+        console.error('❌ Error al cargar categorías:', error);
+        // Categorías médicas por defecto
         this.categorias = [
           { 
-            nombre: 'TECNOLOGÍA', 
-            imagen: 'assets/img/tecnologia.jpeg', 
-            subcategorias: ['Laptops', 'Celulares', 'Tablets', 'Accesorios']
+            nombre: 'EQUIPO MÉDICO',
+            subcategorias: ['Monitores', 'Electrocardiógrafos', 'Desfibriladores', 'Ventiladores']
           },
           { 
-            nombre: 'VESTIMENTA', 
-            imagen: 'assets/img/emma.jpg', 
-            subcategorias: ['Camisas', 'Pantalones', 'Zapatos', 'Vestidos']
+            nombre: 'INSTRUMENTAL QUIRÚRGICO',
+            subcategorias: ['Pinzas', 'Tijeras', 'Bisturís', 'Sets Quirúrgicos']
           },
           { 
-            nombre: 'CALZADO', 
-            imagen: 'assets/img/calzadooo.png', 
-            subcategorias: ['Deportivos', 'Casuales', 'Formales', 'Botas']
+            nombre: 'MOBILIARIO CLÍNICO',
+            subcategorias: ['Camas Hospitalarias', 'Camillas', 'Sillas de Ruedas', 'Mesas']
+          },
+          { 
+            nombre: 'CONSUMIBLES MÉDICOS',
+            subcategorias: ['Guantes', 'Jeringas', 'Gasas', 'Mascarillas']
+          },
+          { 
+            nombre: 'EQUIPOS DE DIAGNÓSTICO',
+            subcategorias: ['Estetoscopios', 'Tensiómetros', 'Termómetros', 'Glucómetros']
           }
         ];
         this.categoriasCargadas = true;
@@ -246,25 +248,14 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
     });
   }
 
-  getImagenCategoria(nombre: string): string {
-    const imagenes: any = {
-      'TECNOLOGÍA': 'assets/img/tecnologia.jpeg',
-      'VESTIMENTA': 'assets/img/emma.jpg',
-      'CALZADO': 'assets/img/calzadooo.png',
-      'VIDEOJUEGOS': 'assets/img/videojuegos.jpg',
-      'JUGUETES': 'assets/img/juguetes.jpg',
-      'HOGAR': 'assets/img/hogar.jpg',
-      'DEPORTE': 'assets/img/deporte.jpg'
-    };
-    return imagenes[nombre.toUpperCase()] || 'assets/img/tecnologia.jpeg';
-  }
-
   cargarProductos() {
     this.productosCargando = true;
     const url = `${this.apiUrl}/productos`;
     
     this.http.get<any[]>(url).subscribe({
       next: (data) => {
+        console.log('📦 Productos recibidos:', data.length);
+        
         const productosFiltradosPorVendedor = data.filter(prod => {
           if (this.isLoggedIn && this.userId) {
             return prod.id_vendedor !== this.userId;
@@ -282,7 +273,7 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
           subcategoria: prod.subcategoria || '',
           disponible: prod.disponible,
           cantidad_disponible: prod.cantidad_disponible,
-          vendedor: prod.vendedor_nombre || 'Vendedor',
+          vendedor: prod.vendedor_nombre || 'Proveedor Médico',
           id_vendedor: prod.id_vendedor,
           vistas: prod.vistas || 0,
           estado: prod.estado,
@@ -291,16 +282,16 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
           calificacion: prod.calificacion || 0,
           condicion: prod.condicion || 'nuevo',
           precio_anterior: prod.precio_anterior || null,
-          descuento: prod.descuento || null,
-          envio_gratis: prod.envio_gratis || false
+          descuento: prod.descuento || null
         }));
         
+        console.log('✅ Productos procesados:', this.productos.length);
         this.productosCargando = false;
         this.extraerMarcas();
         this.filtrarProductos();
       },
       error: (error) => {
-        console.error('Error al cargar productos:', error);
+        console.error('❌ Error al cargar productos:', error);
         this.productosCargando = false;
         this.productos = [];
         this.filtrarProductos();
@@ -309,12 +300,12 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   construirUrlImagen(imagen: string | null): string {
-    if (!imagen) return 'assets/img/producto-default.jpg';
+    if (!imagen) return 'assets/img/producto-default-medical.jpg';
     if (imagen.startsWith('http')) return imagen;
     if (imagen.startsWith('assets/')) return imagen;
     if (imagen.startsWith('data:image')) return imagen;
     if (imagen.startsWith('/uploads/')) return `http://localhost:8000${imagen}`;
-    return 'assets/img/producto-default.jpg';
+    return 'assets/img/producto-default-medical.jpg';
   }
 
   extraerMarcas() {
@@ -414,7 +405,7 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
     if (this.filtros.nuevo || this.filtros.usado) {
       filtrados = filtrados.filter(p => 
         (this.filtros.nuevo && p.condicion === 'nuevo') ||
-        (this.filtros.usado && p.condicion === 'usado')
+        (this.filtros.usado && (p.condicion === 'usado' || p.condicion === 'reacondicionado'))
       );
     }
 
@@ -485,11 +476,7 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   seleccionarCategoria(index: number) {
-    console.log('🎯 Categoría seleccionada:', index);
-    console.log('📂 Categoría:', this.categorias[index]);
-    console.log('📋 Subcategorías disponibles:', this.categorias[index]?.subcategorias);
-    console.log('🔢 Cantidad subcategorías:', this.categorias[index]?.subcategorias?.length);
-    
+    console.log('🎯 Categoría seleccionada:', index, this.categorias[index]);
     this.categoriaSeleccionada = index;
     this.subcategoriaSeleccionada = null;
     this.scrollCategoriaCentrada(index);
@@ -498,6 +485,7 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   seleccionarSubcategoria(subcategoria: string | null) {
+    console.log('📂 Subcategoría seleccionada:', subcategoria);
     this.subcategoriaSeleccionada = subcategoria;
     this.aplicarFiltros();
   }
@@ -564,7 +552,7 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
       try {
         const parsed = JSON.parse(userData);
         this.isLoggedIn = true;
-        this.userId = parsed.id;
+        this.userId = parsed.id || parsed.id_usuario;
 
         this.userName =
           parsed.nombre ||
@@ -580,7 +568,7 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
         this.cargarContadorCarrito();
         this.cargarContadorFavoritos();
       } catch (error) {
-        console.error('Error al cargar usuario:', error);
+        console.error('❌ Error al cargar usuario:', error);
         this.logout();
       }
     } else {
@@ -590,6 +578,8 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
 
   logout() {
     localStorage.removeItem('user');
+    localStorage.removeItem('email');
+    localStorage.removeItem('userId');
     window.dispatchEvent(new Event('storage'));
     this.isLoggedIn = false;
     this.userId = 0;

@@ -2,6 +2,12 @@
   <!-- 🔹 ALERTA MODAL CENTRADO -->
   <div *ngIf="alertaVisible" class="alerta-modal">
     <div class="alerta-card" [ngClass]="tipoAlerta">
+      <i class="alert-icon fas" 
+         [ngClass]="{
+           'fa-check-circle': tipoAlerta === 'exito',
+           'fa-exclamation-circle': tipoAlerta === 'error',
+           'fa-info-circle': tipoAlerta === 'info'
+         }"></i>
       <h3>{{ mensajeAlerta }}</h3>
     </div>
   </div>
@@ -13,9 +19,11 @@
     <div class="login-card">
       <!-- LOGO -->
       <div class="logo-section">
-        <h1 class="logo-text">FOCOSHOP</h1>
-        <i class="fa fa-shopping-cart"></i>
+        <i class="fas fa-heartbeat"></i>
+        <h1 class="logo-text">MEDTOOLS</h1>
       </div>
+
+      <p class="subtitle">Equipamiento médico profesional a tu alcance</p>
 
       <!-- TABS DE LOGIN Y REGISTRO -->
       <div class="tabs">
@@ -24,6 +32,7 @@
           [class.active]="!isRegisterMode"
           (click)="switchToLogin()"
           type="button">
+          <i class="fas fa-sign-in-alt"></i>
           Iniciar Sesión
         </button>
         <button 
@@ -31,6 +40,7 @@
           [class.active]="isRegisterMode"
           (click)="switchToRegister()"
           type="button">
+          <i class="fas fa-user-plus"></i>
           Registrarse
         </button>
       </div>
@@ -47,58 +57,145 @@
       <form (ngSubmit)="onSubmit()">
         <!-- Campos solo para registro -->
         <div *ngIf="isRegisterMode" class="input-group">
-          <label>Nombre</label>
-          <input type="text" [(ngModel)]="nombre" name="nombre" required />
+          <label><i class="fas fa-user-md"></i> Nombre</label>
+          <input 
+            type="text" 
+            [(ngModel)]="nombre" 
+            name="nombre" 
+            placeholder="Ingresa tu nombre" 
+            required 
+          />
         </div>
 
         <div *ngIf="isRegisterMode" class="input-group">
-          <label>Apellido</label>
-          <input type="text" [(ngModel)]="apellido" name="apellido" required />
+          <label><i class="fas fa-user"></i> Apellido</label>
+          <input 
+            type="text" 
+            [(ngModel)]="apellido" 
+            name="apellido" 
+            placeholder="Ingresa tu apellido" 
+            required 
+          />
         </div>
 
         <!-- Correo electrónico -->
         <div class="input-group">
-          <label>Correo Electrónico</label>
-          <input type="email" [(ngModel)]="email" name="email" required />
+          <label><i class="fas fa-envelope"></i> Correo Electrónico</label>
+          <input 
+            type="email" 
+            [(ngModel)]="email" 
+            name="email" 
+            placeholder="ejemplo@medtools.com" 
+            required 
+          />
         </div>
 
         <!-- Contraseña -->
         <div class="input-group">
-          <label>Contraseña</label>
-          <input type="password" [(ngModel)]="contrasena" name="contrasena" required />
+          <label><i class="fas fa-lock"></i> Contraseña</label>
+          <input 
+            type="password" 
+            [(ngModel)]="contrasena" 
+            name="contrasena" 
+            placeholder="••••••••" 
+            required 
+          />
+        </div>
+
+        <!-- Enlace de olvido de contraseña (solo en login) -->
+        <div *ngIf="!isRegisterMode" class="forgot-password">
+          <a href="#">¿Olvidaste tu contraseña?</a>
         </div>
 
         <!-- BOTÓN PRINCIPAL -->
         <button type="submit" class="btn-login">
-          {{ isRegisterMode ? 'REGISTRARME' : 'INICIAR SESIÓN' }}
-          <i class="fa fa-arrow-right"></i>
+          <i class="fas" [ngClass]="isRegisterMode ? 'fa-user-plus' : 'fa-sign-in-alt'"></i>
+          {{ isRegisterMode ? 'CREAR CUENTA' : 'ACCEDER' }}
+          <i class="fas fa-arrow-right"></i>
         </button>
       </form>
 
       <!-- DIVIDER Y GOOGLE (Solo en modo Registro) -->
       <div *ngIf="isRegisterMode">
         <div class="divider">
-          <span>O</span>
+          <span>O registrarse con</span>
         </div>
 
         <!-- BOTÓN DE GOOGLE MANUAL (para registro) -->
         <button class="btn-google" type="button" (click)="switchToLogin()">
           <i class="fab fa-google"></i>
-          Registrarse con Google
+          Continuar con Google
         </button>
+      </div>
+
+      <!-- Footer informativo -->
+      <div class="login-footer">
+        <p class="footer-text">
+          <i class="fas fa-shield-alt"></i>
+          Plataforma segura y certificada para profesionales de la salud
+        </p>
       </div>
     </div>
 
     <!-- COLUMNA DERECHA: ILUSTRACIÓN -->
     <div class="illustration-section">
       <div class="illustration-content">
-        <img src="assets/img/delivery-character.png" alt="Delivery" class="character-img" />
-        <div class="floating-icons">
-          <div class="icon-circle" style="--delay: 0s; --x: 50px; --y: 30px;">📦</div>
-          <div class="icon-circle" style="--delay: 1s; --x: -40px; --y: 60px;">🎁</div>
-          <div class="icon-circle" style="--delay: 2s; --x: 70px; --y: -20px;">⭐</div>
-          <div class="icon-circle" style="--delay: 1.5s; --x: -60px; --y: -40px;">💡</div>
+        <div class="medical-icon-large">
+          <i class="fas fa-user-md"></i>
         </div>
+        <h2 class="illustration-title">Bienvenido a MedTools</h2>
+        <p class="illustration-subtitle">Tu plataforma de confianza para equipamiento médico profesional de la más alta calidad</p>
+        
+        <!-- Stats -->
+        <div class="stats-container">
+          <div class="stat-item">
+            <i class="fas fa-hospital"></i>
+            <span class="stat-number">500+</span>
+            <span class="stat-label">Hospitales</span>
+          </div>
+          <div class="stat-item">
+            <i class="fas fa-box"></i>
+            <span class="stat-number">10K+</span>
+            <span class="stat-label">Productos</span>
+          </div>
+          <div class="stat-item">
+            <i class="fas fa-users"></i>
+            <span class="stat-number">25K+</span>
+            <span class="stat-label">Clientes</span>
+          </div>
+        </div>
+
+        <div class="floating-icons">
+          <div class="icon-circle" style="--delay: 0s; --x: 50px; --y: 30px;">
+            <i class="fas fa-stethoscope"></i>
+          </div>
+          <div class="icon-circle" style="--delay: 1s; --x: -40px; --y: 60px;">
+            <i class="fas fa-syringe"></i>
+          </div>
+          <div class="icon-circle" style="--delay: 2s; --x: 70px; --y: -20px;">
+            <i class="fas fa-microscope"></i>
+          </div>
+          <div class="icon-circle" style="--delay: 1.5s; --x: -60px; --y: -40px;">
+            <i class="fas fa-heartbeat"></i>
+          </div>
+          <div class="icon-circle" style="--delay: 0.5s; --x: 90px; --y: 80px;">
+            <i class="fas fa-notes-medical"></i>
+          </div>
+          <div class="icon-circle" style="--delay: 2.5s; --x: -70px; --y: -60px;">
+            <i class="fas fa-hospital"></i>
+          </div>
+          <div class="icon-circle" style="--delay: 1.2s; --x: -30px; --y: -70px;">
+            <i class="fas fa-pills"></i>
+          </div>
+          <div class="icon-circle" style="--delay: 2.8s; --x: 60px; --y: -50px;">
+            <i class="fas fa-thermometer"></i>
+          </div>
+        </div>
+
+        <!-- Elementos decorativos -->
+        <div class="pulse-circle pulse-1"></div>
+        <div class="pulse-circle pulse-2"></div>
+        <div class="pulse-circle pulse-3"></div>
       </div>
     </div>
 
