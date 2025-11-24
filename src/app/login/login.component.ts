@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   mensajeAlerta = '';
   tipoAlerta: 'exito' | 'error' | 'info' = 'info';
 
-  // 🔹 URL base del backend
+  // 🔹 URL base del backend - ACTUALIZA ESTO CON TU URL
   private apiUrl = 'http://localhost:8000/api';
   private baseUrl = 'http://localhost:8000'; // URL base para imágenes
 
@@ -56,7 +56,7 @@ export class LoginComponent implements OnInit, AfterViewInit {
   initializeGoogleSignIn(): void {
     if (typeof google !== 'undefined') {
       google.accounts.id.initialize({
-        client_id: '287808420980-s2poeedgd6veoojkev5j3huia9no8uh2.apps.googleusercontent.com',
+        client_id: '287808420980-s2poeedgd6veoojkev5j3huia9no8uh2.apps.googleusercontent.com', // CAMBIA ESTO POR TU CLIENT_ID
         callback: this.handleCredentialResponse.bind(this)
       });
 
@@ -136,23 +136,23 @@ export class LoginComponent implements OnInit, AfterViewInit {
           // Redirigir según el rol
           if (response.rol === 'admin') {
             console.log('🔐 Usuario ADMIN detectado, redirigiendo al panel admin...');
-            this.mostrarAlerta(`¡Bienvenido Admin ${response.nombre}! 👑`, 'exito');
+            this.mostrarAlerta(`¡Bienvenido Admin ${response.nombre}! 🏥`, 'exito');
             setTimeout(() => {
               this.router.navigate(['/admin']);
-            }, 1000);
+            }, 1500);
           } else {
             console.log('👤 Usuario NORMAL detectado, redirigiendo a la tienda...');
-            this.mostrarAlerta(`¡Hola ${response.nombre}! Inicio de sesión correcto 🔥`, 'exito');
+            this.mostrarAlerta(`¡Bienvenido ${response.nombre}! Acceso concedido 💙`, 'exito');
             setTimeout(() => {
               this.router.navigate(['/']);
-            }, 1000);
+            }, 1500);
           }
         },
         error: (error) => {
           console.error('❌ Error completo:', error);
           console.error('❌ Error status:', error.status);
           console.error('❌ Error detail:', error.error);
-          this.mostrarAlerta('Error al iniciar sesión con Google', 'error');
+          this.mostrarAlerta('Error al iniciar sesión con Google. Intenta nuevamente.', 'error');
         }
       });
   }
@@ -221,7 +221,14 @@ export class LoginComponent implements OnInit, AfterViewInit {
   register() {
     // Validación básica
     if (!this.nombre || !this.apellido || !this.email || !this.contrasena) {
-      this.mostrarAlerta('Por favor completa todos los campos', 'error');
+      this.mostrarAlerta('Por favor completa todos los campos requeridos', 'error');
+      return;
+    }
+
+    // Validación de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.email)) {
+      this.mostrarAlerta('Por favor ingresa un correo electrónico válido', 'error');
       return;
     }
 
@@ -231,30 +238,41 @@ export class LoginComponent implements OnInit, AfterViewInit {
     }
 
     const user = {
-      nombre: this.nombre,
-      apellido: this.apellido,
-      email: this.email,
+      nombre: this.nombre.trim(),
+      apellido: this.apellido.trim(),
+      email: this.email.trim().toLowerCase(),
       password: this.contrasena
     };
 
+    console.log('📝 Registrando usuario:', { ...user, password: '****' });
+
     this.http.post(`${this.apiUrl}/usuarios/register`, user).subscribe({
       next: (res) => {
-        console.log('Usuario registrado:', res);
-        this.mostrarAlerta('Registro exitoso 🎉', 'exito');
+        console.log('✅ Usuario registrado exitosamente:', res);
+        this.mostrarAlerta('¡Registro exitoso! Ahora puedes iniciar sesión 🎉', 'exito');
         setTimeout(() => {
           this.switchToLogin();
-        }, 1000);
+        }, 1500);
       },
       error: (err) => {
-        console.error('Error al registrar:', err);
-        const mensaje = err.error?.detail || 'Error al registrarte 😢';
+        console.error('❌ Error al registrar:', err);
+        let mensaje = 'Error al registrar usuario. Intenta nuevamente.';
+        
+        if (err.error?.detail) {
+          mensaje = err.error.detail;
+        } else if (err.status === 400) {
+          mensaje = 'El correo electrónico ya está registrado';
+        } else if (err.status === 0) {
+          mensaje = 'No se pudo conectar con el servidor';
+        }
+        
         this.mostrarAlerta(mensaje, 'error');
       }
     });
   }
 
   // ===========================
-  // Login - ACTUALIZADO CON ROLES
+  // Login - CON ROLES Y VALIDACIONES
   // ===========================
   login() {
     // Validación básica
@@ -263,8 +281,15 @@ export class LoginComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    // Validación de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.email)) {
+      this.mostrarAlerta('Por favor ingresa un correo electrónico válido', 'error');
+      return;
+    }
+
     const credentials = {
-      email: this.email,
+      email: this.email.trim().toLowerCase(),
       password: this.contrasena
     };
 
@@ -318,21 +343,32 @@ export class LoginComponent implements OnInit, AfterViewInit {
         // Redirigir según el rol
         if (response.rol === 'admin') {
           console.log('🔐 Usuario ADMIN detectado, redirigiendo al panel admin...');
-          this.mostrarAlerta(`¡Bienvenido Admin ${response.nombre}! 👑`, 'exito');
+          this.mostrarAlerta(`¡Bienvenido Admin ${response.nombre}! 🏥`, 'exito');
           setTimeout(() => {
             this.router.navigate(['/admin']);
-          }, 1000);
+          }, 1500);
         } else {
           console.log('👤 Usuario NORMAL detectado, redirigiendo a la tienda...');
-          this.mostrarAlerta(`¡Hola ${response.nombre}! Inicio de sesión correcto 🔥`, 'exito');
+          this.mostrarAlerta(`¡Hola ${response.nombre}! Acceso concedido 💙`, 'exito');
           setTimeout(() => {
             this.router.navigate(['/']);
-          }, 1000);
+          }, 1500);
         }
       },
       error: (err) => {
         console.error('❌ Error al iniciar sesión:', err);
-        const mensaje = err.error?.detail || 'Credenciales incorrectas ❌';
+        let mensaje = 'Credenciales incorrectas. Verifica tu email y contraseña.';
+        
+        if (err.error?.detail) {
+          mensaje = err.error.detail;
+        } else if (err.status === 401) {
+          mensaje = 'Email o contraseña incorrectos';
+        } else if (err.status === 404) {
+          mensaje = 'Usuario no encontrado. Verifica tu email';
+        } else if (err.status === 0) {
+          mensaje = 'No se pudo conectar con el servidor';
+        }
+        
         this.mostrarAlerta(mensaje, 'error');
       }
     });
