@@ -1,20 +1,37 @@
 <div class="perfil-container">
+  <!-- HEADER CON GRADIENTE DE FOCOSHOP -->
   <header class="header">
+    <button class="btn-volver" (click)="volver()">
+      <i class="fa fa-arrow-left"></i> Volver
+    </button>
+    
     <div class="logo">
-      <span class="logo-text">FOCOSHOP</span>
-      <i class="fa fa-shopping-cart"></i>
+      <i class="fa fa-heartbeat"></i>
+      <span class="logo-text">MEDTOOLS</span>
     </div>
-    <button class="btn-volver" (click)="volver()">Volver</button>
+    
+    <div class="header-spacer"></div>
   </header>
 
   <div class="perfil-card">
-    <h2>Configuración de Perfil</h2>
+    <div class="card-header">
+      <i class="fa fa-user-edit"></i>
+      <h2>Editar Perfil</h2>
+    </div>
 
     <!-- SECCIÓN FOTO -->
     <div class="foto-section">
-      <img [src]="user.imagen" alt="Foto de perfil" class="foto-perfil" />
+      <div class="foto-wrapper">
+        <img [src]="user.imagen" alt="Foto de perfil" class="foto-perfil" />
+        <div class="foto-overlay">
+          <i class="fa fa-camera"></i>
+        </div>
+      </div>
       <input type="file" id="fotoInput" (change)="onFileSelected($event)" hidden />
-      <button class="btn-foto" (click)="abrirSelectorFoto()">Cambiar foto</button>
+      <button class="btn-foto" type="button" (click)="abrirSelectorFoto()">
+        <i class="fa fa-camera"></i>
+        Cambiar foto
+      </button>
     </div>
 
     <!-- FORMULARIO PERFIL -->
@@ -22,42 +39,78 @@
       
       <!-- Nombre -->
       <div class="input-group">
-        <label>Nombre</label>
-        <input type="text" [(ngModel)]="user.nombre" name="nombre" required />
+        <label>
+          <i class="fa fa-user"></i>
+          Nombre
+        </label>
+        <input 
+          type="text" 
+          [(ngModel)]="user.nombre" 
+          name="nombre" 
+          placeholder="Ingresa tu nombre"
+          required />
       </div>
 
       <!-- Apellido -->
       <div class="input-group">
-        <label>Apellido</label>
-        <input type="text" [(ngModel)]="user.apellido" name="apellido" required />
+        <label>
+          <i class="fa fa-user"></i>
+          Apellido
+        </label>
+        <input 
+          type="text" 
+          [(ngModel)]="user.apellido" 
+          name="apellido" 
+          placeholder="Ingresa tu apellido"
+          required />
       </div>
 
       <!-- Correo -->
       <div class="input-group">
-        <label>Correo electrónico</label>
-        <input type="email" [(ngModel)]="user.email" name="email" disabled />
+        <label>
+          <i class="fa fa-envelope"></i>
+          Correo electrónico
+        </label>
+        <input 
+          type="email" 
+          [(ngModel)]="user.email" 
+          name="email" 
+          disabled 
+          class="input-disabled" />
+        <small class="input-help">El correo no puede ser modificado</small>
       </div>
 
       <!-- Teléfono con lada -->
       <div class="input-group">
-        <label>Número de teléfono</label>
+        <label>
+          <i class="fa fa-phone"></i>
+          Número de teléfono
+        </label>
         <div class="telefono-container">
           <select [(ngModel)]="user.lada" name="lada" class="lada-select">
             <option value="+52">🇲🇽 +52</option>
             <option value="+1">🇺🇸 +1</option>
             <option value="+44">🇬🇧 +44</option>
             <option value="+34">🇪🇸 +34</option>
-            <!-- Agrega más países según necesites -->
           </select>
-          <input type="text" [(ngModel)]="user.telefono" name="telefono" placeholder="6681234567" />
+          <input 
+            type="text" 
+            [(ngModel)]="user.telefono" 
+            name="telefono" 
+            placeholder="6681234567"
+            class="telefono-input" />
         </div>
       </div>
 
-      <button type="submit" class="btn-guardar">Guardar cambios</button>
+      <button type="submit" class="btn-guardar">
+        <i class="fa fa-save"></i>
+        Guardar Cambios
+      </button>
     </form>
   </div>
 </div>
-<!-- ✅ Alerta animada con foco (sintaxis moderna) -->
+
+<!-- ALERTA ANIMADA CON FOCO -->
 @if (mostrarAlerta) {
   <div class="alerta-overlay">
     <div class="alerta-container">
@@ -70,17 +123,3 @@
     </div>
   </div>
 }
-
-<!-- ESTILOS BÁSICOS PARA TELEFONO Y SELECT -->
-<style>
-.telefono-container {
-  display: flex;
-  gap: 5px;
-  align-items: center;
-}
-
-.lada-select {
-  padding: 0 5px;
-  height: 35px;
-}
-</style>
