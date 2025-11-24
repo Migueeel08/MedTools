@@ -1,26 +1,31 @@
 <div class="edit-direccion-container">
   <header class="edit-header">
+    <button (click)="volver()" class="btn-volver-header">
+      <i class="fas fa-arrow-left"></i> Volver
+    </button>
+
     <div class="logo">
-      <span class="logo-text">FOCOSHOP</span>
-      <i class="fa fa-shopping-cart"></i>
+      <i class="fas fa-heartbeat"></i>
+      <span class="logo-text">MEDTOOLS</span>
     </div>
 
-    <button (click)="volver()" class="btn-volver-header">
-      <i class="fa fa-arrow-left"></i> Volver
-    </button>
+    <div class="header-spacer"></div>
   </header>
 
   <main class="edit-content">
     <div class="form-card">
       <div class="form-header">
-        <i class="fa fa-map-marker-alt"></i>
-        <h2>Editar Dirección de Envío</h2>
+        <i class="fas fa-map-marker-alt"></i>
+        <h2>Dirección de Envío</h2>
       </div>
 
       <form class="direccion-form" (ngSubmit)="guardarDireccion()">
-        <!-- Información del usuario (solo lectura) -->
         <div class="seccion-info">
-          <h3><i class="fa fa-user"></i> Información de Contacto</h3>
+          <h3>
+            <i class="fas fa-user"></i>
+            Información de Contacto
+          </h3>
+          
           <div class="form-row">
             <div class="form-group readonly full-width">
               <label>Nombre Completo</label>
@@ -35,7 +40,10 @@
 
           <div class="form-row">
             <div class="form-group readonly">
-              <label><i class="fa fa-envelope"></i> Correo Electrónico</label>
+              <label>
+                <i class="fas fa-envelope"></i>
+                Correo Electrónico
+              </label>
               <input 
                 type="email" 
                 [value]="user.email"
@@ -45,7 +53,10 @@
             </div>
 
             <div class="form-group readonly">
-              <label><i class="fa fa-phone"></i> Teléfono</label>
+              <label>
+                <i class="fas fa-phone"></i>
+                Teléfono
+              </label>
               <input 
                 type="tel" 
                 [value]="user.telefono"
@@ -56,14 +67,19 @@
           </div>
         </div>
 
-        <!-- Dirección -->
         <div class="seccion-direccion">
-          <h3><i class="fa fa-home"></i> Dirección de Entrega</h3>
+          <h3>
+            <i class="fas fa-home"></i>
+            Dirección de Entrega
+          </h3>
           
-          <!-- País -->
           <div class="form-row">
             <div class="form-group full-width">
-              <label><i class="fa fa-globe"></i> País <span class="required">*</span></label>
+              <label>
+                <i class="fas fa-globe"></i>
+                País
+                <span class="required">*</span>
+              </label>
               <select 
                 [(ngModel)]="direccion.pais"
                 name="pais"
@@ -76,10 +92,13 @@
             </div>
           </div>
 
-          <!-- Código Postal con búsqueda automática -->
           <div class="form-row">
             <div class="form-group">
-              <label><i class="fa fa-search"></i> Código Postal <span class="required">*</span></label>
+              <label>
+                <i class="fas fa-search"></i>
+                Código Postal
+                <span class="required">*</span>
+              </label>
               <div class="cp-input-container">
                 <input 
                   type="text" 
@@ -94,26 +113,29 @@
                   [class.input-success]="cpEncontrado"
                   [class.input-error]="errorCP"
                 />
-                @if (buscandoCP) {
-                  <span class="cp-loading"><i class="fa fa-spinner fa-spin"></i></span>
-                }
-                @if (cpEncontrado) {
-                  <span class="cp-success"><i class="fa fa-check-circle"></i></span>
-                }
-                @if (errorCP) {
-                  <span class="cp-error"><i class="fa fa-exclamation-circle"></i></span>
-                }
+                <span class="cp-loading" *ngIf="buscandoCP">
+                  <i class="fas fa-spinner fa-spin"></i>
+                </span>
+                <span class="cp-success" *ngIf="cpEncontrado">
+                  <i class="fas fa-check-circle"></i>
+                </span>
+                <span class="cp-error" *ngIf="errorCP">
+                  <i class="fas fa-exclamation-circle"></i>
+                </span>
               </div>
-              @if (cpEncontrado && direccion.pais === 'México') {
-                <small class="helper-text success">✓ Código postal válido - Casillas llenadas automaticamente</small>
-              }
-              @if (errorCP) {
-                <small class="helper-text error">⚠ Código postal no encontrado, completa manualmente</small>
-              }
+              <small class="helper-text success" *ngIf="cpEncontrado && direccion.pais === 'México'">
+                ✓ Código postal válido - Casillas llenadas automaticamente
+              </small>
+              <small class="helper-text error" *ngIf="errorCP">
+                ⚠ Código postal no encontrado, completa manualmente
+              </small>
             </div>
 
             <div class="form-group">
-              <label>Estado <span class="required">*</span></label>
+              <label>
+                Estado
+                <span class="required">*</span>
+              </label>
               <select 
                 [(ngModel)]="direccion.estado"
                 name="estado"
@@ -129,10 +151,12 @@
             </div>
           </div>
 
-          <!-- Ciudad y Colonia -->
           <div class="form-row">
             <div class="form-group">
-              <label>Ciudad / Municipio <span class="required">*</span></label>
+              <label>
+                Ciudad / Municipio
+                <span class="required">*</span>
+              </label>
               <input 
                 type="text" 
                 [(ngModel)]="direccion.ciudad"
@@ -145,36 +169,40 @@
             </div>
 
             <div class="form-group">
-              <label>Colonia <span class="required">*</span></label>
-              @if (colonias.length > 0) {
-                <select 
-                  [(ngModel)]="direccion.colonia"
-                  name="colonia"
-                  required
-                  class="input-field"
-                >
-                  <option value="">Selecciona una colonia</option>
-                  <option *ngFor="let colonia of colonias" [value]="colonia">
-                    {{ colonia }}
-                  </option>
-                </select>
-              } @else {
-                <input 
-                  type="text" 
-                  [(ngModel)]="direccion.colonia"
-                  name="colonia"
-                  placeholder="Ej: Centro"
-                  required
-                  class="input-field"
-                />
-              }
+              <label>
+                Colonia
+                <span class="required">*</span>
+              </label>
+              <select 
+                *ngIf="colonias.length > 0"
+                [(ngModel)]="direccion.colonia"
+                name="colonia"
+                required
+                class="input-field"
+              >
+                <option value="">Selecciona una colonia</option>
+                <option *ngFor="let colonia of colonias" [value]="colonia">
+                  {{ colonia }}
+                </option>
+              </select>
+              <input 
+                *ngIf="colonias.length === 0"
+                type="text" 
+                [(ngModel)]="direccion.colonia"
+                name="colonia"
+                placeholder="Ej: Centro"
+                required
+                class="input-field"
+              />
             </div>
           </div>
 
-          <!-- Calle y Números -->
           <div class="form-row">
             <div class="form-group full-width">
-              <label>Calle <span class="required">*</span></label>
+              <label>
+                Calle
+                <span class="required">*</span>
+              </label>
               <input 
                 type="text" 
                 [(ngModel)]="direccion.calle"
@@ -188,7 +216,10 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label>Número Exterior <span class="required">*</span></label>
+              <label>
+                Número Exterior
+                <span class="required">*</span>
+              </label>
               <input 
                 type="text" 
                 [(ngModel)]="direccion.numeroExterior"
@@ -200,7 +231,10 @@
             </div>
 
             <div class="form-group">
-              <label>Número Interior <span class="opcional">(Opcional)</span></label>
+              <label>
+                Número Interior
+                <span class="opcional">(Opcional)</span>
+              </label>
               <input 
                 type="text" 
                 [(ngModel)]="direccion.numeroInterior"
@@ -211,10 +245,12 @@
             </div>
           </div>
 
-          <!-- Referencias -->
           <div class="form-row">
             <div class="form-group full-width">
-              <label>Referencias de entrega <span class="opcional">(Opcional)</span></label>
+              <label>
+                Referencias de entrega
+                <span class="opcional">(Opcional)</span>
+              </label>
               <textarea 
                 [(ngModel)]="direccion.referencias"
                 name="referencias"
@@ -226,13 +262,12 @@
           </div>
         </div>
 
-        <!-- Botones -->
         <div class="form-actions">
           <button type="button" (click)="volver()" class="btn-cancelar">
-            <i class="fa fa-times"></i> Cancelar
+            <i class="fas fa-times"></i> Cancelar
           </button>
           <button type="submit" class="btn-guardar">
-            <i class="fa fa-save"></i> Guardar Dirección
+            <i class="fas fa-save"></i> Guardar Dirección
           </button>
         </div>
       </form>
@@ -240,12 +275,9 @@
   </main>
 </div>
 
-<!-- Alerta de éxito -->
-@if (mostrarAlerta) {
-  <div class="alerta-exitosa">
-    <div class="alerta-contenido">
-      <i class="fa fa-check-circle"></i>
-      <p>{{ mensajeAlerta }}</p>
-    </div>
+<div class="alerta-exitosa" *ngIf="mostrarAlerta">
+  <div class="alerta-contenido">
+    <i class="fas fa-check-circle"></i>
+    <p>{{ mensajeAlerta }}</p>
   </div>
-}
+</div>
