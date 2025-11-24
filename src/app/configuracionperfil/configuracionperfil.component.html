@@ -1,31 +1,64 @@
 @if (!cargando && usuario) {
   <div class="perfil-container">
+    <!-- HEADER CON GRADIENTE DE FOCOSHOP -->
     <header class="perfil-header">
+      <button class="btn-volver-header" (click)="volver()">
+        <i class="fa fa-arrow-left"></i> Volver
+      </button>
+      
       <div class="logo">
-        <span class="logo-text">FOCOSHOP</span>
-        <i class="fa fa-shopping-cart"></i>
+        <i class="fa fa-heartbeat"></i>
+        <span class="logo-text">MEDTOOLS</span>
       </div>
+      
+      <div class="header-spacer"></div>
     </header>
 
     <main class="perfil-content">
+      <!-- TÍTULO DE SECCIÓN -->
+      <div class="seccion-titulo">
+        <h1>
+          <i class="fa fa-cog"></i>
+          Configuración de Cuenta
+        </h1>
+        <p>Administra tu información personal y preferencias</p>
+      </div>
+
       <div class="perfil-grid">
         <!-- PERFIL -->
         <div class="perfil-card">
-          <h3>CONFIGURACIÓN DE PERFIL</h3>
+          <div class="card-header">
+            <i class="fa fa-user-circle"></i>
+            <h3>Información Personal</h3>
+          </div>
           <div class="perfil-info">
             <img [src]="usuario.imagen || 'assets/img/avatar.png'" alt="avatar" class="avatar" />
-            <p class="nombre">{{usuario.nombre}} {{usuario.apellido}}</p>
-            <p>Email: {{usuario.email}}</p>
-            <p>Teléfono: {{usuario.telefono || 'No especificado'}}</p>
+            <div class="info-detalles">
+              <p class="nombre">{{usuario.nombre}} {{usuario.apellido}}</p>
+              <p class="dato-info">
+                <i class="fa fa-envelope"></i>
+                {{usuario.email}}
+              </p>
+              <p class="dato-info">
+                <i class="fa fa-phone"></i>
+                {{usuario.telefono || 'No especificado'}}
+              </p>
+            </div>
           </div>
-          <button (click)="editarCuenta()" class="btn-accion">EDITAR CUENTA</button>
+          <button (click)="editarCuenta()" class="btn-accion">
+            <i class="fa fa-edit"></i>
+            Editar Cuenta
+          </button>
         </div>
 
         <!-- DIRECCIÓN -->
         <div class="perfil-card">
-          <h3>DIRECCIÓN DE ENVÍO</h3>
+          <div class="card-header">
+            <i class="fa fa-map-marker-alt"></i>
+            <h3>Dirección de Envío</h3>
+          </div>
           <div class="perfil-info">
-            <!-- ✅ Mostrar mientras carga -->
+            <!-- Mostrar mientras carga -->
             @if (cargandoDirecciones) {
               <div class="loading-section">
                 <i class="fa fa-spinner fa-spin"></i>
@@ -33,27 +66,22 @@
               </div>
             }
             
-            <!-- ✅ Mostrar cuando no hay direcciones -->
+            <!-- Mostrar cuando no hay direcciones -->
             @else if (!tieneDireccion) {
               <div class="no-data-section">
-                <i class="fa fa-map-marker-alt" style="font-size: 2rem; color: #ccc; margin-bottom: 10px;"></i>
-                <p style="color: #999; font-style: italic;">No tienes dirección registrada</p>
-                <p style="color: #666; font-size: 0.9rem; margin-top: 5px;">
-                  Agrega una dirección para realizar tus compras
-                </p>
+                <i class="fa fa-map-marker-alt"></i>
+                <p>No tienes dirección registrada</p>
+                <span class="texto-ayuda">Agrega una dirección para realizar tus compras</span>
               </div>
             }
             
-            <!-- ✅ Mostrar dirección principal -->
+            <!-- Mostrar dirección principal -->
             @else {
               <div class="direccion-info">
-                <p><strong>{{usuario.nombre}} {{usuario.apellido}}</strong></p>
-                
                 @if (direccionPrincipal) {
-                  <!-- Dirección formateada desde el backend -->
                   <div class="direccion-detalle">
-                    <p class="direccion-linea">
-                      <i class="fa fa-map-marker-alt" style="color: #667eea; margin-right: 8px;"></i>
+                    <p class="direccion-linea principal">
+                      <i class="fa fa-map-marker-alt"></i>
                       {{direccionPrincipal.calle}} #{{direccionPrincipal.numero_exterior}}
                       @if (direccionPrincipal.numero_interior) {
                         <span>, Int {{direccionPrincipal.numero_interior}}</span>
@@ -69,84 +97,88 @@
                     
                     @if (direccionPrincipal.referencias) {
                       <p class="direccion-referencias">
-                        <i class="fa fa-info-circle" style="color: #666; margin-right: 5px;"></i>
-                        <em>{{direccionPrincipal.referencias}}</em>
+                        <i class="fa fa-info-circle"></i>
+                        {{direccionPrincipal.referencias}}
                       </p>
                     }
                   </div>
                 } @else {
-                  <!-- Fallback: dirección antigua del usuario -->
                   <p class="direccion-legacy">{{usuario.direccion}}</p>
                 }
                 
-                <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
-                  <i class="fa fa-phone" style="color: #667eea; margin-right: 5px;"></i>
-                  {{usuario.telefono || 'No disponible'}}
-                </p>
-                <p>
-                  <i class="fa fa-envelope" style="color: #667eea; margin-right: 5px;"></i>
-                  {{usuario.email}}
-                </p>
+                <div class="contacto-info">
+                  <p>
+                    <i class="fa fa-phone"></i>
+                    {{usuario.telefono || 'No disponible'}}
+                  </p>
+                  <p>
+                    <i class="fa fa-envelope"></i>
+                    {{usuario.email}}
+                  </p>
+                </div>
                 
-                <!-- ✅ Mostrar cantidad de direcciones si hay más de una -->
+                <!-- Mostrar cantidad de direcciones si hay más de una -->
                 @if (direcciones.length > 1) {
                   <button 
                     class="btn-direcciones-extra" 
                     (click)="abrirModalDirecciones()"
                     type="button">
-                    <i class="fa fa-home" style="margin-right: 5px;"></i>
-                    + {{direcciones.length - 1}} dirección(es) adicional(es)
-                    <i class="fa fa-chevron-right" style="margin-left: 10px; font-size: 0.8rem;"></i>
+                    <i class="fa fa-home"></i>
+                    {{direcciones.length - 1}} dirección(es) adicional(es)
+                    <i class="fa fa-chevron-right"></i>
                   </button>
                 }
               </div>
             }
           </div>
           <button (click)="editarDireccion()" class="btn-accion">
-            @if (tieneDireccion) {
-              EDITAR DIRECCIÓN
-            } @else {
-              AGREGAR DIRECCIÓN
-            }
+            <i class="fa fa-{{tieneDireccion ? 'edit' : 'plus'}}"></i>
+            {{tieneDireccion ? 'Editar Dirección' : 'Agregar Dirección'}}
           </button>
         </div>
 
         <!-- MÉTODO DE PAGO -->
         <div class="perfil-card">
-          <h3>MÉTODO DE PAGO</h3>
-          <div class="tarjeta" [style.background]="colorTarjeta">
-            <div class="tarjeta-top">
-              @if (bancoTarjeta) {
-                <span class="banco">{{bancoTarjeta}}</span>
-              } @else {
-                <span class="tipo-mini">{{tipoTarjeta}}</span>
-              }
-              <i class="fa fa-credit-card chip-icon"></i>
-            </div>
-            <p class="numero">{{numeroTarjeta}}</p>
-            <div class="tarjeta-bottom">
-              <div class="titular-section">
-                <span class="label-small">TITULAR</span>
-                <span class="titular">{{titularTarjeta}}</span>
+          <div class="card-header">
+            <i class="fa fa-credit-card"></i>
+            <h3>Método de Pago</h3>
+          </div>
+          <div class="tarjeta-container">
+            <div class="tarjeta" [style.background]="colorTarjeta">
+              <div class="tarjeta-top">
+                @if (bancoTarjeta) {
+                  <span class="banco">{{bancoTarjeta}}</span>
+                } @else {
+                  <span class="tipo-mini">{{tipoTarjeta}}</span>
+                }
+                <i class="fa fa-credit-card chip-icon"></i>
               </div>
-              <span class="tipo">{{tipoTarjeta}}</span>
+              <p class="numero">{{numeroTarjeta}}</p>
+              <div class="tarjeta-bottom">
+                <div class="titular-section">
+                  <span class="label-small">TITULAR</span>
+                  <span class="titular">{{titularTarjeta}}</span>
+                </div>
+                <span class="tipo">{{tipoTarjeta}}</span>
+              </div>
             </div>
           </div>
-          <button (click)="editarPago()" class="btn-accion">EDITAR MÉTODO DE PAGO</button>
+          <button (click)="editarPago()" class="btn-accion">
+            <i class="fa fa-edit"></i>
+            Editar Método de Pago
+          </button>
         </div>
       </div>
-
-      <button (click)="volver()" class="btn-volver">VOLVER</button>
     </main>
   </div>
 
-  <!-- ✅ MODAL DE DIRECCIONES -->
+  <!-- MODAL DE DIRECCIONES -->
   @if (mostrarModal) {
     <div class="modal-overlay" (click)="cerrarModal()">
       <div class="modal-direcciones" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h2>
-            <i class="fa fa-map-marker-alt" style="margin-right: 10px; color: #667eea;"></i>
+            <i class="fa fa-map-marker-alt"></i>
             Mis Direcciones
           </h2>
           <button class="btn-cerrar-modal" (click)="cerrarModal()">
@@ -157,7 +189,7 @@
         <div class="modal-body">
           @if (direcciones.length === 0) {
             <div class="no-direcciones">
-              <i class="fa fa-map-marker-alt" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+              <i class="fa fa-map-marker-alt"></i>
               <p>No tienes direcciones guardadas</p>
               <button class="btn-agregar-direccion" (click)="editarDireccion()">
                 <i class="fa fa-plus"></i> Agregar dirección
@@ -172,17 +204,15 @@
                   (click)="seleccionarDireccionPrincipal(direccion)">
                   
                   <div class="direccion-contenido">
-                    <!-- Indicador de dirección principal -->
                     @if (direccionPrincipal?.id_direccion === direccion.id_direccion) {
                       <div class="badge-principal">
                         <i class="fa fa-check-circle"></i> Principal
                       </div>
                     }
 
-                    <!-- Dirección -->
                     <div class="direccion-texto">
                       <p class="direccion-titulo">
-                        <i class="fa fa-map-marker-alt" style="color: #667eea; margin-right: 8px;"></i>
+                        <i class="fa fa-map-marker-alt"></i>
                         <strong>{{direccion.calle}} #{{direccion.numero_exterior}}</strong>
                         @if (direccion.numero_interior) {
                           <span>, Int {{direccion.numero_interior}}</span>
@@ -199,7 +229,6 @@
                     </div>
                   </div>
 
-                  <!-- Acciones -->
                   <div class="direccion-acciones">
                     <button 
                       class="btn-icono btn-eliminar" 
@@ -213,7 +242,6 @@
               }
             </div>
 
-            <!-- Botón para agregar nueva dirección -->
             <button class="btn-agregar-nueva" (click)="editarDireccion()">
               <i class="fa fa-plus-circle"></i> Agregar nueva dirección
             </button>
@@ -225,6 +253,6 @@
 } @else {
   <div class="loading">
     <div class="spinner"></div>
-    <p>Cargando perfil...</p>
+    <p>Cargando configuración...</p>
   </div>
 }

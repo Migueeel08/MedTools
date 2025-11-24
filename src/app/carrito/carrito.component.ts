@@ -19,6 +19,8 @@ interface ItemCarrito {
   producto_imagen: string | null;
   producto_disponible: boolean;
   producto_cantidad_disponible: number;
+  producto_marca?: string | null;
+  producto_condicion?: string | null;
   subtotal: number;
 }
 
@@ -28,6 +30,31 @@ interface CarritoResumen {
   total_productos: number;
   subtotal: number;
   items: ItemCarrito[];
+}
+
+interface Direccion {
+  id_direccion: number;
+  nombre_contacto: string;
+  telefono_contacto: string;
+  calle: string;
+  numero_exterior: string;
+  numero_interior?: string;
+  colonia: string;
+  ciudad: string;
+  estado: string;
+  codigo_postal: string;
+  pais: string;
+  es_principal: boolean;
+}
+
+interface MetodoPago {
+  id_metodo_pago: number;
+  tipo_tarjeta: string;
+  ultimos_digitos: string;
+  mes_expiracion: string;
+  anio_expiracion: string;
+  banco?: string;
+  es_principal: boolean;
 }
 
 @Component({
@@ -52,12 +79,16 @@ export class CarritoComponent implements OnInit, OnDestroy {
   userImage: string = 'assets/img/user-icon.png';
   userMenuOpen: boolean = false;
 
+  // ===== CONTADORES DEL HEADER =====
+  contadorCarrito: number = 0;
+  contadorFavoritos: number = 0;
+
   // ===== MODAL DE CHECKOUT =====
   modalCheckoutVisible: boolean = false;
-  direcciones: any[] = [];
-  metodosPago: any[] = [];
-  direccionSeleccionada: any = null;
-  metodoPagoSeleccionado: any = null;
+  direcciones: Direccion[] = [];
+  metodosPago: MetodoPago[] = [];
+  direccionSeleccionada: Direccion | null = null;
+  metodoPagoSeleccionado: MetodoPago | null = null;
   procesandoPago: boolean = false;
 
   // ===== STRIPE =====
@@ -76,6 +107,7 @@ export class CarritoComponent implements OnInit, OnDestroy {
     this.cargarUsuario();
     if (this.isLoggedIn) {
       this.cargarCarrito();
+      this.cargarContadores();
     } else {
       this.router.navigate(['/login']);
     }
@@ -87,7 +119,7 @@ export class CarritoComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ===== CARGAR USUARIO =====
+  // ========== CARGAR USUARIO ==========
   cargarUsuario(): void {
     const userData = localStorage.getItem('user');
     if (userData) {
@@ -115,13 +147,32 @@ export class CarritoComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ===== CARGAR CARRITO =====
+  // ========== CARGAR CONTADORES ==========
+  cargarContadores(): void {
+    // Contador del carrito
+    if (this.carrito) {
+      this.contadorCarrito = this.carrito.total_productos || 0;
+    }
+
+    // Contador de favoritos (implementar según tu API)
+    this.http.get<any>(`${this.apiUrl}/favoritos/usuario/${this.userId}/count`).subscribe({
+      next: (response) => {
+        this.contadorFavoritos = response.count || 0;
+      },
+      error: () => {
+        this.contadorFavoritos = 0;
+      }
+    });
+  }
+
+  // ========== CARGAR CARRITO ==========
   cargarCarrito(): void {
     this.cargando = true;
     this.http.get<CarritoResumen>(`${this.apiUrl}/carrito/usuario/${this.userId}`).subscribe({
       next: (carrito) => {
         this.carrito = carrito;
         this.cargando = false;
+        this.cargarContadores();
         console.log('✅ Carrito cargado:', carrito);
       },
       error: (error) => {
@@ -132,7 +183,7 @@ export class CarritoComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ===== INCREMENTAR CANTIDAD =====
+  // ========== OPERACIONES DEL CARRITO ==========
   incrementarCantidad(item: ItemCarrito): void {
     if (item.cantidad >= item.producto_cantidad_disponible) {
       alert(`Solo hay ${item.producto_cantidad_disponible} unidades disponibles`);
@@ -153,7 +204,6 @@ export class CarritoComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ===== DECREMENTAR CANTIDAD =====
   decrementarCantidad(item: ItemCarrito): void {
     if (item.cantidad <= 1) {
       return;
@@ -173,7 +223,6 @@ export class CarritoComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ===== ELIMINAR ITEM =====
   eliminarItem(item: ItemCarrito): void {
     if (!confirm(`¿Eliminar ${item.producto_nombre} del carrito?`)) {
       return;
@@ -184,6 +233,7 @@ export class CarritoComponent implements OnInit, OnDestroy {
         this.cargarCarrito();
         console.log('✅ Producto eliminado del carrito');
         
+        // Disparar evento para actualizar el header
         window.dispatchEvent(new CustomEvent('carritoActualizado'));
       },
       error: (error) => {
@@ -193,7 +243,6 @@ export class CarritoComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ===== VACIAR CARRITO =====
   vaciarCarrito(): void {
     if (!confirm('¿Estás seguro de vaciar todo el carrito?')) {
       return;
@@ -204,6 +253,7 @@ export class CarritoComponent implements OnInit, OnDestroy {
         this.cargarCarrito();
         console.log('✅ Carrito vaciado');
         
+        // Disparar evento para actualizar el header
         window.dispatchEvent(new CustomEvent('carritoActualizado'));
       },
       error: (error) => {
@@ -213,7 +263,7 @@ export class CarritoComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ===== PROCEDER AL PAGO =====
+  // ========== CHECKOUT ==========
   procederAlPago(): void {
     const itemsDisponibles = this.carrito?.items.filter(item => item.producto_disponible);
     
@@ -227,11 +277,10 @@ export class CarritoComponent implements OnInit, OnDestroy {
     this.cargarMetodosPagoUsuario();
   }
 
-  // ===== CARGAR DIRECCIONES DEL USUARIO =====
   cargarDireccionesUsuario(): void {
     console.log('🔍 Cargando direcciones para usuario:', this.userId);
     
-    this.http.get<any[]>(`${this.apiUrl}/direcciones/usuario/${this.userId}`).subscribe({
+    this.http.get<Direccion[]>(`${this.apiUrl}/direcciones/usuario/${this.userId}`).subscribe({
       next: (direcciones) => {
         console.log('✅ Direcciones recibidas:', direcciones);
         this.direcciones = direcciones;
@@ -247,11 +296,10 @@ export class CarritoComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ===== CARGAR MÉTODOS DE PAGO DEL USUARIO =====
   cargarMetodosPagoUsuario(): void {
     console.log('🔍 Cargando métodos de pago para usuario:', this.userId);
     
-    this.http.get<any[]>(`${this.apiUrl}/metodos-pago/usuario/${this.userId}`).subscribe({
+    this.http.get<MetodoPago[]>(`${this.apiUrl}/metodos-pago/usuario/${this.userId}`).subscribe({
       next: (metodos) => {
         console.log('✅ Métodos de pago recibidos:', metodos);
         this.metodosPago = metodos;
@@ -263,7 +311,6 @@ export class CarritoComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ===== CERRAR MODAL =====
   cerrarModalCheckout(): void {
     this.modalCheckoutVisible = false;
     this.direccionSeleccionada = null;
@@ -276,13 +323,11 @@ export class CarritoComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ===== SELECCIONAR DIRECCIÓN =====
-  seleccionarDireccion(direccion: any): void {
+  seleccionarDireccion(direccion: Direccion): void {
     this.direccionSeleccionada = direccion;
   }
 
-  // ===== SELECCIONAR MÉTODO DE PAGO =====
-  seleccionarMetodoPago(metodo: any): void {
+  seleccionarMetodoPago(metodo: MetodoPago): void {
     this.metodoPagoSeleccionado = metodo;
     if (this.mostrarFormularioStripe) {
       this.mostrarFormularioStripe = false;
@@ -293,7 +338,7 @@ export class CarritoComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ===== PAGAR CON NUEVA TARJETA (STRIPE) =====
+  // ========== STRIPE ==========
   async pagarConNuevaTarjeta() {
     this.metodoPagoSeleccionado = null;
     this.mostrarFormularioStripe = true;
@@ -317,7 +362,6 @@ export class CarritoComponent implements OnInit, OnDestroy {
     }, 300);
   }
 
-  // ===== PROCESAR PAGO CON STRIPE =====
   async procesarPagoConStripe() {
     if (!this.direccionSeleccionada) {
       alert('Debes seleccionar una dirección de envío');
@@ -374,6 +418,7 @@ export class CarritoComponent implements OnInit, OnDestroy {
       this.cerrarModalCheckout();
       this.stripeService.destroyElements();
       
+      // Vaciar carrito después del pago exitoso
       await this.http.delete(`${this.apiUrl}/carrito/usuario/${this.userId}`).toPromise();
       window.dispatchEvent(new CustomEvent('carritoActualizado'));
       
@@ -387,7 +432,6 @@ export class CarritoComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ===== CANCELAR FORMULARIO STRIPE =====
   cancelarStripe() {
     this.mostrarFormularioStripe = false;
     this.errorStripe = '';
@@ -397,7 +441,7 @@ export class CarritoComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ===== DETECTAR MARCA DE TARJETA =====
+  // ========== MÉTODOS DE PAGO - UTILIDADES ==========
   detectarMarcaTarjeta(banco: string): string {
     if (!banco) return 'generic';
     
@@ -425,8 +469,7 @@ export class CarritoComponent implements OnInit, OnDestroy {
     return 'generic';
   }
 
-  // ===== OBTENER LOGO DE TARJETA =====
-  obtenerLogoTarjeta(metodo: any): string {
+  obtenerLogoTarjeta(metodo: MetodoPago): string {
     let marca = 'generic';
 
     if (metodo.banco) {
@@ -448,8 +491,7 @@ export class CarritoComponent implements OnInit, OnDestroy {
     return logos[marca] || logos['generic'];
   }
 
-  // ===== OBTENER NOMBRE DE MARCA =====
-  obtenerNombreMarca(metodo: any): string {
+  obtenerNombreMarca(metodo: MetodoPago): string {
     if (!metodo.banco) return 'Tarjeta';
     
     const marca = this.detectarMarcaTarjeta(metodo.banco);
@@ -469,12 +511,7 @@ export class CarritoComponent implements OnInit, OnDestroy {
     return nombres[marca] || metodo.banco;
   }
 
-  // ===== CALCULAR TOTAL =====
-  calcularTotal(): number {
-    return this.carrito?.subtotal || 0;
-  }
-
-  // ===== CONFIRMAR COMPRA (con método guardado) =====
+  // ========== CONFIRMAR COMPRA CON MÉTODO GUARDADO ==========
   confirmarCompra(): void {
     if (!this.direccionSeleccionada) {
       alert('Debes seleccionar una dirección de envío');
@@ -493,6 +530,7 @@ export class CarritoComponent implements OnInit, OnDestroy {
 
     this.procesandoPago = true;
 
+    // Simulación de proceso de compra (reemplazar con tu API real)
     setTimeout(() => {
       const compra = {
         items: this.carrito!.items,
@@ -507,19 +545,45 @@ export class CarritoComponent implements OnInit, OnDestroy {
       this.procesandoPago = false;
       this.cerrarModalCheckout();
       
-      this.vaciarCarrito();
-      
-      alert('¡Compra realizada exitosamente! 🎉');
-      this.router.navigate(['/perfil']);
+      // Vaciar carrito
+      this.http.delete(`${this.apiUrl}/carrito/usuario/${this.userId}`).subscribe({
+        next: () => {
+          window.dispatchEvent(new CustomEvent('carritoActualizado'));
+          alert('¡Compra realizada exitosamente! 🎉');
+          this.router.navigate(['/perfil']);
+        }
+      });
     }, 2000);
   }
 
-  // ===== CONTINUAR COMPRANDO =====
+  // ========== NAVEGACIÓN ==========
   continuarComprando(): void {
     this.router.navigate(['/']);
   }
 
-  // ===== CONSTRUIR URL IMAGEN =====
+  volverInicio(): void {
+    this.router.navigate(['/']);
+  }
+
+  irAProducto(idProducto: number): void {
+    this.router.navigate(['/producto', idProducto]);
+  }
+
+  irFavoritos(): void {
+    this.router.navigate(['/favoritos']);
+  }
+
+  irPerfil(): void {
+    this.userMenuOpen = false;
+    this.router.navigate(['/perfil']);
+  }
+
+  irConfiguracion(): void {
+    this.userMenuOpen = false;
+    this.router.navigate(['/configuracion']);
+  }
+
+  // ========== UTILIDADES ==========
   construirUrlImagen(imagen: string | null): string {
     if (!imagen) return 'assets/img/producto-default.jpg';
     if (imagen.startsWith('http')) return imagen;
@@ -529,17 +593,11 @@ export class CarritoComponent implements OnInit, OnDestroy {
     return 'assets/img/producto-default.jpg';
   }
 
-  // ===== IR A PRODUCTO =====
-  irAProducto(idProducto: number): void {
-    this.router.navigate(['/producto', idProducto]);
+  // ========== MENÚ DE USUARIO ==========
+  toggleUserMenu(): void {
+    this.userMenuOpen = !this.userMenuOpen;
   }
 
-  // ===== NAVEGACIÓN =====
-  volverInicio(): void {
-    this.router.navigate(['/']);
-  }
-
-  // ===== USUARIO MENÚ =====
   logout(): void {
     localStorage.removeItem('user');
     window.dispatchEvent(new Event('storage'));
@@ -548,25 +606,6 @@ export class CarritoComponent implements OnInit, OnDestroy {
     this.userImage = 'assets/img/profile.jpeg';
     this.userMenuOpen = false;
     this.router.navigate(['/']);
-  }
-
-  toggleUserMenu(): void {
-    this.userMenuOpen = !this.userMenuOpen;
-  }
-
-  irPerfil(): void {
-    this.userMenuOpen = false;
-    this.router.navigate(['/perfil']);
-  }
-
-  irVender(): void {
-    this.userMenuOpen = false;
-    this.router.navigate(['/vender']);
-  }
-
-  irConfiguracion(): void {
-    this.userMenuOpen = false;
-    this.router.navigate(['/configuracion']);
   }
 
   @HostListener('document:click', ['$event'])

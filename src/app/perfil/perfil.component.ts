@@ -21,35 +21,8 @@ export class PerfilComponent implements OnInit {
     imagen: 'assets/img/profile.jpeg',
   };
 
-  productosVendiendo: any[] = [];
-  productosVendidos: any[] = [];
   compras: any[] = [];
-
-  tabSeleccionado: 'vendiendo' | 'vendidos' | 'compras' = 'vendiendo';
   cargando = false;
-
-  // ✅ Modal de gestión de producto
-  modalGestionVisible = false;
-  productoSeleccionado: any = null;
-  
-  // ✅ Modal de editar stock
-  modalStockVisible = false;
-  nuevoStock = 0;
-
-  // ✅ NUEVO: Modal de editar información del producto
-  modalEditarVisible = false;
-  formularioEdicion = {
-    nombre: '',
-    descripcion: '',
-    precio: 0,
-    categoria: '',
-    condicion: 'nuevo',
-    color: '',
-    talla: '',
-    marca: ''
-  };
-
-  categorias: any[] = [];
 
   constructor(
     private router: Router,
@@ -58,12 +31,11 @@ export class PerfilComponent implements OnInit {
 
   ngOnInit() {
     this.cargarUsuario();
-    this.cargarProductosDelUsuario();
-    this.cargarCategorias();
+    this.cargarCompras();
     
     window.addEventListener('storage', () => {
       this.cargarUsuario();
-      this.cargarProductosDelUsuario();
+      this.cargarCompras();
     });
   }
 
@@ -88,48 +60,13 @@ export class PerfilComponent implements OnInit {
     }
   }
 
-  cargarCategorias() {
-    this.http.get<any[]>(`${this.apiUrl}/categorias`).subscribe({
-      next: (categorias) => {
-        this.categorias = categorias;
-      },
-      error: (error) => {
-        console.error('Error cargando categorías:', error);
-      }
-    });
-  }
-
-  cargarProductosDelUsuario() {
+  cargarCompras() {
     if (!this.user.id) {
       console.warn('No hay ID de usuario disponible');
       return;
     }
 
     this.cargando = true;
-
-    this.http.get<any[]>(`${this.apiUrl}/productos/usuario/${this.user.id}/vendiendo`)
-      .subscribe({
-        next: (productos) => {
-          this.productosVendiendo = productos.map(p => this.normalizarProducto(p));
-          console.log('Productos en venta:', this.productosVendiendo);
-        },
-        error: (error) => {
-          console.error('Error cargando productos en venta:', error);
-          this.productosVendiendo = [];
-        }
-      });
-
-    this.http.get<any[]>(`${this.apiUrl}/productos/usuario/${this.user.id}/vendidos`)
-      .subscribe({
-        next: (productos) => {
-          this.productosVendidos = productos.map(p => this.normalizarProducto(p));
-          console.log('Productos vendidos:', this.productosVendidos);
-        },
-        error: (error) => {
-          console.error('Error cargando productos vendidos:', error);
-          this.productosVendidos = [];
-        }
-      });
 
     this.http.get<any[]>(`${this.apiUrl}/productos/usuario/${this.user.id}/compras`)
       .subscribe({
@@ -155,7 +92,7 @@ export class PerfilComponent implements OnInit {
       imagen: this.obtenerUrlImagenProducto(producto.imagen),
       categoria: producto.categoria,
       id_categoria: producto.id_categoria,
-      vendedor: producto.vendedor || producto.usuario?.nombre,
+      vendedor: producto.vendedor || producto.usuario?.nombre || 'Vendedor',
       estado: producto.estado,
       fecha_venta: producto.fecha_venta || producto.fecha_vendido,
       cantidad_disponible: producto.cantidad_disponible || 0,
@@ -201,173 +138,11 @@ export class PerfilComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  seleccionarTab(tab: 'vendiendo' | 'vendidos' | 'compras') {
-    this.tabSeleccionado = tab;
-  }
-
-  obtenerProductosActivos() {
-    switch (this.tabSeleccionado) {
-      case 'vendiendo': return this.productosVendiendo;
-      case 'vendidos': return this.productosVendidos;
-      case 'compras': return this.compras;
-      default: return [];
-    }
-  }
-
   verDetalleProducto(producto: any) {
-    if (this.tabSeleccionado === 'vendiendo') {
-      this.abrirModalGestion(producto);
-    } else {
-      this.router.navigate(['/producto', producto.id]);
-    }
-  }
-
-  irAVender() {
-    this.router.navigate(['/vender']);
+    this.router.navigate(['/producto', producto.id]);
   }
 
   explorarProductos() {
     this.router.navigate(['/']);
-  }
-
-  // ========================================
-  // GESTIÓN DE PRODUCTOS EN VENTA
-  // ========================================
-
-  abrirModalGestion(producto: any) {
-    this.productoSeleccionado = producto;
-    this.modalGestionVisible = true;
-  }
-
-  cerrarModalGestion() {
-    this.modalGestionVisible = false;
-    this.productoSeleccionado = null;
-  }
-
-  abrirModalStock() {
-    this.nuevoStock = this.productoSeleccionado?.cantidad_disponible || 0;
-    this.modalStockVisible = true;
-    this.modalGestionVisible = false;
-  }
-
-  cerrarModalStock() {
-    this.modalStockVisible = false;
-    this.modalGestionVisible = true;
-  }
-
-  guardarStock() {
-    if (!this.productoSeleccionado) return;
-
-    const actualizacion = {
-      cantidad_disponible: this.nuevoStock
-    };
-
-    this.http.put(
-      `${this.apiUrl}/productos/${this.productoSeleccionado.id_producto}`,
-      actualizacion
-    ).subscribe({
-      next: () => {
-        alert('Stock actualizado correctamente');
-        this.cerrarModalStock();
-        this.cerrarModalGestion();
-        this.cargarProductosDelUsuario();
-      },
-      error: (error) => {
-        console.error('Error actualizando stock:', error);
-        alert('Error al actualizar el stock');
-      }
-    });
-  }
-
-  editarProducto() {
-    if (!this.productoSeleccionado) return;
-    
-    // Llenar formulario con datos actuales
-    this.formularioEdicion = {
-      nombre: this.productoSeleccionado.nombre || '',
-      descripcion: this.productoSeleccionado.descripcion || '',
-      precio: this.productoSeleccionado.precio || 0,
-      categoria: this.productoSeleccionado.id_categoria || '',
-      condicion: this.productoSeleccionado.condicion || 'nuevo',
-      color: this.productoSeleccionado.color || '',
-      talla: this.productoSeleccionado.talla || '',
-      marca: this.productoSeleccionado.marca || ''
-    };
-    
-    this.modalEditarVisible = true;
-    this.modalGestionVisible = false;
-  }
-
-  /**
-   * Cerrar modal de editar producto
-   */
-  cerrarModalEditar() {
-    this.modalEditarVisible = false;
-    this.modalGestionVisible = true;
-  }
-
-  /**
-   * Guardar cambios del producto
-   */
-  guardarCambiosProducto() {
-    if (!this.productoSeleccionado) return;
-
-    if (!this.formularioEdicion.nombre.trim()) {
-      alert('El nombre del producto es obligatorio');
-      return;
-    }
-
-    if (this.formularioEdicion.precio <= 0) {
-      alert('El precio debe ser mayor a 0');
-      return;
-    }
-
-    const actualizacion = {
-      nombre: this.formularioEdicion.nombre,
-      descripcion: this.formularioEdicion.descripcion,
-      precio: this.formularioEdicion.precio,
-      id_categoria: this.formularioEdicion.categoria,
-      condicion: this.formularioEdicion.condicion,
-      color: this.formularioEdicion.color,
-      talla: this.formularioEdicion.talla,
-      marca: this.formularioEdicion.marca
-    };
-
-    this.http.put(
-      `${this.apiUrl}/productos/${this.productoSeleccionado.id_producto}`,
-      actualizacion
-    ).subscribe({
-      next: () => {
-        alert('Producto actualizado correctamente');
-        this.cerrarModalEditar();
-        this.cerrarModalGestion();
-        this.cargarProductosDelUsuario();
-      },
-      error: (error) => {
-        console.error('Error actualizando producto:', error);
-        alert('Error al actualizar el producto');
-      }
-    });
-  }
-
-  eliminarProducto() {
-    if (!this.productoSeleccionado) return;
-
-    if (!confirm(`¿Estás seguro de eliminar "${this.productoSeleccionado.nombre}"?`)) {
-      return;
-    }
-
-    this.http.delete(`${this.apiUrl}/productos/${this.productoSeleccionado.id_producto}`)
-      .subscribe({
-        next: () => {
-          alert('Producto eliminado correctamente');
-          this.cerrarModalGestion();
-          this.cargarProductosDelUsuario();
-        },
-        error: (error) => {
-          console.error('Error eliminando producto:', error);
-          alert('Error al eliminar el producto');
-        }
-      });
   }
 }

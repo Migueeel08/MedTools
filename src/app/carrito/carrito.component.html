@@ -1,31 +1,55 @@
 <div class="carrito-container">
-  <!-- HEADER -->
+  <!-- HEADER PRINCIPAL -->
   <header class="header">
     <div class="logo" (click)="volverInicio()">
       <i class="fas fa-heartbeat"></i>
       <span class="logo-text">MEDTOOLS</span>
     </div>
 
-    <div class="header-title">
-      <i class="fas fa-shopping-bag"></i>
-      <span>Mi Carrito</span>
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Buscar equipo médico..."
+        disabled
+      />
+      <i class="fas fa-search"></i>
     </div>
 
-    <!-- USUARIO -->
+    <!-- LINKS DE AUTENTICACIÓN Y CARRITO -->
     <div class="auth-links">
+      <!-- ÍCONO DE FAVORITOS (solo si está logueado) -->
+      @if (isLoggedIn) {
+        <div class="favoritos-header" (click)="irFavoritos()">
+          <i class="fas fa-heart"></i>
+          @if (contadorFavoritos > 0) {
+            <span class="favoritos-badge">{{ contadorFavoritos }}</span>
+          }
+        </div>
+      }
+
+      <!-- ÍCONO DEL CARRITO (solo si está logueado) - ACTIVO -->
+      @if (isLoggedIn) {
+        <div class="carrito-header active">
+          <i class="fas fa-shopping-cart"></i>
+          @if (contadorCarrito > 0) {
+            <span class="carrito-badge">{{ contadorCarrito }}</span>
+          }
+        </div>
+      }
+
+      <!-- USUARIO -->
       @if (isLoggedIn) {
         <div class="user-info" (click)="toggleUserMenu()">
           <img [src]="userImage" alt="Perfil" class="user-icon" />
 
           <div class="user-menu" [class.open]="userMenuOpen">
-            <div class="user-name-header">{{ userName }}</div>
+            <div class="user-name-header">
+              <i class="fas fa-user-md"></i>
+              {{ userName }}
+            </div>
 
             <button (click)="irPerfil()">
               <i class="fas fa-user"></i> Mi perfil
-            </button>
-
-            <button (click)="irVender()">
-              <i class="fas fa-briefcase-medical"></i> Vender equipo
             </button>
 
             <button (click)="irConfiguracion()">
@@ -39,9 +63,29 @@
             </button>
           </div>
         </div>
+      } @else {
+        <a [routerLink]="['/login']" class="auth-link">
+          <i class="fas fa-sign-in-alt"></i>
+          Iniciar Sesión
+        </a>
       }
     </div>
   </header>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb-container">
+    <div class="breadcrumb">
+      <span (click)="volverInicio()">
+        <i class="fas fa-home"></i>
+        Inicio
+      </span>
+      <i class="fas fa-chevron-right"></i>
+      <span class="actual">
+        <i class="fas fa-shopping-cart"></i>
+        Mi Carrito
+      </span>
+    </div>
+  </div>
 
   <!-- CONTENIDO PRINCIPAL -->
   <div class="carrito-content">
@@ -49,7 +93,9 @@
     <!-- LOADING -->
     @if (cargando) {
       <div class="loading">
-        <i class="fas fa-spinner fa-spin fa-3x"></i>
+        <div class="loading-spinner">
+          <i class="fas fa-spinner fa-spin fa-3x"></i>
+        </div>
         <p>Cargando carrito...</p>
       </div>
     }
@@ -81,6 +127,11 @@
                   <img [src]="construirUrlImagen(item.producto_imagen)" [alt]="item.producto_nombre" />
                   @if (!item.producto_disponible) {
                     <div class="badge-no-disponible">No disponible</div>
+                  } @else if (item.producto_condicion === 'nuevo') {
+                    <span class="badge-nuevo">
+                      <i class="fas fa-certificate"></i>
+                      Nuevo
+                    </span>
                   }
                 </div>
 
@@ -89,6 +140,13 @@
                   <h3 class="item-nombre" (click)="irAProducto(item.id_producto)">
                     {{ item.producto_nombre }}
                   </h3>
+
+                  @if (item.producto_marca) {
+                    <p class="producto-marca">
+                      <i class="fas fa-building"></i>
+                      {{ item.producto_marca }}
+                    </p>
+                  }
 
                   <!-- Color y Talla -->
                   @if (item.color || item.talla) {
