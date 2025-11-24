@@ -1,20 +1,22 @@
 <div class="edit-pago-container">
   <header class="edit-header">
+    <button (click)="volver()" class="btn-volver-header">
+      <i class="fas fa-arrow-left"></i> Volver
+    </button>
+
     <div class="logo">
-      <span class="logo-text">FOCOSHOP</span>
-      <i class="fa fa-shopping-cart"></i>
+      <i class="fas fa-heartbeat"></i>
+      <span class="logo-text">MEDTOOLS</span>
     </div>
 
-    <button (click)="volver()" class="btn-volver-header">
-      <i class="fa fa-arrow-left"></i> Volver
-    </button>
+    <div class="header-spacer"></div>
   </header>
 
   <main class="edit-content">
     <div class="form-card">
       <div class="form-header">
-        <i class="fa fa-credit-card"></i>
-        <h2>Editar Método de Pago</h2>
+        <i class="fas fa-credit-card"></i>
+        <h2>Método de Pago</h2>
       </div>
 
       <div class="pago-content">
@@ -25,12 +27,12 @@
             <div class="tarjeta-front" [style.background]="tarjeta.colorTarjeta">
               <div class="tarjeta-chip">
                 <svg viewBox="0 0 50 40" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="50" height="40" rx="5" fill="#f9a825"/>
-                  <rect x="5" y="5" width="40" height="30" rx="3" fill="#fbc02d"/>
-                  <rect x="10" y="10" width="15" height="10" rx="2" fill="#fff9c4" opacity="0.5"/>
-                  <rect x="25" y="10" width="15" height="10" rx="2" fill="#fff9c4" opacity="0.5"/>
-                  <rect x="10" y="20" width="15" height="10" rx="2" fill="#fff9c4" opacity="0.5"/>
-                  <rect x="25" y="20" width="15" height="10" rx="2" fill="#fff9c4" opacity="0.5"/>
+                  <rect width="50" height="40" rx="5" fill="#06b6d4"/>
+                  <rect x="5" y="5" width="40" height="30" rx="3" fill="#0891b2"/>
+                  <rect x="10" y="10" width="15" height="10" rx="2" fill="#e0f2fe" opacity="0.5"/>
+                  <rect x="25" y="10" width="15" height="10" rx="2" fill="#e0f2fe" opacity="0.5"/>
+                  <rect x="10" y="20" width="15" height="10" rx="2" fill="#e0f2fe" opacity="0.5"/>
+                  <rect x="25" y="20" width="15" height="10" rx="2" fill="#e0f2fe" opacity="0.5"/>
                 </svg>
               </div>
 
@@ -78,7 +80,7 @@
           </div>
 
           <div class="seguridad-info">
-            <i class="fa fa-shield-alt"></i>
+            <i class="fas fa-shield-alt"></i>
             <p>Tu información está protegida con encriptación SSL de 256 bits</p>
           </div>
         </div>
@@ -86,7 +88,11 @@
         <!-- Formulario -->
         <form class="pago-form" (ngSubmit)="guardarTarjeta()">
           <div class="form-group">
-            <label><i class="fa fa-credit-card"></i> Número de Tarjeta <span class="required">*</span></label>
+            <label>
+              <i class="fas fa-credit-card"></i>
+              Número de Tarjeta
+              <span class="required">*</span>
+            </label>
             <input 
               type="text" 
               [(ngModel)]="tarjeta.numero"
@@ -100,12 +106,16 @@
               autocomplete="cc-number"
             />
             <small class="helper-text success" *ngIf="tarjeta.banco && tarjeta.banco !== 'Desconocido'">
-              <i class="fa fa-check-circle"></i> {{ tarjeta.banco }} - {{ tarjeta.tipoTarjeta }}
+              <i class="fas fa-check-circle"></i> {{ tarjeta.banco }} - {{ tarjeta.tipoTarjeta }}
             </small>
           </div>
 
           <div class="form-group">
-            <label><i class="fa fa-user"></i> Nombre del Titular <span class="required">*</span></label>
+            <label>
+              <i class="fas fa-user"></i>
+              Nombre del Titular
+              <span class="required">*</span>
+            </label>
             <input 
               type="text" 
               [(ngModel)]="tarjeta.nombreTitular"
@@ -120,7 +130,11 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label><i class="fa fa-calendar"></i> Fecha de Expiración <span class="required">*</span></label>
+              <label>
+                <i class="fas fa-calendar"></i>
+                Fecha de Expiración
+                <span class="required">*</span>
+              </label>
               <div class="fecha-expiracion">
                 <select 
                   [(ngModel)]="tarjeta.mesExpiracion"
@@ -147,7 +161,11 @@
             </div>
 
             <div class="form-group">
-              <label><i class="fa fa-lock"></i> CVV <span class="required">*</span></label>
+              <label>
+                <i class="fas fa-lock"></i>
+                CVV
+                <span class="required">*</span>
+              </label>
               <input 
                 type="text" 
                 [(ngModel)]="tarjeta.cvv"
@@ -167,21 +185,21 @@
 
           <div class="info-seguridad">
             <div class="info-item">
-              <i class="fa fa-lock"></i>
+              <i class="fas fa-lock"></i>
               <div>
                 <strong>Conexión Segura</strong>
                 <p>Certificado SSL</p>
               </div>
             </div>
             <div class="info-item">
-              <i class="fa fa-shield-alt"></i>
+              <i class="fas fa-shield-alt"></i>
               <div>
                 <strong>Datos Encriptados</strong>
                 <p>AES-256</p>
               </div>
             </div>
             <div class="info-item">
-              <i class="fa fa-check-circle"></i>
+              <i class="fas fa-check-circle"></i>
               <div>
                 <strong>PCI Compliant</strong>
                 <p>Nivel 1</p>
@@ -191,10 +209,10 @@
 
           <div class="form-actions">
             <button type="button" (click)="volver()" class="btn-cancelar">
-              <i class="fa fa-times"></i> Cancelar
+              <i class="fas fa-times"></i> Cancelar
             </button>
             <button type="submit" class="btn-guardar">
-              <i class="fa fa-save"></i> Guardar Método de Pago
+              <i class="fas fa-save"></i> Guardar Método de Pago
             </button>
           </div>
         </form>
@@ -205,7 +223,7 @@
 
 <div class="alerta-exitosa" *ngIf="mostrarAlerta">
   <div class="alerta-contenido">
-    <i class="fa fa-check-circle"></i>
+    <i class="fas fa-check-circle"></i>
     <p>{{ mensajeAlerta }}</p>
   </div>
 </div>
