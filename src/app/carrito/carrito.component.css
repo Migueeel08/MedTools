@@ -1,4 +1,4 @@
-/* ======= ESTILOS DEL CARRITO - FOCOSHOP ======= */
+/* ======= ESTILOS DEL CARRITO - MEDTOOLS ======= */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Montserrat:wght@600;700&display=swap');
 
 * {
@@ -8,8 +8,8 @@
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
   margin: 0;
-  background: #f5f3fa;
-  color: #333;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e8f4f8 100%);
+  color: #1e3a5f;
 }
 
 /* ======= HEADER ======= */
@@ -22,22 +22,27 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #000;
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
   padding: 0 2rem;
   z-index: 1000;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+  box-shadow: 0 4px 20px rgba(8, 145, 178, 0.3);
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   cursor: pointer;
   transition: transform 0.3s ease;
 }
 
 .logo:hover {
   transform: scale(1.05);
+}
+
+.logo i {
+  font-size: 2rem;
+  color: #22d3ee;
 }
 
 .logo-text {
@@ -64,7 +69,7 @@ body {
 }
 
 .header-title i {
-  color: #a68efc;
+  color: #22d3ee;
 }
 
 /* Usuario */
@@ -80,14 +85,14 @@ body {
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #7d5fff;
+  border: 2px solid #22d3ee;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .user-icon:hover {
   transform: scale(1.1);
-  box-shadow: 0 0 15px rgba(123, 87, 255, 0.6);
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.6);
 }
 
 .user-info {
@@ -155,7 +160,7 @@ body {
 .carrito-container {
   padding-top: 100px;
   min-height: 100vh;
-  background: #f5f3fa;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e8f4f8 100%);
 }
 
 .carrito-content {
@@ -168,11 +173,11 @@ body {
 .loading {
   text-align: center;
   padding: 100px 20px;
-  color: #666;
+  color: #64748b;
 }
 
 .loading i {
-  color: #667eea;
+  color: #0891b2;
   margin-bottom: 20px;
 }
 
@@ -209,14 +214,14 @@ body {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #333;
+  color: #1e3a5f;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 .section-header h2 i {
-  color: #667eea;
+  color: #0891b2;
 }
 
 .btn-vaciar {
@@ -259,9 +264,9 @@ body {
 }
 
 .item-card:hover {
-  border-color: #667eea;
+  border-color: #0891b2;
   background: white;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.15);
 }
 
 .item-card.no-disponible {
@@ -315,20 +320,20 @@ body {
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: #1e3a5f;
   cursor: pointer;
   transition: color 0.3s ease;
 }
 
 .item-nombre:hover {
-  color: #667eea;
+  color: #0891b2;
 }
 
 .item-variantes {
   display: flex;
   gap: 16px;
   font-size: 0.9rem;
-  color: #666;
+  color: #64748b;
 }
 
 .variante {
@@ -347,7 +352,7 @@ body {
 }
 
 .stock-ok {
-  color: #00a650;
+  color: #10b981;
 }
 
 .stock-ok i {
@@ -408,11 +413,11 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  color: #333;
+  color: #1e3a5f;
 }
 
 .btn-cantidad:hover:not(:disabled) {
-  background: #667eea;
+  background: #0891b2;
   color: white;
 }
 
@@ -431,7 +436,7 @@ body {
 .item-subtotal {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #333;
+  color: #1e3a5f;
 }
 
 .btn-eliminar {
@@ -473,14 +478,14 @@ body {
   margin: 0 0 20px;
   font-size: 1.3rem;
   font-weight: 700;
-  color: #333;
+  color: #1e3a5f;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
 .resumen-card h3 i {
-  color: #667eea;
+  color: #0891b2;
 }
 
 .resumen-desglose {
@@ -494,11 +499,11 @@ body {
   display: flex;
   justify-content: space-between;
   font-size: 1rem;
-  color: #666;
+  color: #64748b;
 }
 
 .envio-gratis {
-  color: #00a650;
+  color: #10b981;
   font-weight: 700;
 }
 
@@ -513,7 +518,7 @@ body {
   justify-content: space-between;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #333;
+  color: #1e3a5f;
   padding-top: 16px;
   border-top: 2px solid #e0e0e0;
 }
@@ -521,7 +526,7 @@ body {
 .btn-proceder {
   width: 100%;
   padding: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -535,20 +540,20 @@ body {
   transition: all 0.3s ease;
   margin-bottom: 12px;
   font-family: 'Montserrat', sans-serif;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(8, 145, 178, 0.3);
 }
 
 .btn-proceder:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(8, 145, 178, 0.4);
 }
 
 .btn-continuar {
   width: 100%;
   padding: 14px;
   background: white;
-  color: #667eea;
-  border: 2px solid #667eea;
+  color: #0891b2;
+  border: 2px solid #0891b2;
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
@@ -562,7 +567,7 @@ body {
 }
 
 .btn-continuar:hover {
-  background: #f0f3ff;
+  background: #e0f2fe;
 }
 
 .info-seguridad {
@@ -578,11 +583,11 @@ body {
   align-items: center;
   gap: 10px;
   font-size: 0.9rem;
-  color: #666;
+  color: #64748b;
 }
 
 .seguridad-item i {
-  color: #667eea;
+  color: #0891b2;
   font-size: 1rem;
 }
 
@@ -602,19 +607,19 @@ body {
 
 .carrito-vacio h2 {
   font-size: 2rem;
-  color: #333;
+  color: #1e3a5f;
   margin: 0 0 16px;
 }
 
 .carrito-vacio p {
   font-size: 1.1rem;
-  color: #999;
+  color: #64748b;
   margin: 0 0 40px;
 }
 
 .btn-explorar {
   padding: 16px 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -625,12 +630,12 @@ body {
   align-items: center;
   gap: 12px;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(8, 145, 178, 0.3);
 }
 
 .btn-explorar:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(8, 145, 178, 0.4);
 }
 
 /* ============================================
@@ -685,7 +690,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
   border-radius: 20px 20px 0 0;
   color: white;
 }
@@ -738,7 +743,7 @@ body {
 .seccion-checkout h3 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #333;
+  color: #1e3a5f;
   margin: 0 0 20px;
   display: flex;
   align-items: center;
@@ -746,11 +751,11 @@ body {
 }
 
 .seccion-checkout h3 i {
-  color: #667eea;
+  color: #0891b2;
   font-size: 1.3rem;
 }
 
-/* Productos resumen lista (versión compacta para el carrito) */
+/* Productos resumen lista */
 .productos-resumen-lista {
   display: flex;
   flex-direction: column;
@@ -774,7 +779,7 @@ body {
   height: 70px;
   object-fit: cover;
   border-radius: 8px;
-  border: 2px solid #667eea;
+  border: 2px solid #0891b2;
   flex-shrink: 0;
 }
 
@@ -786,7 +791,7 @@ body {
 .producto-resumen-info-mini h4 {
   margin: 0 0 6px;
   font-size: 0.95rem;
-  color: #333;
+  color: #1e3a5f;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -795,12 +800,12 @@ body {
 .producto-resumen-info-mini p {
   margin: 3px 0;
   font-size: 0.8rem;
-  color: #666;
+  color: #64748b;
 }
 
 .cantidad-resumen {
   font-weight: 600;
-  color: #667eea;
+  color: #0891b2;
 }
 
 .precio-resumen-mini {
@@ -818,7 +823,7 @@ body {
 .precio-total-mini {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #333;
+  color: #1e3a5f;
 }
 
 /* Info comprador */
@@ -836,7 +841,7 @@ body {
 
 .dato-comprador i {
   font-size: 2rem;
-  color: #667eea;
+  color: #0891b2;
 }
 
 .dato-comprador label {
@@ -850,7 +855,7 @@ body {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: #333;
+  color: #1e3a5f;
 }
 
 /* Direcciones */
@@ -872,19 +877,19 @@ body {
 }
 
 .direccion-card:hover {
-  border-color: #667eea;
+  border-color: #0891b2;
   background: #f8f9fa;
 }
 
 .direccion-card.selected {
-  border-color: #667eea;
-  background: #f0f3ff;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  border-color: #0891b2;
+  background: #e0f2fe;
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.15);
 }
 
 .direccion-radio i {
   font-size: 1.5rem;
-  color: #667eea;
+  color: #0891b2;
 }
 
 .direccion-info {
@@ -894,20 +899,20 @@ body {
 .direccion-titulo {
   font-weight: 700;
   font-size: 1rem;
-  color: #333;
+  color: #1e3a5f;
   margin: 0 0 8px;
 }
 
 .direccion-info p {
   margin: 4px 0;
   font-size: 0.9rem;
-  color: #666;
+  color: #64748b;
   line-height: 1.4;
 }
 
 .direccion-telefono {
   margin-top: 8px !important;
-  color: #667eea !important;
+  color: #0891b2 !important;
   font-weight: 500;
 }
 
@@ -931,20 +936,20 @@ body {
 }
 
 .metodo-card:hover {
-  border-color: #667eea;
+  border-color: #0891b2;
   background: #f8f9fa;
   transform: translateX(3px);
 }
 
 .metodo-card.selected {
-  border-color: #667eea;
-  background: #f0f3ff;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  border-color: #0891b2;
+  background: #e0f2fe;
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.15);
 }
 
 .metodo-radio i {
   font-size: 1.5rem;
-  color: #667eea;
+  color: #0891b2;
   transition: all 0.3s ease;
 }
 
@@ -980,7 +985,7 @@ body {
 .metodo-tipo {
   font-weight: 700;
   font-size: 1.05rem;
-  color: #333;
+  color: #1e3a5f;
   margin: 0 0 6px;
   display: flex;
   align-items: center;
@@ -991,8 +996,8 @@ body {
 .tipo-badge {
   font-size: 0.7rem;
   font-weight: 600;
-  color: #667eea;
-  background: #e8ecff;
+  color: #0891b2;
+  background: #e0f2fe;
   padding: 3px 10px;
   border-radius: 6px;
   text-transform: uppercase;
@@ -1001,7 +1006,7 @@ body {
 
 .metodo-numero {
   font-size: 1.15rem;
-  color: #333;
+  color: #1e3a5f;
   margin: 0;
   font-family: 'Courier New', monospace;
   letter-spacing: 3px;
@@ -1019,7 +1024,7 @@ body {
 .sin-datos {
   text-align: center;
   padding: 40px 20px;
-  color: #999;
+  color: #64748b;
 }
 
 .sin-datos i {
@@ -1034,7 +1039,7 @@ body {
 
 .btn-agregar-dato {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -1048,7 +1053,7 @@ body {
 
 .btn-agregar-dato:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 15px rgba(8, 145, 178, 0.4);
 }
 
 /* Total */
@@ -1069,7 +1074,7 @@ body {
   display: flex;
   justify-content: space-between;
   font-size: 1rem;
-  color: #666;
+  color: #64748b;
 }
 
 .total-final {
@@ -1079,7 +1084,7 @@ body {
   border-top: 2px solid #ddd;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #333;
+  color: #1e3a5f;
   margin-top: 10px;
 }
 
@@ -1097,7 +1102,7 @@ body {
 .btn-cancelar {
   padding: 14px 28px;
   background: white;
-  color: #666;
+  color: #64748b;
   border: 2px solid #ddd;
   border-radius: 10px;
   font-weight: 600;
@@ -1116,7 +1121,7 @@ body {
 
 .btn-confirmar-compra {
   padding: 14px 32px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -1127,12 +1132,12 @@ body {
   gap: 10px;
   transition: all 0.3s ease;
   font-size: 1rem;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 15px rgba(8, 145, 178, 0.3);
 }
 
 .btn-confirmar-compra:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 20px rgba(8, 145, 178, 0.4);
 }
 
 .btn-confirmar-compra:disabled {
@@ -1153,6 +1158,252 @@ body {
 .metodo-card.selected .metodo-radio i,
 .direccion-card.selected .direccion-radio i {
   animation: pulseCheck 0.3s ease;
+}
+
+/* ============================================
+   💳 ESTILOS PARA STRIPE
+   ============================================ */
+
+/* Sección de pago Stripe */
+.stripe-payment-section {
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+  padding: 30px;
+  border-radius: 15px;
+  border: 2px solid #0891b2;
+  animation: fadeInSlideDown 0.4s ease;
+  margin-top: 20px;
+}
+
+@keyframes fadeInSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stripe-form-container {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Elemento de tarjeta de Stripe */
+.stripe-card-element {
+  padding: 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  transition: all 0.3s ease;
+  min-height: 50px;
+}
+
+.stripe-card-element:hover {
+  border-color: #0891b2;
+}
+
+.stripe-card-element:focus-within {
+  border-color: #0891b2;
+  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+}
+
+/* Error de Stripe */
+.stripe-error {
+  margin-top: 15px;
+  padding: 12px 15px;
+  background: #fee;
+  border-left: 4px solid #f44;
+  border-radius: 6px;
+  color: #c33;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+.stripe-error i {
+  font-size: 1.2rem;
+}
+
+/* Info de seguridad */
+.stripe-security-info {
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.stripe-security-info i {
+  color: #10b981;
+  font-size: 1rem;
+}
+
+/* Tarjetas aceptadas */
+.tarjetas-aceptadas {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.texto-tarjetas {
+  font-size: 0.85rem;
+  color: #999;
+  font-weight: 500;
+}
+
+.tarjetas-aceptadas img {
+  height: 25px;
+  width: auto;
+  opacity: 0.7;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.tarjetas-aceptadas img:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* ===== BOTÓN PAGAR CON NUEVA TARJETA STRIPE ===== */
+.metodo-card.agregar-nuevo-stripe {
+  border: 2px solid #0891b2;
+  background: linear-gradient(135deg, rgba(8, 145, 178, 0.08) 0%, rgba(6, 182, 212, 0.03) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.metodo-card.agregar-nuevo-stripe::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(8, 145, 178, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.metodo-card.agregar-nuevo-stripe:hover::before {
+  left: 100%;
+}
+
+.metodo-card.agregar-nuevo-stripe:hover {
+  border-color: #0891b2;
+  background: linear-gradient(135deg, rgba(8, 145, 178, 0.12) 0%, rgba(6, 182, 212, 0.06) 100%);
+  transform: translateX(5px);
+  box-shadow: 0 8px 20px rgba(8, 145, 178, 0.2);
+}
+
+.agregar-icono {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #0891b2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.agregar-icono.stripe-icon {
+  background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%);
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+}
+
+.agregar-texto {
+  flex: 1;
+}
+
+.agregar-titulo {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #1e3a5f;
+  margin: 0 0 4px;
+}
+
+.metodo-card.agregar-nuevo-stripe .agregar-titulo {
+  color: #0891b2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.metodo-card.agregar-nuevo-stripe .agregar-titulo i.fa-bolt {
+  color: #fbbf24;
+  font-size: 1rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.agregar-descripcion {
+  font-size: 0.85rem;
+  color: #999;
+  margin: 0;
+}
+
+.metodo-card.agregar-nuevo-stripe .agregar-descripcion {
+  color: #0891b2;
+  font-weight: 500;
+}
+
+.agregar-arrow {
+  flex-shrink: 0;
+  color: #999;
+  font-size: 1.2rem;
+}
+
+.metodo-card.agregar-nuevo-stripe .agregar-arrow i {
+  color: #0891b2;
+}
+
+.metodo-card.agregar-nuevo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  border: 2px dashed #ddd;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #fafafa;
+  margin-top: 10px;
+}
+
+.metodo-card.agregar-nuevo:hover {
+  border-color: #0891b2;
+  border-style: solid;
+  background: #e0f2fe;
+  transform: translateX(5px);
 }
 
 /* ======= RESPONSIVE ======= */
@@ -1252,256 +1503,7 @@ body {
   .modal-body-checkout {
     padding: 20px;
   }
-}
-/* ============================================
-   💳 ESTILOS PARA STRIPE EN EL CARRITO
-   AGREGAR AL FINAL DE carrito.component.css
-   ============================================ */
 
-/* Sección de pago Stripe */
-.stripe-payment-section {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  padding: 30px;
-  border-radius: 15px;
-  border: 2px solid #667eea;
-  animation: fadeInSlideDown 0.4s ease;
-  margin-top: 20px;
-}
-
-@keyframes fadeInSlideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.stripe-form-container {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-/* Elemento de tarjeta de Stripe */
-.stripe-card-element {
-  padding: 15px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
-  background: white;
-  transition: all 0.3s ease;
-  min-height: 50px;
-}
-
-.stripe-card-element:hover {
-  border-color: #667eea;
-}
-
-.stripe-card-element:focus-within {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Error de Stripe */
-.stripe-error {
-  margin-top: 15px;
-  padding: 12px 15px;
-  background: #fee;
-  border-left: 4px solid #f44;
-  border-radius: 6px;
-  color: #c33;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.9rem;
-  animation: shake 0.5s ease;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-10px); }
-  75% { transform: translateX(10px); }
-}
-
-.stripe-error i {
-  font-size: 1.2rem;
-}
-
-/* Info de seguridad */
-.stripe-security-info {
-  margin-top: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  color: #666;
-  font-size: 0.85rem;
-}
-
-.stripe-security-info i {
-  color: #00a650;
-  font-size: 1rem;
-}
-
-/* Tarjetas aceptadas */
-.tarjetas-aceptadas {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #e0e0e0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.texto-tarjetas {
-  font-size: 0.85rem;
-  color: #999;
-  font-weight: 500;
-}
-
-.tarjetas-aceptadas img {
-  height: 25px;
-  width: auto;
-  opacity: 0.7;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.tarjetas-aceptadas img:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-/* ===== BOTÓN PAGAR CON NUEVA TARJETA STRIPE ===== */
-.metodo-card.agregar-nuevo-stripe {
-  border: 2px solid #635bff;
-  background: linear-gradient(135deg, rgba(99, 91, 255, 0.08) 0%, rgba(99, 91, 255, 0.03) 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.metodo-card.agregar-nuevo-stripe::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(99, 91, 255, 0.1), transparent);
-  transition: left 0.5s ease;
-}
-
-.metodo-card.agregar-nuevo-stripe:hover::before {
-  left: 100%;
-}
-
-.metodo-card.agregar-nuevo-stripe:hover {
-  border-color: #635bff;
-  background: linear-gradient(135deg, rgba(99, 91, 255, 0.12) 0%, rgba(99, 91, 255, 0.06) 100%);
-  transform: translateX(5px);
-  box-shadow: 0 8px 20px rgba(99, 91, 255, 0.2);
-}
-
-.agregar-icono {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: #667eea;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.3rem;
-  flex-shrink: 0;
-}
-
-.agregar-icono.stripe-icon {
-  background: linear-gradient(135deg, #635bff 0%, #4f46e5 100%);
-  box-shadow: 0 4px 12px rgba(99, 91, 255, 0.3);
-}
-
-.agregar-texto {
-  flex: 1;
-}
-
-.agregar-titulo {
-  font-weight: 700;
-  font-size: 1.05rem;
-  color: #333;
-  margin: 0 0 4px;
-}
-
-.metodo-card.agregar-nuevo-stripe .agregar-titulo {
-  color: #635bff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.metodo-card.agregar-nuevo-stripe .agregar-titulo i.fa-bolt {
-  color: #fbbf24;
-  font-size: 1rem;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.7;
-    transform: scale(1.1);
-  }
-}
-
-.agregar-descripcion {
-  font-size: 0.85rem;
-  color: #999;
-  margin: 0;
-}
-
-.metodo-card.agregar-nuevo-stripe .agregar-descripcion {
-  color: #635bff;
-  font-weight: 500;
-}
-
-.agregar-arrow {
-  flex-shrink: 0;
-  color: #999;
-  font-size: 1.2rem;
-}
-
-.metodo-card.agregar-nuevo-stripe .agregar-arrow i {
-  color: #635bff;
-}
-
-.metodo-card.agregar-nuevo {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 20px;
-  border: 2px dashed #ddd;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: #fafafa;
-  margin-top: 10px;
-}
-
-.metodo-card.agregar-nuevo:hover {
-  border-color: #667eea;
-  border-style: solid;
-  background: #f0f3ff;
-  transform: translateX(5px);
-}
-
-/* Responsive para Stripe */
-@media (max-width: 768px) {
   .stripe-payment-section {
     padding: 20px;
   }

@@ -1,9 +1,9 @@
 <div class="carrito-container">
-  <!-- HEADER (mismo de FocoShop) -->
+  <!-- HEADER -->
   <header class="header">
     <div class="logo" (click)="volverInicio()">
-      <span class="logo-text">FOCOSHOP</span>
-      <i class="fas fa-shopping-cart"></i>
+      <i class="fas fa-heartbeat"></i>
+      <span class="logo-text">MEDTOOLS</span>
     </div>
 
     <div class="header-title">
@@ -25,7 +25,7 @@
             </button>
 
             <button (click)="irVender()">
-              <i class="fas fa-tag"></i> Vender
+              <i class="fas fa-briefcase-medical"></i> Vender equipo
             </button>
 
             <button (click)="irConfiguracion()">
@@ -63,7 +63,7 @@
           <div class="section-header">
             <h2>
               <i class="fas fa-shopping-basket"></i>
-              Productos en tu carrito
+              Equipos médicos en tu carrito
             </h2>
             <button class="btn-vaciar" (click)="vaciarCarrito()">
               <i class="fas fa-trash"></i>
@@ -241,16 +241,16 @@
           <i class="fas fa-shopping-cart"></i>
         </div>
         <h2>Tu carrito está vacío</h2>
-        <p>¡Descubre miles de productos y comienza a agregar!</p>
+        <p>¡Descubre equipos médicos profesionales y comienza a agregar!</p>
         <button class="btn-explorar" (click)="continuarComprando()">
           <i class="fas fa-search"></i>
-          Explorar productos
+          Explorar equipos
         </button>
       </div>
     }
   </div>
 
-  <!-- ===== MODAL DE CHECKOUT ===== ✅ CON STRIPE -->
+  <!-- ===== MODAL DE CHECKOUT ===== -->
   @if (modalCheckoutVisible) {
     <div class="modal-overlay" (click)="cerrarModalCheckout()">
       <div class="modal-checkout" (click)="$event.stopPropagation()">
@@ -267,7 +267,7 @@
         <div class="modal-body-checkout">
           <!-- RESUMEN DE PRODUCTOS -->
           <div class="seccion-checkout">
-            <h3><i class="fas fa-box"></i> Resumen de tu pedido</h3>
+            <h3><i class="fas fa-box-open"></i> Resumen de tu pedido</h3>
             <div class="productos-resumen-lista">
               @for (item of carrito!.items; track item.id_carrito) {
                 @if (item.producto_disponible) {
@@ -295,7 +295,7 @@
 
           <!-- INFORMACIÓN DEL COMPRADOR -->
           <div class="seccion-checkout">
-            <h3><i class="fas fa-user"></i> Información del comprador</h3>
+            <h3><i class="fas fa-user-md"></i> Información del comprador</h3>
             <div class="info-comprador">
               <div class="dato-comprador">
                 <i class="fas fa-user-circle"></i>
