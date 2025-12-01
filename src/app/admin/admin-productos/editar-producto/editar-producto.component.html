@@ -1,0 +1,288 @@
+<div class="editar-producto-modal">
+  <div class="modal-overlay" (click)="cancelar()"></div>
+  
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- HEADER CON GRADIENTE -->
+    <div class="modal-header">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="fas fa-pen-fancy"></i>
+        </div>
+        <div class="header-text">
+          <h2>Editar Producto</h2>
+          <p>Actualiza la información del equipo médico</p>
+        </div>
+      </div>
+      <button class="btn-close-modal" (click)="cancelar()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- MENSAJES DE ESTADO -->
+      @if (error) {
+        <div class="alert alert-error">
+          <div class="alert-icon">
+            <i class="fas fa-exclamation-circle"></i>
+          </div>
+          <div class="alert-content">
+            <strong>Error</strong>
+            <p>{{ error }}</p>
+          </div>
+        </div>
+      }
+
+      @if (exito) {
+        <div class="alert alert-success">
+          <div class="alert-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="alert-content">
+            <strong>¡Éxito!</strong>
+            <p>{{ exito }}</p>
+          </div>
+        </div>
+      }
+
+      <!-- SECCIÓN DE IMAGEN -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-image"></i>
+          <h3>Foto del Producto</h3>
+        </div>
+        
+        <div class="imagen-editor">
+          <div class="imagen-container">
+            @if (previewImagen) {
+              <img [src]="previewImagen" alt="Preview" class="preview-active">
+              <div class="overlay-preview">
+                <button class="btn-cambiar-imagen" (click)="fileInput.click()">
+                  <i class="fas fa-camera"></i>
+                  <span>Cambiar foto</span>
+                </button>
+              </div>
+            } @else if (imagenActual) {
+              <img [src]="imagenActual" alt="Producto" class="current-image">
+              <div class="overlay-preview">
+                <button class="btn-cambiar-imagen" (click)="fileInput.click()">
+                  <i class="fas fa-camera"></i>
+                  <span>Cambiar foto</span>
+                </button>
+              </div>
+            } @else {
+              <div class="sin-imagen">
+                <i class="fas fa-image-slash"></i>
+                <p>Sin foto</p>
+                <small>Sube una imagen para el producto</small>
+              </div>
+              <button class="btn-subir-imagen" (click)="fileInput.click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Subir Foto</span>
+              </button>
+            }
+          </div>
+          
+          <input 
+            #fileInput 
+            type="file" 
+            accept="image/*" 
+            (change)="seleccionarImagen($event)"
+            style="display: none"
+          />
+          
+          <div class="image-info">
+            <i class="fas fa-info-circle"></i>
+            <span>Formatos soportados: JPG, PNG. Tamaño máximo: 5MB</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN DE INFORMACIÓN BÁSICA -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-box"></i>
+          <h3>Información del Equipo</h3>
+        </div>
+        
+        <div class="form-group">
+          <label for="nombre">
+            <span class="label-text">Nombre del Producto</span>
+            <span class="required">*</span>
+          </label>
+          <div class="input-wrapper">
+            <i class="fas fa-tag"></i>
+            <input 
+              type="text" 
+              id="nombre"
+              [(ngModel)]="formulario.nombre"
+              placeholder="Ej: Tensiómetro digital automático"
+              class="form-input"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="descripcion">
+            <span class="label-text">Descripción Detallada</span>
+          </label>
+          <div class="textarea-wrapper">
+            <i class="fas fa-align-left"></i>
+            <textarea 
+              id="descripcion"
+              [(ngModel)]="formulario.descripcion"
+              placeholder="Describe las características principales del producto..."
+              rows="4"
+              class="form-textarea"
+            ></textarea>
+          </div>
+          <div class="char-counter">
+            {{ formulario.descripcion.length || 0 }} caracteres
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="marca">
+              <span class="label-text">Marca</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="fas fa-building"></i>
+              <input 
+                type="text" 
+                id="marca"
+                [(ngModel)]="formulario.marca"
+                placeholder="Ej: Omron, Welch Allyn"
+                class="form-input"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="condicion">
+              <span class="label-text">Condición</span>
+              <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="fas fa-certificate"></i>
+              <select id="condicion" [(ngModel)]="formulario.condicion" class="form-input">
+                <option value="nuevo">Nuevo</option>
+                <option value="reacondicionado">Reacondicionado</option>
+                <option value="usado">Usado</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN DE PRECIOS Y STOCK -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-dollar-sign"></i>
+          <h3>Precio y Disponibilidad</h3>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="precio">
+              <span class="label-text">Precio (MXN)</span>
+              <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="currency">$</span>
+              <input 
+                type="number" 
+                id="precio"
+                [(ngModel)]="formulario.precio"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                class="form-input"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="stock">
+              <span class="label-text">Stock (Unidades)</span>
+              <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="fas fa-boxes"></i>
+              <input 
+                type="number" 
+                id="stock"
+                [(ngModel)]="formulario.stock"
+                min="0"
+                placeholder="0"
+                class="form-input"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN DE VARIANTES -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-palette"></i>
+          <h3>Variantes (Opcional)</h3>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="color">
+              <span class="label-text">Color</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="fas fa-paint-brush"></i>
+              <input 
+                type="text" 
+                id="color"
+                [(ngModel)]="formulario.color"
+                placeholder="Ej: Blanco, Negro, Azul"
+                class="form-input"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="talla">
+              <span class="label-text">Talla/Tamaño</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="fas fa-ruler"></i>
+              <input 
+                type="text" 
+                id="talla"
+                [(ngModel)]="formulario.talla"
+                placeholder="Ej: M, L, XL"
+                class="form-input"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER CON BOTONES -->
+    <div class="modal-footer">
+      <button class="btn-modal btn-cancelar" (click)="cancelar()" [disabled]="guardando">
+        <i class="fas fa-arrow-left"></i>
+        <span>Cancelar</span>
+      </button>
+      <button 
+        class="btn-modal btn-guardar" 
+        (click)="guardarCambios()"
+        [disabled]="guardando"
+      >
+        @if (guardando) {
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>Guardando...</span>
+        } @else {
+          <i class="fas fa-save"></i>
+          <span>Guardar Cambios</span>
+        }
+      </button>
+    </div>
+  </div>
+</div>

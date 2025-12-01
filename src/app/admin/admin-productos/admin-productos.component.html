@@ -11,6 +11,9 @@
         <p>Administra el catálogo de equipos médicos de MedTools</p>
       </div>
     </div>
+    <button class="btn-crear" (click)="abrirModalCrear()">
+      <i class="fas fa-plus"></i> Nuevo Producto
+    </button>
   </div>
 
   <!-- ===== BREADCRUMB ===== -->
@@ -294,4 +297,144 @@
     </div>
   }
 
+  <!-- ===== MODAL CREAR PRODUCTO ===== -->
+  @if (modalCrearVisible) {
+    <div class="modal-overlay" (click)="cerrarModalCrear()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2><i class="fas fa-plus-circle"></i> Crear Nuevo Producto</h2>
+          <button class="btn-close-modal" (click)="cerrarModalCrear()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Sección de Imagen -->
+          <div class="form-section">
+            <h3><i class="fas fa-image"></i> Imagen del Producto</h3>
+            
+            <div class="imagen-editor">
+              <div class="imagen-container">
+                @if (imagenPreview) {
+                  <img [src]="imagenPreview" alt="Preview">
+                  <button class="btn-cambiar-imagen" (click)="fileInputCrear.click()">
+                    <i class="fas fa-camera"></i> Cambiar imagen
+                  </button>
+                } @else {
+                  <div class="sin-imagen">
+                    <i class="fas fa-image fa-3x"></i>
+                    <p>Sin imagen</p>
+                  </div>
+                  <button class="btn-subir-imagen" (click)="fileInputCrear.click()">
+                    <i class="fas fa-upload"></i> Subir imagen
+                  </button>
+                }
+              </div>
+              
+              <input 
+                #fileInputCrear 
+                type="file" 
+                accept="image/*" 
+                (change)="seleccionarImagenCrear($event)"
+                style="display: none"
+              />
+            </div>
+          </div>
+
+          <!-- Sección de Información -->
+          <div class="form-section">
+            <h3><i class="fas fa-info-circle"></i> Información del Producto</h3>
+            
+            <div class="form-group">
+              <label for="nombre">Nombre del Producto *</label>
+              <input 
+                type="text" 
+                id="nombre"
+                [(ngModel)]="formularioProducto.nombre"
+                placeholder="Ej: Tensiómetro digital"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="descripcion">Descripción</label>
+              <textarea 
+                id="descripcion"
+                [(ngModel)]="formularioProducto.descripcion"
+                placeholder="Describe el producto..."
+                rows="4"
+              ></textarea>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="categoria">Categoría *</label>
+                <select id="categoria" [(ngModel)]="formularioProducto.id_categoria">
+                  <option [value]="0">Seleccionar categoría</option>
+                  @for (cat of categorias; track cat.id_categoria) {
+                    <option [value]="cat.id_categoria">{{ cat.nombre }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="condicion">Condición *</label>
+                <select id="condicion" [(ngModel)]="formularioProducto.condicion">
+                  <option value="nuevo">Nuevo</option>
+                  <option value="reacondicionado">Reacondicionado</option>
+                  <option value="usado">Usado</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sección de Precio y Stock -->
+          <div class="form-section">
+            <h3><i class="fas fa-dollar-sign"></i> Precio y Stock</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="precio">Precio ($) *</label>
+                <input 
+                  type="number" 
+                  id="precio"
+                  [(ngModel)]="formularioProducto.precio"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="stock">Stock (unidades) *</label>
+                <input 
+                  type="number" 
+                  id="stock"
+                  [(ngModel)]="formularioProducto.stock"
+                  min="0"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancelar" (click)="cerrarModalCrear()">
+            <i class="fas fa-times"></i> Cancelar
+          </button>
+          <button class="btn-guardar" (click)="crearProducto()">
+            <i class="fas fa-save"></i> Crear Producto
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ===== MODAL EDITAR PRODUCTO ===== -->
+  @if (modalEditarVisible && productoEditando) {
+    <app-editar-producto 
+      [producto]="productoEditando"
+      [onClose]="cerrarModalEditar.bind(this)"
+    ></app-editar-producto>
+  }
 </div>
