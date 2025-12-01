@@ -58,25 +58,32 @@
       @for (msg of mensajes; track msg.id) {
         <div class="mensaje-wrapper" [class.usuario]="msg.es_usuario">
           <div class="mensaje" [class.usuario]="msg.es_usuario">
-            @if (msg.tipo === 'texto') {
-              <p>{{ msg.texto }}</p>
+            <!-- MENSAJE DE TEXTO -->
+            @if (msg.tipo === 'texto' || !msg.productos) {
+              <p [innerHTML]="formatearTexto(msg.texto)"></p>
             }
 
-            @if (msg.tipo === 'productos' && msg.productos) {
-              <div class="productos-sugerencias">
+            <!-- MENSAJE CON PRODUCTOS -->
+            @if (msg.tipo === 'productos' && msg.productos && msg.productos.length > 0) {
+              <p [innerHTML]="formatearTexto(msg.texto)"></p>
+              
+              <div class="productos-lista">
                 @for (prod of msg.productos; track prod.id_producto) {
-                  <div class="producto-card-chat" (click)="irAProducto(prod.id_producto)">
-                    <img [src]="prod.imagen" [alt]="prod.nombre" />
-                    <div class="producto-info-chat">
-                      <h4>{{ prod.nombre }}</h4>
-                      <p class="marca">{{ prod.marca }}</p>
-                      <p class="precio">${{ prod.precio | number:'1.0-0' }}</p>
-                      <div class="rating">
+                  <div class="producto-item" (click)="irAProducto(prod.id_producto)">
+                    <img [src]="prod.imagen" [alt]="prod.nombre" class="producto-img" />
+                    <div class="producto-detalles">
+                      <h4 class="producto-nombre">{{ prod.nombre }}</h4>
+                      <p class="producto-marca">{{ prod.marca }}</p>
+                      <p class="producto-precio">${{ prod.precio | number:'1.0-0' }}</p>
+                      <div class="producto-rating">
                         @for (star of [1,2,3,4,5]; track star) {
-                          <i class="fas fa-star" [class.filled]="star <= (prod.calificacion || 0)"></i>
+                          <i class="fas fa-star" [class.filled]="star <= prod.calificacion"></i>
                         }
                         <span>({{ prod.reviews }})</span>
                       </div>
+                      <button class="btn-ver-detalle">
+                        <i class="fas fa-eye"></i> Ver detalles
+                      </button>
                     </div>
                   </div>
                 }
@@ -104,7 +111,7 @@
 
     <!-- INPUT -->
     <div class="chat-input-area">
-      <!-- SUGERENCIAS RÁPIDAS (solo si no hay mensajes o al inicio) -->
+      <!-- SUGERENCIAS RÁPIDAS -->
       @if (mensajes.length <= 1) {
         <div class="sugerencias-rapidas">
           <p class="sugerencias-titulo">Sugerencias rápidas:</p>

@@ -10,7 +10,7 @@ interface Mensaje {
   texto: string;
   es_usuario: boolean;
   timestamp: Date;
-  tipo?: 'texto' | 'productos' | 'recomendacion';
+  tipo?: 'texto' | 'productos';
   productos?: any[];
 }
 
@@ -42,11 +42,11 @@ export class ChatIAComponent implements OnInit, AfterViewChecked {
 
   // ===== SUGERENCIAS =====
   sugerenciasRapidas = [
-    '¿Qué medicamento para la gripe?',
+    '¿Hay oxímetros disponibles?',
     'Medicamentos para la presión arterial',
-    'Equipos de laboratorio',
-    'Productos de farmacia',
-    'Promociones actuales'
+    'Termómetros digitales',
+    '¿Qué tomar para el dolor de cabeza?',
+    'Equipos de laboratorio'
   ];
 
   constructor(
@@ -67,7 +67,7 @@ export class ChatIAComponent implements OnInit, AfterViewChecked {
   inicializarChat() {
     const mensajeBienvenida: Mensaje = {
       id: '1',
-      texto: '👋 ¡Hola! Soy tu asistente IA de MedTools. Puedo ayudarte a encontrar medicamentos, equipos médicos y recomendaciones de salud. ¿Qué buscas hoy?\n\nPrueba preguntar sobre:\n• Síntomas o dolencias\n• Tipos de medicamentos\n• Equipos médicos\n• Promociones y ofertas',
+      texto: '👋 ¡Hola! Soy tu asistente IA de MedTools. Puedo ayudarte a encontrar medicamentos, equipos médicos y darte recomendaciones de salud.\n\n💡 Prueba preguntarme:\n• "¿Hay oxímetros disponibles?"\n• "¿Qué tomar para el dolor de cabeza?"\n• "Necesito un termómetro digital"',
       es_usuario: false,
       timestamp: new Date(),
       tipo: 'texto'
@@ -75,11 +75,16 @@ export class ChatIAComponent implements OnInit, AfterViewChecked {
     this.mensajes.push(mensajeBienvenida);
   }
 
+  // ===== FORMATEAR TEXTO =====
+  formatearTexto(texto: string): string {
+    // Convertir saltos de línea en <br>
+    return texto.replace(/\n/g, '<br>');
+  }
+
   // ===== ENVIAR MENSAJE =====
   enviarMensaje() {
     if (!this.mensajeActual.trim()) return;
 
-    // Agregar mensaje del usuario
     const mensajeUsuario: Mensaje = {
       id: `msg_${Date.now()}`,
       texto: this.mensajeActual,
@@ -93,59 +98,34 @@ export class ChatIAComponent implements OnInit, AfterViewChecked {
     this.mensajeActual = '';
     this.cargando = true;
 
-    // Obtener respuesta de IA
     this.chatIAService.obtenerRespuestaIA(pregunta, this.userId).subscribe({
       next: (response) => {
         console.log('✅ Respuesta IA:', response);
         
-        // Procesar la respuesta
-        let textRespuesta = response.respuesta || response.texto || 'No pude procesar tu solicitud';
-        let tipoRespuesta = response.tipo || 'texto';
-        let productosRespuesta = response.productos || [];
-
         const mensajeRespuesta: Mensaje = {
           id: `msg_${Date.now()}`,
-          texto: textRespuesta,
+          texto: response.respuesta || 'No pude procesar tu solicitud',
           es_usuario: false,
           timestamp: new Date(),
-          tipo: tipoRespuesta,
-          productos: productosRespuesta
+          tipo: response.tipo || 'texto',
+          productos: response.productos || []
         };
 
         this.mensajes.push(mensajeRespuesta);
         this.cargando = false;
-
-        // Guardar en historial si está logueado
-        if (this.isLoggedIn && this.userId) {
-          this.chatIAService.guardarHistorialChat(
-            this.userId,
-            pregunta,
-            textRespuesta
-          ).subscribe({
-            error: (err) => console.error('Error al guardar historial:', err)
-          });
-        }
       },
       error: (error) => {
         console.error('❌ Error:', error);
         
-        let mensajeError = '❌ Lo siento, hubo un error al procesar tu solicitud. Por favor intenta de nuevo.';
-        
-        if (error.status === 0) {
-          mensajeError = '❌ Error de conexión. Verifica que el servidor esté disponible.';
-        } else if (error.error?.detail) {
-          mensajeError = `❌ Error: ${error.error.detail}`;
-        }
-
-        const mensajeRespuestaError: Mensaje = {
+        const mensajeError: Mensaje = {
           id: `msg_${Date.now()}`,
-          texto: mensajeError,
+          texto: '❌ Lo siento, hubo un error. Por favor intenta de nuevo.',
           es_usuario: false,
           timestamp: new Date(),
           tipo: 'texto'
         };
 
-        this.mensajes.push(mensajeRespuestaError);
+        this.mensajes.push(mensajeError);
         this.cargando = false;
       }
     });
@@ -169,9 +149,7 @@ export class ChatIAComponent implements OnInit, AfterViewChecked {
         this.chatMessages.nativeElement.scrollTop = 
           this.chatMessages.nativeElement.scrollHeight;
       }
-    } catch (err) {
-      console.log('Error al hacer scroll', err);
-    }
+    } catch (err) {}
   }
 
   // ===== NAVEGACIÓN =====
@@ -195,7 +173,6 @@ export class ChatIAComponent implements OnInit, AfterViewChecked {
         this.userId = parsed.id;
         this.userName = parsed.nombre || parsed.email?.split('@')[0] || 'Usuario';
         this.userImage = parsed.imagen || 'assets/img/profile.jpeg';
-        console.log('✅ Usuario cargado:', this.userName);
       } catch (error) {
         console.error('Error al cargar usuario:', error);
       }
