@@ -599,4 +599,8 @@ export class FocoShopComponent implements AfterViewInit, OnInit, OnDestroy {
       this.userMenuOpen = false;
     }
   }
+
+  abrirChatIA() {
+    this.router.navigate(['/chat-ia']);
+  }
 }

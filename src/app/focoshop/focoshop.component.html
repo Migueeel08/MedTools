@@ -18,6 +18,12 @@
 
     <!-- LINKS DE AUTENTICACIÓN Y CARRITO -->
     <div class="auth-links">
+      <!-- CHAT CON IA -->
+      <div class="chat-header" (click)="abrirChatIA()" title="Chat con IA">
+        <i class="fas fa-robot"></i>
+        <span class="chat-label">Chat IA</span>
+      </div>
+
       <!-- ÍCONO DE FAVORITOS (solo si está logueado) -->
       @if (isLoggedIn) {
         <div class="favoritos-header" (click)="irFavoritos()">

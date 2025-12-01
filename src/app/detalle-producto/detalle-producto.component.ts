@@ -306,9 +306,29 @@ export class DetalleProductoComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.modalCheckoutVisible = true;
+    if (!this.producto?.id_producto) {
+      alert('Error: Producto no válido');
+      return;
+    }
+
+    // ✅ CARGAR DATOS ANTES DE ABRIR MODAL
     this.cargarDireccionesUsuario();
     this.cargarMetodosPagoUsuario();
+
+    // ✅ ESPERAR A QUE CARGUEN LOS DATOS (500ms)
+    setTimeout(() => {
+      this.modalCheckoutVisible = true;
+      
+      // ✅ SCROLL AL MODAL
+      setTimeout(() => {
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) {
+          modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        // ✅ AGREGAR CLASE AL BODY PARA EVITAR SCROLL
+        document.body.style.overflow = 'hidden';
+      }, 100);
+    }, 500);
   }
 
   // ===== CARGAR DIRECCIONES DEL USUARIO =====
@@ -322,11 +342,15 @@ export class DetalleProductoComponent implements OnInit, OnDestroy {
         
         if (direcciones.length > 0) {
           this.direccionSeleccionada = direcciones[0];
+          console.log('✅ Dirección seleccionada por defecto:', this.direccionSeleccionada);
+        } else {
+          console.warn('⚠️ No hay direcciones guardadas');
         }
       },
       error: (error) => {
         console.error('❌ Error cargando direcciones:', error);
         this.direcciones = [];
+        alert('No se pudieron cargar tus direcciones. Por favor intenta de nuevo.');
       }
     });
   }
@@ -339,6 +363,10 @@ export class DetalleProductoComponent implements OnInit, OnDestroy {
       next: (metodos) => {
         console.log('✅ Métodos de pago recibidos:', metodos);
         this.metodosPago = metodos;
+        
+        if (metodos.length === 0) {
+          console.warn('⚠️ No hay métodos de pago guardados');
+        }
       },
       error: (error) => {
         console.error('❌ Error cargando métodos de pago:', error);
@@ -354,6 +382,10 @@ export class DetalleProductoComponent implements OnInit, OnDestroy {
     this.metodoPagoSeleccionado = null;
     this.mostrarFormularioStripe = false;
     this.errorStripe = '';
+    
+    // ✅ REMOVER OVERFLOW HIDDEN DEL BODY
+    document.body.style.overflow = 'auto';
+    
     if (this.stripeInicializado) {
       this.stripeService.destroyElements();
       this.stripeInicializado = false;

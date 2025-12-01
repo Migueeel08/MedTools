@@ -1,17 +1,18 @@
 <div class="detalle-container">
-  <!-- HEADER PRINCIPAL (mismo de FocoShop) -->
+  <!-- HEADER PRINCIPAL - IGUAL QUE MEDTOOLS -->
   <header class="header">
     <div class="logo" (click)="volverInicio()">
-      <span class="logo-text">FOCOSHOP</span>
-      <i class="fas fa-shopping-cart"></i>
+      <i class="fas fa-heartbeat"></i>
+      <span class="logo-text">MEDTOOLS</span>
     </div>
 
     <div class="search-box">
       <input
         type="text"
-        placeholder="Buscar productos..."
+        placeholder="Buscar equipo médico..."
         [(ngModel)]="busqueda"
         (keyup.enter)="buscarProductos()"
+        disabled
       />
       <i class="fas fa-search"></i>
     </div>
@@ -23,14 +24,13 @@
           <img [src]="userImage" alt="Perfil" class="user-icon" />
 
           <div class="user-menu" [class.open]="userMenuOpen">
-            <div class="user-name-header">{{ userName }}</div>
+            <div class="user-name-header">
+              <i class="fas fa-user-md"></i>
+              {{ userName }}
+            </div>
 
             <button (click)="irPerfil()">
               <i class="fas fa-user"></i> Mi perfil
-            </button>
-
-            <button (click)="irVender()">
-              <i class="fas fa-tag"></i> Vender
             </button>
 
             <button (click)="irConfiguracion()">
@@ -45,7 +45,10 @@
           </div>
         </div>
       } @else {
-        <a [routerLink]="['/login']" class="auth-link">Iniciar Sesión</a>
+        <a [routerLink]="['/login']" class="auth-link">
+          <i class="fas fa-sign-in-alt"></i>
+          Iniciar Sesión
+        </a>
       }
     </div>
   </header>
@@ -482,7 +485,7 @@
             <i class="fas fa-shopping-bag"></i>
             Finalizar Compra
           </h2>
-          <button class="btn-close-modal" (click)="cerrarModalCheckout()">
+          <button class="btn-close-modal" (click)="cerrarModalCheckout()" type="button">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -491,43 +494,31 @@
           <!-- RESUMEN DEL PRODUCTO -->
           <div class="seccion-checkout">
             <h3><i class="fas fa-box"></i> Resumen de tu pedido</h3>
-            <div class="producto-resumen">
-              <img [src]="producto.imagen" [alt]="producto.nombre">
-              <div class="producto-resumen-info">
-                <h4>{{ producto.nombre }}</h4>
-                <p class="cantidad-resumen">Cantidad: {{ cantidadComprar }}</p>
-                @if (colorSeleccionado) {
-                  <p><strong>Color:</strong> {{ colorSeleccionado }}</p>
-                }
-                @if (tallaSeleccionada) {
-                  <p><strong>Talla:</strong> {{ tallaSeleccionada }}</p>
-                }
-              </div>
-              <div class="precio-resumen">
-                <span class="precio-unitario">${{ producto.precio | number:'1.0-0' }} c/u</span>
-                <span class="precio-total">${{ calcularTotal() | number:'1.0-0' }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- INFORMACIÓN DEL COMPRADOR -->
-          <div class="seccion-checkout">
-            <h3><i class="fas fa-user"></i> Información del comprador</h3>
-            <div class="info-comprador">
-              <div class="dato-comprador">
-                <i class="fas fa-user-circle"></i>
-                <div>
-                  <label>Nombre</label>
-                  <p>{{ userName }}</p>
+            @if (producto) {
+              <div class="producto-resumen">
+                <img [src]="producto.imagen" [alt]="producto.nombre">
+                <div class="producto-resumen-info">
+                  <h4>{{ producto.nombre }}</h4>
+                  <p class="cantidad-resumen">Cantidad: {{ cantidadComprar }}</p>
+                  @if (colorSeleccionado) {
+                    <p><strong>Color:</strong> {{ colorSeleccionado }}</p>
+                  }
+                  @if (tallaSeleccionada) {
+                    <p><strong>Talla:</strong> {{ tallaSeleccionada }}</p>
+                  }
+                </div>
+                <div class="precio-resumen">
+                  <span class="precio-unitario">${{ producto.precio | number:'1.0-0' }} c/u</span>
+                  <span class="precio-total">${{ calcularTotal() | number:'1.0-0' }}</span>
                 </div>
               </div>
-            </div>
+            }
           </div>
 
           <!-- DIRECCIÓN DE ENVÍO -->
           <div class="seccion-checkout">
             <h3><i class="fas fa-map-marker-alt"></i> Dirección de envío</h3>
-            @if (direcciones.length > 0) {
+            @if (direcciones && direcciones.length > 0) {
               <div class="direcciones-lista">
                 @for (direccion of direcciones; track direccion.id_direccion) {
                   <div 
@@ -542,10 +533,6 @@
                       <p class="direccion-titulo">{{ direccion.nombre_contacto }}</p>
                       <p>{{ direccion.calle }} {{ direccion.numero_exterior }}</p>
                       <p>{{ direccion.colonia }}, {{ direccion.ciudad }}</p>
-                      <p>{{ direccion.estado }}, {{ direccion.codigo_postal }}</p>
-                      <p class="direccion-telefono">
-                        <i class="fas fa-phone"></i> {{ direccion.telefono_contacto }}
-                      </p>
                     </div>
                   </div>
                 }
@@ -554,7 +541,7 @@
               <div class="sin-datos">
                 <i class="fas fa-map-marked-alt fa-2x"></i>
                 <p>No tienes direcciones guardadas</p>
-                <button class="btn-agregar-dato">
+                <button class="btn-agregar-dato" (click)="irConfiguracion()">
                   <i class="fas fa-plus"></i> Agregar dirección
                 </button>
               </div>
@@ -564,7 +551,7 @@
           <!-- MÉTODO DE PAGO -->
           <div class="seccion-checkout">
             <h3><i class="fas fa-credit-card"></i> Método de pago</h3>
-            @if (metodosPago.length > 0) {
+            @if (metodosPago && metodosPago.length > 0) {
               <div class="metodos-pago-lista">
                 @for (metodo of metodosPago; track metodo.id_metodo_pago) {
                   <div 
@@ -575,8 +562,6 @@
                     <div class="metodo-radio">
                       <i [class]="metodoPagoSeleccionado?.id_metodo_pago === metodo.id_metodo_pago ? 'fas fa-check-circle' : 'far fa-circle'"></i>
                     </div>
-                    
-                    <!-- Logo de la marca de tarjeta -->
                     <div class="tarjeta-logo">
                       <img 
                         [src]="obtenerLogoTarjeta(metodo)" 
@@ -584,21 +569,15 @@
                         class="logo-marca-tarjeta"
                       />
                     </div>
-                    
                     <div class="metodo-info">
                       <p class="metodo-tipo">
                         {{ obtenerNombreMarca(metodo) }}
-                        <span class="tipo-badge">{{ metodo.tipo_tarjeta === 'credito' ? 'Crédito' : 'Débito' }}</span>
                       </p>
                       <p class="metodo-numero">•••• {{ metodo.ultimos_digitos }}</p>
-                      @if (metodo.banco && !metodo.banco.toLowerCase().includes('visa') && !metodo.banco.toLowerCase().includes('mastercard')) {
-                        <p class="metodo-banco">{{ metodo.banco }}</p>
-                      }
                     </div>
                   </div>
                 }
                 
-                <!-- BOTÓN PAGAR CON NUEVA TARJETA (STRIPE) -->
                 <div class="metodo-card agregar-nuevo-stripe" (click)="pagarConNuevaTarjeta()">
                   <div class="agregar-icono stripe-icon">
                     <i class="fas fa-credit-card"></i>
@@ -607,24 +586,6 @@
                     <p class="agregar-titulo">
                       <i class="fas fa-bolt"></i> Pagar con nueva tarjeta
                     </p>
-                    <p class="agregar-descripcion">Procesado de forma segura por Stripe</p>
-                  </div>
-                  <div class="agregar-arrow">
-                    <i class="fas fa-chevron-right"></i>
-                  </div>
-                </div>
-
-                <!-- BOTÓN AGREGAR MÉTODO DE PAGO (guardar para después) -->
-                <div class="metodo-card agregar-nuevo" (click)="agregarMetodoPago()">
-                  <div class="agregar-icono">
-                    <i class="fas fa-plus-circle"></i>
-                  </div>
-                  <div class="agregar-texto">
-                    <p class="agregar-titulo">Guardar nuevo método de pago</p>
-                    <p class="agregar-descripcion">Añade una tarjeta para usar después</p>
-                  </div>
-                  <div class="agregar-arrow">
-                    <i class="fas fa-chevron-right"></i>
                   </div>
                 </div>
               </div>
@@ -632,56 +593,18 @@
               <div class="sin-datos">
                 <i class="fas fa-credit-card fa-2x"></i>
                 <p>No tienes métodos de pago guardados</p>
-                <button class="btn-agregar-dato" (click)="agregarMetodoPago()">
-                  <i class="fas fa-plus"></i> Agregar método de pago
+                <button class="btn-agregar-dato" (click)="pagarConNuevaTarjeta()">
+                  <i class="fas fa-credit-card"></i> Pagar con nueva tarjeta
                 </button>
               </div>
             }
           </div>
 
-          <!-- FORMULARIO DE PAGO CON STRIPE -->
-          @if (mostrarFormularioStripe) {
-            <div class="seccion-checkout stripe-payment-section">
-              <h3><i class="fas fa-credit-card"></i> Ingresa los datos de tu tarjeta</h3>
-              
-              <div class="stripe-form-container">
-                <div id="card-element" class="stripe-card-element"></div>
-                
-                @if (errorStripe) {
-                  <div class="stripe-error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    {{ errorStripe }}
-                  </div>
-                }
-                
-                <div class="stripe-security-info">
-                  <i class="fas fa-lock"></i>
-                  <span>Pago seguro procesado por Stripe</span>
-                </div>
-                
-                <div class="tarjetas-aceptadas">
-                  <span class="texto-tarjetas">Aceptamos:</span>
-                  <img src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons/flat/visa.svg" alt="Visa">
-                  <img src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons/flat/mastercard.svg" alt="Mastercard">
-                  <img src="https://cdn.jsdelivr.net/gh/aaronfagan/svg-credit-card-payment-icons/flat/amex.svg" alt="American Express">
-                </div>
-              </div>
-            </div>
-          }
-
           <!-- TOTAL -->
           <div class="seccion-total">
             <div class="total-desglose">
-              <div class="total-item">
-                <span>Subtotal ({{ cantidadComprar }} {{ cantidadComprar === 1 ? 'producto' : 'productos' }})</span>
-                <span>${{ calcularTotal() | number:'1.0-0' }}</span>
-              </div>
-              <div class="total-item">
-                <span>Envío</span>
-                <span class="envio-gratis">GRATIS</span>
-              </div>
               <div class="total-final">
-                <span>Total</span>
+                <span>Total a pagar</span>
                 <span>${{ calcularTotal() | number:'1.0-0' }}</span>
               </div>
             </div>
@@ -689,37 +612,20 @@
         </div>
 
         <div class="modal-footer-checkout">
-          @if (mostrarFormularioStripe) {
-            <button class="btn-cancelar" (click)="cancelarStripe()" [disabled]="procesandoStripe">
-              <i class="fas fa-times"></i> Cancelar
-            </button>
-            <button 
-              class="btn-confirmar-compra" 
-              (click)="procesarPagoConStripe()"
-              [disabled]="procesandoStripe"
-            >
-              @if (procesandoStripe) {
-                <i class="fas fa-spinner fa-spin"></i> Procesando pago...
-              } @else {
-                <i class="fas fa-lock"></i> Pagar ${{ calcularTotal() | number:'1.0-0' }}
-              }
-            </button>
-          } @else {
-            <button class="btn-cancelar" (click)="cerrarModalCheckout()">
-              <i class="fas fa-times"></i> Cancelar
-            </button>
-            <button 
-              class="btn-confirmar-compra" 
-              (click)="confirmarCompra()"
-              [disabled]="procesandoPago || !direccionSeleccionada"
-            >
-              @if (procesandoPago) {
-                <i class="fas fa-spinner fa-spin"></i> Procesando...
-              } @else {
-                <i class="fas fa-lock"></i> Confirmar Compra
-              }
-            </button>
-          }
+          <button class="btn-cancelar" (click)="cerrarModalCheckout()">
+            <i class="fas fa-times"></i> Cancelar
+          </button>
+          <button 
+            class="btn-confirmar-compra" 
+            (click)="confirmarCompra()"
+            [disabled]="procesandoPago || !direccionSeleccionada"
+          >
+            @if (procesandoPago) {
+              <i class="fas fa-spinner fa-spin"></i> Procesando...
+            } @else {
+              <i class="fas fa-lock"></i> Confirmar Compra
+            }
+          </button>
         </div>
       </div>
     </div>

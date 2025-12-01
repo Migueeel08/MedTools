@@ -16,6 +16,7 @@ import { AdminProductosComponent } from './admin/admin-productos/admin-productos
 import { AdminCategoriasComponent } from './admin/admin-categorias/admin-categorias.component';
 import { adminGuard } from './guards/admin.guard';
 import { authGuard } from './guards/auth.guard';
+import { ChatIAComponent } from './chat-ia/chat-ia.component';
 
 export const routes: Routes = [
   // Rutas públicas
@@ -89,6 +90,12 @@ export const routes: Routes = [
     path: 'admin/categorias', 
     component: AdminCategoriasComponent,
     canActivate: [adminGuard]
+  },
+  
+  // Chat IA
+  { 
+    path: 'chat-ia', 
+    component: ChatIAComponent
   },
   
   // Ruta 404
