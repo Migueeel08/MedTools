@@ -6,7 +6,7 @@
 
 /* ===== HEADER ===== */
 .admin-header {
-  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
   color: white;
   padding: 25px 40px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -34,7 +34,7 @@
 
 .btn-volver:hover {
   background: white;
-  color: #f59e0b;
+  color: #06b6d4;
   transform: translateY(-2px);
 }
 
@@ -112,7 +112,7 @@
 }
 
 .stat-mini.total i {
-  color: #f59e0b;
+  color: #06b6d4;
 }
 
 .stat-mini.activos i {
@@ -238,7 +238,7 @@
 }
 
 .btn-refresh:hover {
-  background: #f59e0b;
+  background: #06b6d4;
   color: white;
   transform: rotate(180deg);
 }
@@ -505,7 +505,7 @@
 }
 
 .modal-header {
-  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
   color: white;
   padding: 20px 25px;
   display: flex;
@@ -537,7 +537,7 @@
 
 .btn-close-modal:hover {
   background: white;
-  color: #f59e0b;
+  color: #06b6d4;
   transform: rotate(90deg);
 }
 
@@ -650,14 +650,14 @@
 }
 
 .btn-modal.btn-warning {
-  background: #f59e0b;
+  background: #06b6d4;
   color: white;
 }
 
 .btn-modal.btn-warning:hover {
-  background: #ea580c;
+  background: #0891b2;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
 }
 
 .btn-modal.btn-danger {

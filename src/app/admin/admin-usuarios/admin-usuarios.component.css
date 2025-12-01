@@ -6,7 +6,7 @@
 
 /* ===== HEADER ===== */
 .admin-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
   color: white;
   padding: 25px 40px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -34,7 +34,7 @@
 
 .btn-volver:hover {
   background: white;
-  color: #667eea;
+  color: #06b6d4;
   transform: translateY(-2px);
 }
 
@@ -295,13 +295,13 @@
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
-  background: #e0e7ff;
-  color: #667eea;
+  background: #cffafe;
+  color: #06b6d4;
 }
 
 .badge-admin {
-  background: #fef3c7;
-  color: #f59e0b;
+  background: #d1fae5;
+  color: #10b981;
 }
 
 .acciones-col {
@@ -409,7 +409,7 @@
 }
 
 .modal-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
   color: white;
   padding: 20px 25px;
   display: flex;
@@ -441,7 +441,7 @@
 
 .btn-close-modal:hover {
   background: white;
-  color: #667eea;
+  color: #06b6d4;
   transform: rotate(90deg);
 }
 
@@ -538,13 +538,14 @@
 }
 
 .btn-modal.btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
   color: white;
 }
 
 .btn-modal.btn-primary:hover {
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
 }
 
 /* ===== RESPONSIVE ===== */

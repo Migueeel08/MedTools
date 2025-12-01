@@ -6,7 +6,7 @@
 
 /* ===== HEADER ===== */
 .admin-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
   color: white;
   padding: 20px 40px;
   display: flex;
@@ -85,12 +85,12 @@
 
 .btn-inicio {
   background: white;
-  color: #667eea;
+  color: #06b6d4;
 }
 
 .btn-inicio:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
 }
 
 .btn-logout {
@@ -129,7 +129,7 @@
 
 .loading i {
   font-size: 3rem;
-  color: #667eea;
+  color: #06b6d4;
   margin-bottom: 15px;
 }
 
@@ -162,7 +162,7 @@
 }
 
 .stat-card.usuarios {
-  border-color: #2196F3;
+  border-color: #06b6d4;
 }
 
 .stat-card.productos {
@@ -188,8 +188,8 @@
 }
 
 .stat-card.usuarios .stat-icon {
-  background: rgba(76, 175, 80, 0.1);
-  color: #2196F3;
+  background: rgba(6, 182, 212, 0.1);
+  color: #06b6d4;
 }
 
 .stat-card.productos .stat-icon {
@@ -235,7 +235,7 @@
 }
 
 .actions-section h2 i {
-  color: #667eea;
+  color: #06b6d4;
 }
 
 .actions-grid {
@@ -269,7 +269,7 @@
   left: 0;
   width: 5px;
   height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
   transition: width 0.3s ease;
 }
 
@@ -290,8 +290,8 @@
 }
 
 .action-icon.usuarios {
-  background: rgba(76, 175, 80, 0.1);
-  color: #2196F3;
+  background: rgba(6, 182, 212, 0.1);
+  color: #06b6d4;
 }
 
 .action-icon.productos {
@@ -328,7 +328,7 @@
   right: 30px;
   bottom: 30px;
   font-size: 2rem;
-  color: #667eea;
+  color: #06b6d4;
   opacity: 0;
   transition: all 0.3s ease;
 }
