@@ -57,13 +57,31 @@
     <div class="chat-messages" #chatMessages>
       @for (msg of mensajes; track msg.id) {
         <div class="mensaje-wrapper" [class.usuario]="msg.es_usuario">
-          <div class="mensaje" [class.usuario]="msg.es_usuario">
-            <!-- MENSAJE DE TEXTO -->
-            @if (msg.tipo === 'texto' || !msg.productos) {
+          <div class="mensaje" [class.usuario]="msg.es_usuario" [class.mensaje-medico]="msg.tipo === 'consulta_medica' || msg.tipo === 'productos_medicos'">
+            
+            <!-- ============================================ -->
+            <!-- MENSAJE DE TEXTO SIMPLE -->
+            <!-- ============================================ -->
+            @if (msg.tipo === 'texto') {
               <p [innerHTML]="formatearTexto(msg.texto)"></p>
             }
 
-            <!-- MENSAJE CON PRODUCTOS -->
+            <!-- ============================================ -->
+            <!-- MENSAJE DE CONSULTA MÉDICA (SIN PRODUCTOS) -->
+            <!-- ============================================ -->
+            @if (msg.tipo === 'consulta_medica') {
+              <div class="mensaje-medico-contenido">
+                <div class="alerta-medica">
+                  <i class="fas fa-stethoscope"></i>
+                  <span>Consulta Médica</span>
+                </div>
+                <div [innerHTML]="formatearTexto(msg.texto)"></div>
+              </div>
+            }
+
+            <!-- ============================================ -->
+            <!-- MENSAJE CON PRODUCTOS (NORMAL) -->
+            <!-- ============================================ -->
             @if (msg.tipo === 'productos' && msg.productos && msg.productos.length > 0) {
               <p [innerHTML]="formatearTexto(msg.texto)"></p>
               
@@ -89,6 +107,42 @@
                 }
               </div>
             }
+
+            <!-- ============================================ -->
+            <!-- MENSAJE CON PRODUCTOS (MÉDICOS) -->
+            <!-- ============================================ -->
+            @if (msg.tipo === 'productos_medicos' && msg.productos && msg.productos.length > 0) {
+              <div class="mensaje-medico-contenido">
+                <div class="alerta-medica">
+                  <i class="fas fa-stethoscope"></i>
+                  <span>Recomendación Médica</span>
+                </div>
+                <div [innerHTML]="formatearTexto(msg.texto)"></div>
+              </div>
+              
+              <div class="productos-lista productos-medicos">
+                @for (prod of msg.productos; track prod.id_producto) {
+                  <div class="producto-item" (click)="irAProducto(prod.id_producto)">
+                    <img [src]="prod.imagen" [alt]="prod.nombre" class="producto-img" />
+                    <div class="producto-detalles">
+                      <h4 class="producto-nombre">{{ prod.nombre }}</h4>
+                      <p class="producto-marca">{{ prod.marca }}</p>
+                      <p class="producto-precio">${{ prod.precio | number:'1.0-0' }}</p>
+                      <div class="producto-rating">
+                        @for (star of [1,2,3,4,5]; track star) {
+                          <i class="fas fa-star" [class.filled]="star <= prod.calificacion"></i>
+                        }
+                        <span>({{ prod.reviews }})</span>
+                      </div>
+                      <button class="btn-ver-detalle">
+                        <i class="fas fa-eye"></i> Ver detalles
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+
           </div>
           <span class="timestamp">
             {{ msg.timestamp | date:'HH:mm' }}
@@ -114,7 +168,7 @@
       <!-- SUGERENCIAS RÁPIDAS -->
       @if (mensajes.length <= 1) {
         <div class="sugerencias-rapidas">
-          <p class="sugerencias-titulo">Sugerencias rápidas:</p>
+          <p class="sugerencias-titulo">💡 Sugerencias rápidas:</p>
           <div class="sugerencias-grid">
             @for (sugerencia of sugerenciasRapidas; track sugerencia) {
               <button class="btn-sugerencia" (click)="usarSugerencia(sugerencia)">

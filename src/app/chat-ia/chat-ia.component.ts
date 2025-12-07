@@ -10,7 +10,7 @@ interface Mensaje {
   texto: string;
   es_usuario: boolean;
   timestamp: Date;
-  tipo?: 'texto' | 'productos';
+  tipo?: 'texto' | 'productos' | 'consulta_medica' | 'productos_medicos';
   productos?: any[];
 }
 
@@ -43,10 +43,10 @@ export class ChatIAComponent implements OnInit, AfterViewChecked {
   // ===== SUGERENCIAS =====
   sugerenciasRapidas = [
     '¿Hay oxímetros disponibles?',
-    'Medicamentos para la presión arterial',
-    'Termómetros digitales',
     '¿Qué tomar para el dolor de cabeza?',
-    'Equipos de laboratorio'
+    'Necesito un termómetro digital',
+    'Tengo gripa, ¿qué me recomiendas?',
+    'Medicamentos para la presión arterial'
   ];
 
   constructor(
@@ -77,8 +77,22 @@ export class ChatIAComponent implements OnInit, AfterViewChecked {
 
   // ===== FORMATEAR TEXTO =====
   formatearTexto(texto: string): string {
-    // Convertir saltos de línea en <br>
-    return texto.replace(/\n/g, '<br>');
+    if (!texto) return '';
+    
+    // Convertir Markdown a HTML
+    let html = texto;
+    
+    // Bold (**texto**)
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Listas (- item o • item)
+    html = html.replace(/^[•\-]\s+(.+)$/gm, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+    
+    // Saltos de línea
+    html = html.replace(/\n/g, '<br>');
+    
+    return html;
   }
 
   // ===== ENVIAR MENSAJE =====
@@ -101,13 +115,23 @@ export class ChatIAComponent implements OnInit, AfterViewChecked {
     this.chatIAService.obtenerRespuestaIA(pregunta, this.userId).subscribe({
       next: (response) => {
         console.log('✅ Respuesta IA:', response);
+        console.log('📦 Tipo:', response.tipo);
+        console.log('📦 Productos:', response.productos?.length || 0);
+        
+        // Normalizar tipo de respuesta
+        let tipo: any = response.tipo || 'texto';
+        
+        // Si tiene productos, siempre mostrarlos
+        if (response.productos && response.productos.length > 0) {
+          tipo = tipo === 'consulta_medica' ? 'productos_medicos' : 'productos';
+        }
         
         const mensajeRespuesta: Mensaje = {
           id: `msg_${Date.now()}`,
           texto: response.respuesta || 'No pude procesar tu solicitud',
           es_usuario: false,
           timestamp: new Date(),
-          tipo: response.tipo || 'texto',
+          tipo: tipo,
           productos: response.productos || []
         };
 
@@ -119,7 +143,7 @@ export class ChatIAComponent implements OnInit, AfterViewChecked {
         
         const mensajeError: Mensaje = {
           id: `msg_${Date.now()}`,
-          texto: '❌ Lo siento, hubo un error. Por favor intenta de nuevo.',
+          texto: '❌ Lo siento, hubo un error al procesar tu consulta. Por favor intenta de nuevo.',
           es_usuario: false,
           timestamp: new Date(),
           tipo: 'texto'
@@ -146,8 +170,10 @@ export class ChatIAComponent implements OnInit, AfterViewChecked {
   scrollAlFinal() {
     try {
       if (this.chatMessages) {
-        this.chatMessages.nativeElement.scrollTop = 
-          this.chatMessages.nativeElement.scrollHeight;
+        setTimeout(() => {
+          this.chatMessages.nativeElement.scrollTop = 
+            this.chatMessages.nativeElement.scrollHeight;
+        }, 100);
       }
     } catch (err) {}
   }
